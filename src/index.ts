@@ -1,20 +1,21 @@
-console.log("typescrip")
+import * as http from "http";
+import GoogleMaps from './map'
 
-class GoogleMaps  {
+ class Server {
 
-    public name: string;
-    private map: any;
-    private options: any;
+    constructor() {
+        console.log('server')
 
-    constructor () {
-        this.name = "GoogleMap";
-        this.options = { zoom: 3, MapTypeId: 'terrian' };
-        this.map = new google.maps.Map(document.getElementById('map', ) ,{
-            center: { lat: 48.2, lng: 16.3667 },
-            scrollwheel: false,
-            zoom:10,
-            }
-        )}
+        var server = http.createServer((req, res):void => {
+            new  GoogleMaps(req)
+            res.writeHead(200, { "Content-Type": "text/plain" });
+            res.write("Hello World!!\n");
+            res.end();
+        });
+        server.listen('8080');
+    }
 }
 
-new GoogleMaps()
+new Server()
+
+
