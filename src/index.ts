@@ -1,21 +1,22 @@
-import * as http from "http";
 import GoogleMaps from './map'
 
- class Server {
+ class Request {
 
-    constructor() {
-        console.log('server')
-
-        var server = http.createServer((req, res):void => {
-            new  GoogleMaps(req)
-            res.writeHead(200, { "Content-Type": "text/plain" });
-            res.write("Hello World!!\n");
-            res.end();
-        });
-        server.listen('8080');
+    Initserver() {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", "http://localhost:8000")
+        xhr.responseType = 'json';
+        xhr.send()
+        xhr.onload = function () {
+            if (xhr.readyState === xhr.DONE) {
+                if (xhr.status === 200) {
+                    new GoogleMaps(xhr.response)
+                }
+            }
+        };
     }
 }
 
-new Server()
-
+const server = new Request()
+server.Initserver()
 
