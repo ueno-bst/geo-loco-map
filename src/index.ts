@@ -1,6 +1,6 @@
 console.log("typescrip")
 
-export class GoogleMaps  {
+class GoogleMaps  {
 
     public name: string;
     private map: any;
@@ -9,8 +9,11 @@ export class GoogleMaps  {
     constructor () {
         this.name = "GoogleMap";
         this.options = { zoom: 3, MapTypeId: 'terrian' };
-        console.log(new google.maps.Map(document.getElementById('map')))
-        this.map = new google.maps.Map(document.getElementById('map')
+        this.map = new google.maps.Map(document.getElementById('map', ) ,{
+            center: { lat: 48.2, lng: 16.3667 },
+            scrollwheel: false,
+            zoom:10,
+            }
         )}
 }
 
