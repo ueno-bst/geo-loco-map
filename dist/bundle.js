@@ -94,7 +94,7 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar map_1 = __importDefault(__webpack_require__(/*! ./map */ \"./src/map.ts\"));\nvar Request = (function () {\n    function Request() {\n    }\n    Request.prototype.Initserver = function () {\n        var xhr = new XMLHttpRequest();\n        xhr.open(\"GET\", \"http://localhost:8000\");\n        xhr.responseType = 'json';\n        xhr.send();\n        xhr.onload = function () {\n            if (xhr.readyState === xhr.DONE) {\n                if (xhr.status === 200) {\n                    new map_1.default(xhr.response);\n                }\n            }\n        };\n    };\n    return Request;\n}());\nvar server = new Request();\nserver.Initserver();\n\n\n//# sourceURL=webpack:///./src/index.ts?");
+eval("\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar map_1 = __importDefault(__webpack_require__(/*! ./map */ \"./src/map.ts\"));\nvar Request = (function () {\n    function Request() {\n        var xhr = new XMLHttpRequest();\n        xhr.open(\"GET\", \"http://localhost:8000\");\n        xhr.responseType = 'json';\n        xhr.send();\n        xhr.onload = function () {\n            if (xhr.readyState === xhr.DONE) {\n                if (xhr.status === 200) {\n                    new map_1.default(xhr.response);\n                }\n            }\n        };\n    }\n    return Request;\n}());\nnew Request();\n\n\n//# sourceURL=webpack:///./src/index.ts?");
 
 /***/ }),
 
@@ -106,7 +106,7 @@ eval("\nvar __importDefault = (this && this.__importDefault) || function (mod) {
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar GoogleMaps = (function () {\n    function GoogleMaps(req) {\n        console.log(req);\n        this.options = { zoom: 3, MapTypeId: 'terrian' };\n        this.map = new google.maps.Map(document.getElementById('map'), {\n            center: { lat: 48.2, lng: 16.3667 },\n            scrollwheel: false,\n            zoom: 10,\n        });\n        this.marker = new google.maps.Marker({\n            position: { lat: 48.3, lng: 16.3668 },\n            map: this.map\n        });\n    }\n    ;\n    return GoogleMaps;\n}());\nexports.default = GoogleMaps;\n\n\n//# sourceURL=webpack:///./src/map.ts?");
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar GoogleMaps = (function () {\n    function GoogleMaps(req) {\n        console.log(req.marker.lat);\n        this.options = { zoom: 3, MapTypeId: 'terrian' };\n        this.map = new google.maps.Map(document.getElementById('map'), {\n            center: { lat: req.marker.lat, lng: req.marker.lng },\n            scrollwheel: false,\n            zoom: 10,\n        });\n        this.marker = new google.maps.Marker({\n            position: { lat: req.marker.lat, lng: req.marker.lng },\n            map: this.map\n        });\n    }\n    ;\n    return GoogleMaps;\n}());\nexports.default = GoogleMaps;\n\n\n//# sourceURL=webpack:///./src/map.ts?");
 
 /***/ }),
 

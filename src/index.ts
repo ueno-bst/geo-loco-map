@@ -2,7 +2,7 @@ import GoogleMaps from './map'
 
  class Request {
 
-    Initserver() {
+     constructor() {
         const xhr = new XMLHttpRequest();
         xhr.open("GET", "http://localhost:8000")
         xhr.responseType = 'json';
@@ -17,6 +17,5 @@ import GoogleMaps from './map'
     }
 }
 
-const server = new Request()
-server.Initserver()
+new Request()
 
