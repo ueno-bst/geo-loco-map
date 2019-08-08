@@ -1,6 +1,8 @@
 ## パラメーター一覧  
 - lng:経度  
+  - -180.0 ~ +180.0(float) 
 - lat:緯度  
+  - -90.0 ~ +90.0(float) 
 - zoom:地図の拡大縮小  
   - Google Map:1~21  
   - Yahoo Map:1~20  
