@@ -18,7 +18,7 @@
 |物件情報の詳細、説明|description|string|||物件の説明文|
 |物件情報の詳細、説明のフォーマット|description_format|string|html||物件の説明文のフォーマットhtmlかテキストで表示するかを選択 テキストの場合 "text" 値がなければ表示しない|
 |フィードURL|feed|string|||フィードURL|
-|フィードフラグ|feed_flag|boolean|||フィードURLか詳細を表示するかのフラグ、デフォルトはフィードURLを表示させる|
+|フィードフラグ|feed_flag|boolean|true||フィードURLか詳細を表示するかのフラグ、デフォルトはフィードURLを表示させる|
 |マーカーフラグ|marker_display|boolean|true||マーカーを表示させるかしないかのフラグ デフォルトは表示|
 |座標|coordinate|array||coordinate[lat: lng:]||取得した不動産の緯度経度の座標データ この座標データに対してマーカを立てる
 
