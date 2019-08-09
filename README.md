@@ -20,18 +20,17 @@
 |フィードURL|feed|string||フィードURL|
 |フラグ|feeed_flag|boolean||フィードURLか詳細を表示するかのフラグ、デフォルトはフィードURLを表示させる|
 |マーカーフラグ|marker_flag|boolean||マーカーを表示させるかしないかのフラグ|
-
 |座標|coordinate|array|coordinate[lat: lng:]|取得した不動産の緯度経度の座標データ この座標データに対してマーカを立てる
 |ズーム|zoom|string|地図の拡大縮小 Google Map:1~21, Yahoo Map:1~20,Open Street Map: 1~19 |
 
 ## geo-loco-map初期表示パラメータ
-|論理名|名前|型|フォーマット|説明|
+|論理名|名前|型|フォーマット|デフォルト値|説明|
 |:---|:---|:---|:---|:---|
-|中心地|latlng|array|latlng[]|表示させる地図の中心地|
-|ズーム|zoom|int||地図表示のズーム Google Map 1~21, Yahoo Map 1~20|
-|インターフェイス|element|boolean||地図上のインターフェースの表示、非表示のフラグ|
-|グリッド|grid||int|一つのあたりのグリッドの距離　デフォルトは5km|
-|遅延秒数|lazy_load|int||地図をスクロールして止めた際にAPIにリクエスト送る秒数 デフォルトは0.5秒|
+|中心地|latlng|array|latlng[]||表示させる地図の中心地|
+|ズーム|zoom|int||10|地図表示のズーム Google Map 1~21, Yahoo Map 1~20|
+|インターフェイス|element|boolean||true|地図上のインターフェースの表示、非表示のフラグ|
+|グリッド|grid|int||5|一つのあたりのグリッドの距離|
+|遅延秒数|lazy_load|int||0.5|地図をスクロールして止めた際にAPIにリクエスト送る秒数|
 
 
 
