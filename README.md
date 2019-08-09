@@ -19,8 +19,8 @@
 |物件情報の詳細、説明のフォーマット|description_format|string|html||物件の説明文のフォーマットhtmlかtextで表示するかを選択 値がなければ表示しない|
 |フィードURL|feed|string|||フィードURL|
 |フィードフラグ|feed_flag|boolean|||フィードURLか詳細を表示するかのフラグ、デフォルトはフィードURLを表示させる|
-|マーカーフラグ|marker_flag|boolean|||マーカーを表示させるかしないかのフラグ|
-|座標|coordinate|array||coordinate[lat: lng:]|取得した不動産の緯度経度の座標データ この座標データに対してマーカを立てる
+|マーカーフラグ|marker_display|boolean||true|マーカーを表示させるかしないかのフラグ デフォルトは表示|
+|座標|coordinate|array|||coordinate[lat: lng:]|取得した不動産の緯度経度の座標データ この座標データに対してマーカを立てる
 
 ## geo-loco-map初期表示パラメータ
 
