@@ -5,7 +5,7 @@
 |:---|:---|:---|:---|
 |経度|lng|float|位置情報を取得する基準値|
 |緯度|lat|float|位置情報を取得する基準値|
-|APIURL|api_url|string|リクエスト先のAPI|
+|APIのURL|api_url|string|リクエスト先のAPI|
 
 
 
