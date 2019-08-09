@@ -16,7 +16,7 @@
 |物件情報のURL|url|string|||物件情報のurl|
 |ラベル|label|string|||物件の名前|
 |物件情報の詳細、説明|description|string|||物件の説明文|
-|物件情報の詳細、説明のフォーマット|description_format|string|html||物件の説明文のフォーマットhtmlかtextで表示するかを選択 値がなければ表示しない|
+|物件情報の詳細、説明のフォーマット|description_format|string|html||物件の説明文のフォーマットhtmlかテキストで表示するかを選択 テキストの場合 "text" 値がなければ表示しない|
 |フィードURL|feed|string|||フィードURL|
 |フィードフラグ|feed_flag|boolean|||フィードURLか詳細を表示するかのフラグ、デフォルトはフィードURLを表示させる|
 |マーカーフラグ|marker_display|boolean|true||マーカーを表示させるかしないかのフラグ デフォルトは表示|
@@ -26,6 +26,7 @@
 
 |論理名|名前|型|フォーマット|デフォルト値|説明|
 |:---|:---|:---|:---|:---|:---|
+|地図の種類|map_type|string||google|Google Map or Yahoo Mapで表示させるか|
 |中心地|latlng|array|latlng[]||表示させる地図の中心地|
 |ズーム|zoom|int||10|地図表示のズーム Google Map 1~21, Yahoo Map 1~20|
 |インターフェイス|element_flag|boolean||true|地図上のインターフェースの表示、非表示のフラグ|
