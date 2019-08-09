@@ -5,7 +5,6 @@
 |:---|:---|:---|:---|
 |経度|lng|float|位置情報を取得する基準値|
 |緯度|lat|float|位置情報を取得する基準値|
-|APIのURL|api_url|string|リクエスト先のAPI|
 
 
 
@@ -35,6 +34,8 @@
 |グリッド|grid|int||5|一つのあたりのグリッドの距離 単位はkm|
 |遅延秒数|lazy_load|int||0.5|地図をスクロールして止めた際にAPIにリクエスト送る秒数|
 |セレクタ|selector|string|||地図を表示させるセレクタ|
+|APIのURL|api_url|string|||リクエスト先のAPI|
+
 
 
 
