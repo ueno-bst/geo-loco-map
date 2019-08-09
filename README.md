@@ -16,7 +16,5 @@
 |物件情報のURL|url|string||物件情報のurl|
 |ラベル|label|string||物件の名前|
 |物件情報の詳細、説明|description|string||物件の説明文|
-
-
 |座標|coordinate|array|coordinate[lat: lng:]|取得した不動産の緯度経度の座標データ この座標データに対してマーカを立てる
 |ズーム|zoom|string|地図の拡大縮小 Google Map:1~21, Yahoo Map:1~20,Open Street Map: 1~19 |
