@@ -20,7 +20,7 @@
 |フィードURL|feed|string|||フィードURL|
 |フィードフラグ|feed_flag|boolean|||フィードURLか詳細を表示するかのフラグ、デフォルトはフィードURLを表示させる|
 |マーカーフラグ|marker_display|boolean|true||マーカーを表示させるかしないかのフラグ デフォルトは表示|
-|座標|coordinate|array|||coordinate[lat: lng:]|取得した不動産の緯度経度の座標データ この座標データに対してマーカを立てる
+|座標|coordinate|array||coordinate[lat: lng:]||取得した不動産の緯度経度の座標データ この座標データに対してマーカを立てる
 
 ## geo-loco-map初期表示パラメータ
 
