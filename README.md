@@ -30,7 +30,7 @@
 |中心地|latlng|array|latlng[]||表示させる地図の中心地|
 |ズーム|zoom|int||10|地図表示のズーム Google Map 1~21, Yahoo Map 1~20|
 |インターフェイス|element_flag|boolean||true|地図上のインターフェースの表示、非表示のフラグ|
-|グリッド|grid|int||5|一つのあたりのグリッドの距離|
+|グリッド|grid|int||5|一つのあたりのグリッドの距離 単位はkm|
 |遅延秒数|lazy_load|int||0.5|地図をスクロールして止めた際にAPIにリクエスト送る秒数|
 |セレクタ|selector|string|||地図を表示させるセレクタ|
 
