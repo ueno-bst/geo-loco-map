@@ -1,21 +1,26 @@
-import GoogleMaps from './map'
+import RequestControllers from './controllers/RequestControllers'
+import MapsControllers from './controllers/MapsControllers'
+import { IMaps, Maps }  from './entities/Maps'
+import { ICoordinate} from "./entities/Coordinate";
 
- class Request {
+export class GeoLocoMap {
+    maps: IMaps
 
-     constructor() {
-        const xhr = new XMLHttpRequest();
-        xhr.open("GET", "http://localhost:8000")
-        xhr.responseType = 'json';
-        xhr.send()
-        xhr.onload = function () {
-            if (xhr.readyState === xhr.DONE) {
-                if (xhr.status === 200) {
-                    new GoogleMaps(xhr.response)
-                }
-            }
-        };
+    constructor(maps: IMaps)
+    {
+        this.maps = maps
+    }
+
+    InitMaps(){
+        new  MapsControllers(this.maps)
+    }
+
+    request(req: ICoordinate) {
+        new RequestControllers(req)
     }
 }
 
-new Request()
+const geolocomap = new GeoLocoMap({latlng: [35.658581, 139.745433],selector: 'map', api_url: 'http://localhost:9000'})
+//geolocomap.InitMaps()
 
+geolocomap.request({lat: 35.658581, lng:139.745433})

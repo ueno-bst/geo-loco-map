@@ -86,6 +86,66 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./src/controllers/MapsControllers.ts":
+/*!********************************************!*\
+  !*** ./src/controllers/MapsControllers.ts ***!
+  \********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar MapsUseCase_1 = __importDefault(__webpack_require__(/*! ../usecases/MapsUseCase */ \"./src/usecases/MapsUseCase.ts\"));\nvar MapsControllers = (function () {\n    function MapsControllers(maps) {\n        this.maps = maps;\n        var mapsUsecase = new MapsUseCase_1.default(this.maps);\n        mapsUsecase.execute();\n    }\n    return MapsControllers;\n}());\nexports.default = MapsControllers;\n\n\n//# sourceURL=webpack:///./src/controllers/MapsControllers.ts?");
+
+/***/ }),
+
+/***/ "./src/controllers/RequestControllers.ts":
+/*!***********************************************!*\
+  !*** ./src/controllers/RequestControllers.ts ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar RequestUseCase_1 = __importDefault(__webpack_require__(/*! ../usecases/RequestUseCase */ \"./src/usecases/RequestUseCase.ts\"));\nvar RequestControllers = (function () {\n    function RequestControllers(req) {\n        var request = new RequestUseCase_1.default(req);\n        request.RequestUseCase();\n    }\n    return RequestControllers;\n}());\nexports.default = RequestControllers;\n\n\n//# sourceURL=webpack:///./src/controllers/RequestControllers.ts?");
+
+/***/ }),
+
+/***/ "./src/entities/GoogleMap.ts":
+/*!***********************************!*\
+  !*** ./src/entities/GoogleMap.ts ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nvar __assign = (this && this.__assign) || function () {\n    __assign = Object.assign || function(t) {\n        for (var s, i = 1, n = arguments.length; i < n; i++) {\n            s = arguments[i];\n            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))\n                t[p] = s[p];\n        }\n        return t;\n    };\n    return __assign.apply(this, arguments);\n};\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar Maps_1 = __webpack_require__(/*! ../entities/Maps */ \"./src/entities/Maps.ts\");\nvar GoogleMapEntiry = (function () {\n    function GoogleMapEntiry(maps) {\n        if (maps === void 0) { maps = {}; }\n        var opts = __assign({}, Maps_1.Maps, maps);\n        this.maps = opts;\n        this.options = { zoom: 3, MapTypeId: 'terrian' };\n        this.map = new google.maps.Map(document.getElementById(this.maps.selector), {\n            center: { lat: 35.681236, lng: 139.767125 },\n            scrollwheel: false,\n            zoom: this.maps.zoom,\n        });\n    }\n    GoogleMapEntiry.prototype.requestMap = function (coordinate, reponse) {\n        this.map = new google.maps.Map(document.getElementById('map'), {\n            center: { lat: coordinate.lat, lng: coordinate.lng },\n            scrollwheel: false,\n            zoom: this.maps.zoom,\n        });\n        for (var i = 0; i < reponse.length; i++) {\n            var markerLatLng = new google.maps.LatLng({ lat: reponse[i].lat, lng: reponse[i].lng });\n            this.marker = new google.maps.Marker({\n                position: { lat: 35.681236, lng: 139.767125 },\n                map: this.map\n            });\n        }\n    };\n    return GoogleMapEntiry;\n}());\nexports.GoogleMapEntiry = GoogleMapEntiry;\n\n\n//# sourceURL=webpack:///./src/entities/GoogleMap.ts?");
+
+/***/ }),
+
+/***/ "./src/entities/Maps.ts":
+/*!******************************!*\
+  !*** ./src/entities/Maps.ts ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.Maps = {\n    map_type: 'google',\n    latlng: [35.681236, 139.767125],\n    zoom: 16,\n    element_flag: true,\n    grid: 5,\n    lazy_load: 0.5,\n    selector: 'map',\n    api_url: 'localhost:8000'\n};\n\n\n//# sourceURL=webpack:///./src/entities/Maps.ts?");
+
+/***/ }),
+
+/***/ "./src/entities/Request.ts":
+/*!*********************************!*\
+  !*** ./src/entities/Request.ts ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar GoogleMap_1 = __webpack_require__(/*! ./GoogleMap */ \"./src/entities/GoogleMap.ts\");\nvar RequestEntity = (function () {\n    function RequestEntity() {\n    }\n    RequestEntity.prototype.xmlHttpRequest = function (coordinate) {\n        var xhr = new XMLHttpRequest();\n        xhr.open(\"GET\", \"http://localhost:8000\");\n        xhr.responseType = 'json';\n        xhr.send();\n        xhr.onload = function () {\n            if (xhr.readyState === xhr.DONE) {\n                if (xhr.status === 200) {\n                    var googlemap = new GoogleMap_1.GoogleMapEntiry();\n                    googlemap.requestMap(coordinate, xhr.response);\n                }\n            }\n        };\n    };\n    return RequestEntity;\n}());\nexports.RequestEntity = RequestEntity;\n\n\n//# sourceURL=webpack:///./src/entities/Request.ts?");
+
+/***/ }),
+
 /***/ "./src/index.ts":
 /*!**********************!*\
   !*** ./src/index.ts ***!
@@ -94,19 +154,31 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar map_1 = __importDefault(__webpack_require__(/*! ./map */ \"./src/map.ts\"));\nvar Request = (function () {\n    function Request() {\n        var xhr = new XMLHttpRequest();\n        xhr.open(\"GET\", \"http://localhost:8000\");\n        xhr.responseType = 'json';\n        xhr.send();\n        xhr.onload = function () {\n            if (xhr.readyState === xhr.DONE) {\n                if (xhr.status === 200) {\n                    new map_1.default(xhr.response);\n                }\n            }\n        };\n    }\n    return Request;\n}());\nnew Request();\n\n\n//# sourceURL=webpack:///./src/index.ts?");
+eval("\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar RequestControllers_1 = __importDefault(__webpack_require__(/*! ./controllers/RequestControllers */ \"./src/controllers/RequestControllers.ts\"));\nvar MapsControllers_1 = __importDefault(__webpack_require__(/*! ./controllers/MapsControllers */ \"./src/controllers/MapsControllers.ts\"));\nvar GeoLocoMap = (function () {\n    function GeoLocoMap(maps) {\n        this.maps = maps;\n    }\n    GeoLocoMap.prototype.InitMaps = function () {\n        new MapsControllers_1.default(this.maps);\n    };\n    GeoLocoMap.prototype.request = function (req) {\n        new RequestControllers_1.default(req);\n    };\n    return GeoLocoMap;\n}());\nexports.GeoLocoMap = GeoLocoMap;\nvar geolocomap = new GeoLocoMap({ latlng: [35.658581, 139.745433], selector: 'map', api_url: 'http://localhost:9000' });\ngeolocomap.InitMaps();\ngeolocomap.request({ lat: 35.658581, lng: 139.745433 });\n\n\n//# sourceURL=webpack:///./src/index.ts?");
 
 /***/ }),
 
-/***/ "./src/map.ts":
-/*!********************!*\
-  !*** ./src/map.ts ***!
-  \********************/
+/***/ "./src/usecases/MapsUseCase.ts":
+/*!*************************************!*\
+  !*** ./src/usecases/MapsUseCase.ts ***!
+  \*************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar GoogleMaps = (function () {\n    function GoogleMaps(req) {\n        console.log(req.marker.lat);\n        this.options = { zoom: 3, MapTypeId: 'terrian' };\n        this.map = new google.maps.Map(document.getElementById('map'), {\n            center: { lat: req.marker.lat, lng: req.marker.lng },\n            scrollwheel: false,\n            zoom: 10,\n        });\n        this.marker = new google.maps.Marker({\n            position: { lat: req.marker.lat, lng: req.marker.lng },\n            map: this.map\n        });\n    }\n    ;\n    return GoogleMaps;\n}());\nexports.default = GoogleMaps;\n\n\n//# sourceURL=webpack:///./src/map.ts?");
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar GoogleMap_1 = __webpack_require__(/*! ../entities/GoogleMap */ \"./src/entities/GoogleMap.ts\");\nvar MapsUseCase = (function () {\n    function MapsUseCase(maps) {\n        this.imaps = maps;\n    }\n    MapsUseCase.prototype.execute = function () {\n        new GoogleMap_1.GoogleMapEntiry(this.imaps);\n    };\n    return MapsUseCase;\n}());\nexports.default = MapsUseCase;\n\n\n//# sourceURL=webpack:///./src/usecases/MapsUseCase.ts?");
+
+/***/ }),
+
+/***/ "./src/usecases/RequestUseCase.ts":
+/*!****************************************!*\
+  !*** ./src/usecases/RequestUseCase.ts ***!
+  \****************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar Request_1 = __webpack_require__(/*! ../entities/Request */ \"./src/entities/Request.ts\");\nvar RequestUseCase = (function () {\n    function RequestUseCase(coordinate) {\n        this.coodinate = coordinate;\n    }\n    RequestUseCase.prototype.RequestUseCase = function () {\n        var request = new Request_1.RequestEntity();\n        request.xmlHttpRequest(this.coodinate);\n    };\n    return RequestUseCase;\n}());\nexports.default = RequestUseCase;\n\n\n//# sourceURL=webpack:///./src/usecases/RequestUseCase.ts?");
 
 /***/ }),
 
