@@ -30,11 +30,6 @@ export class GoogleMapEntiry {
                 zoom: this.maps.zoom,
             }
         )
-        //this.marker = new google.maps.Marker({
-        //    position: { lat: 35.681236, lng:139.767125 },
-        //    map: this.map
-        //})
-
     }
 
     requestMap(coordinate: ICoordinate, reponse: IResponseEntity[]) {
@@ -47,6 +42,7 @@ export class GoogleMapEntiry {
         )
 
         for (var i = 0; i < reponse.length; i++) {
+            console.log(reponse)
             const markerLatLng = new google.maps.LatLng({lat: reponse[i]['lat'], lng: reponse[i]['lng']}); // 緯度経度のデータ作成
             this.marker = new google.maps.Marker({ // マーカーの追加
                 position: markerLatLng, // マーカーを立てる位置を指定
