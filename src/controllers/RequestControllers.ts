@@ -3,8 +3,8 @@ import { ICoordinate } from '../entities/Coordinate'
 
 export default class RequestControllers {
 
-    constructor(req: ICoordinate) {
-        const request = new RequestUseCase(req)
+    constructor(req: ICoordinate, url: string) {
+        const request = new RequestUseCase(req, url)
         request.RequestUseCase()
     }
 }

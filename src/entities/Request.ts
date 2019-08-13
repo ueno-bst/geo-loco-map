@@ -3,9 +3,9 @@ import {GoogleMapEntiry} from "./GoogleMap";
 
 export class RequestEntity {
 
-    xmlHttpRequest(coordinate: ICoordinate) {
+    xmlHttpRequest(coordinate: ICoordinate, url: string) {
         const xhr = new XMLHttpRequest();
-        xhr.open("GET", "http://localhost:8000")
+        xhr.open("GET", url)
         xhr.responseType = 'json';
         xhr.send()
         xhr.onload = function () {

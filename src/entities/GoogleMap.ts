@@ -55,7 +55,6 @@ export class GoogleMapEntiry {
             })
             this.markerEvent(i);
 
-            console.log('aaaaaaaaa')
         }
 
     }

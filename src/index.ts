@@ -15,12 +15,12 @@ export class GeoLocoMap {
         new  MapsControllers(this.maps)
     }
 
-    request(req: ICoordinate) {
-        new RequestControllers(req)
+    request(req: ICoordinate, url = this.maps.api_url) {
+        new RequestControllers(req, url)
     }
 }
 
-const geolocomap = new GeoLocoMap({latlng: [35.658581, 139.745433],selector: 'map', api_url: 'http://localhost:9000'})
+const geolocomap = new GeoLocoMap({latlng: [35.658581, 139.745433],selector: 'map', api_url: 'http://localhost:8000'})
 //geolocomap.InitMaps()
 
 geolocomap.request({lat: 35.658581, lng:139.745433})
