@@ -1,4 +1,4 @@
-import { IMaps, Maps } from '../entities/Maps'
+import { IMaps, Maps } from './Maps'
 import { ICoordinate} from "./Coordinate";
 import { IResponseEntity } from "./Response";
 
@@ -34,8 +34,8 @@ export class GoogleMapEntiry {
         )
     }
 
-    requestMap(coordinate: ICoordinate, reponse: IResponseEntity[]) {
-
+    requestMap(coordinate: ICoordinate, response: any) {
+        console.log(response)
         this.map = new google.maps.Map(document.getElementById('map') ,{
                 center: { lat: coordinate.lat, lng: coordinate.lng },
                 scrollwheel: false,
@@ -43,15 +43,14 @@ export class GoogleMapEntiry {
             }
         )
 
-        for (var i = 0; i < reponse.length; i++) {
-            const markerLatLng = new google.maps.LatLng({lat: reponse[i]['lat'], lng: reponse[i]['lng']}); // 緯度経度のデータ作成
+        for (var i = 0; i < response['data'].length; i++) {
+            const markerLatLng = new google.maps.LatLng({lat: response['data'][i]['coordinate'][0], lng: response['data'][i]['coordinate'][1]}); // 緯度経度のデータ作成
             this.marker = new google.maps.Marker({
                 position: markerLatLng,
                 map: this.map
             });
-            console.log(reponse[i])
             this.info = new google.maps.InfoWindow({
-                content: '<div class="detail">'+ reponse[i]['url']+'</div>'
+                content: '<div class="detail">'+ response['data'][i]['url']+'</div>'
             })
             this.markerEvent(i);
 
