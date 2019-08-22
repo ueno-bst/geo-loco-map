@@ -1,20 +1,36 @@
 import { ICoordinate } from "../entities/Coordinate"
-import { RequestEntity } from "../entities/Request"
+import { API } from "../entities/Request"
+import {GoogleMapEntiry} from "../entities/GoogleMap";
+import { IMaps} from "../entities/Maps";
 
 export default class RequestUseCase {
     coodinate: ICoordinate;
-    url: string
-    map_type: string
+    maps: IMaps
+    response: any
 
-    constructor(coordinate: ICoordinate, url: string, map_type: string) {
+    constructor(coordinate: ICoordinate, maps: IMaps) {
         this.coodinate = coordinate
-        this.url = url
-        this.map_type = map_type
+        this.maps = maps
+        this.response =  API.request(maps, coordinate)
     }
 
-    RequestUseCase() {
-        const request = new RequestEntity()
-        request.xmlHttpRequest(this.coodinate, this.url, this.map_type)
-    }
+
+    //static test(maps: IMaps,coordinate: ICoordinate) {
+    //    return async () => {
+    //        await API.request(maps, coordinate)
+    //    }
+    //}
+
+
+
+    //addMarker() {
+    //    const google = new GoogleMapEntiry()
+    //    google.addMarker( this.coodinate)
+    //}
+    //removeMarker() {
+    //    const google = new GoogleMapEntiry()
+    //    google.addMarker( this.coodinate)
+    //}
+
 
 }

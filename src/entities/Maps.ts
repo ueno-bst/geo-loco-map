@@ -12,7 +12,7 @@ export interface IMaps {
 export const Maps: IMaps =  {
     map_type: 'google',
     latlng:  [35.681236,139.767125],
-    zoom: 16,
+    zoom: 13,
     element_flag:true,
     grid: 5,
     lazy_load: 0.5,

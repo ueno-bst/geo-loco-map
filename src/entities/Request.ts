@@ -1,29 +1,72 @@
 import { ICoordinate } from "./Coordinate";
-import {GoogleMapEntiry} from "./GoogleMap";
+import {GoogleMapRequestEntiry} from "./GoogleMapRequest";
+import { IMaps} from "./Maps";
 import {YahooMapEntity} from "./YahooMap";
 
-export class RequestEntity {
 
-    xmlHttpRequest(coordinate: ICoordinate, url: string, map_type: string) {
-        const xhr = new XMLHttpRequest();
-        xhr.open("GET", url,true)
-        xhr.responseType = 'json';
-        xhr.send()
-        xhr.onload = function () {
-            if (xhr.readyState === xhr.DONE) {
-                if (xhr.status === 200) {
+export class API {
 
-                    if (map_type == 'yahoo') {
-                        const yahoomap = new YahooMapEntity()
-                        yahoomap.requestMap(coordinate, xhr.response)
+    coordinate: ICoordinate
+    maps: IMaps
+    response: any
 
-                    }else {
-                        const googlemap = new GoogleMapEntiry()
-                        googlemap.requestMap(coordinate, xhr.response)
-                    }
-                }
-            }
-        };
+    constructor(coordinate: ICoordinate, maps: IMaps )  {
+        this.coordinate = coordinate
+        this.maps = maps
+        this.response = API.request(this.maps,this.coordinate)
+    }
 
+
+    static async request(maps: any, coordinate: ICoordinate) {
+        var res = await fetch(maps.maps.api_url)
+            .then(res => res.json())
+
+
+        if (maps.maps.map_type == 'google') {
+            new GoogleMapRequestEntiry(coordinate, maps.maps, res)
+        } else if (maps.maps.map_type == 'yahoo') {
+            new YahooMapEntity().addMarker(coordinate, res,true)
+        }
+
+       return RequestEntity.fromJSON(res);
+    }
+
+}
+
+class Marker {
+
+    coordinate: number[]
+    description:string
+    description_format: string
+    label: string
+    marker_display: boolean
+    url: string
+
+    constructor(arg: any) {
+        this.coordinate = arg['coordinate'];
+        this.description = arg['description'];
+        this.description_format = arg['description_format'];
+        this.label = arg['label'];
+        this.marker_display = arg['marker_display'];
+        this.url = arg['url'];
     }
 }
+class RequestEntity {
+    json: any[] = []
+
+    static fromJSON(res: any) {
+        var obj = new RequestEntity();
+
+        for (var index = 0; index < res.data.length; index++) {
+            obj.json[index] = new Marker(res.data[index])
+        }
+        return obj;
+    }
+
+}
+
+
+
+
+
+
