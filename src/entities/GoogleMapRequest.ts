@@ -5,15 +5,18 @@ import {readdirSync} from "fs";
 
 export class GoogleMapRequestEntiry {
 
-    marker: google.maps.Marker[] = []
+    markers: google.maps.Marker[] = []
     info: google.maps.InfoWindow
     maps: google.maps.Map
     map: IMaps
+    coordinate: ICoordinate
 
 
 
     constructor(coordinate: ICoordinate, maps: IMaps, response: any) {
+        this.coordinate = coordinate
         this.map = maps
+
 
         this.info = new google.maps.InfoWindow
 
@@ -25,11 +28,13 @@ export class GoogleMapRequestEntiry {
         )
 
 
+        var marker: google.maps.Marker[] = []
         for (var i = 0; i < response['data'].length; i++) {
+
 
             if(response['data'][i]['marker_display']) {
                 const markerLatLng = new google.maps.LatLng({lat: response['data'][i]['coordinate'][0], lng: response['data'][i]['coordinate'][1]});
-                this.marker[i] = new google.maps.Marker({
+                this.markers[i] = new google.maps.Marker({
                     position: markerLatLng,
                     map: this.maps
                 });
@@ -50,20 +55,12 @@ export class GoogleMapRequestEntiry {
                 }
                 this.markerEvent(i);
 
-
             }
 
         }
+        this.markers = marker
     }
 
-    markerEvent(i:number) {
-        const marker =  this.marker[i]
-        const info =  this.info
-        const map = this.maps
-        this.marker[i].addListener('click', function() {
-            info.open(map, marker);
-        });
-    }
 
     addMarker(coordinate: ICoordinate){
 
@@ -78,15 +75,49 @@ export class GoogleMapRequestEntiry {
     deleteMarker(id:number,response: any) {
 
         response.then(res => {
-            var res = res.json[1]
-            const markerLatLng = new google.maps.LatLng({lat: res.coordinate[0], lng: res.coordinate[1]}); // 緯度経度のデータ作成
-            var marker = new google.maps.Marker({
-                position: markerLatLng,
-                map:this.maps
-            });
-            console.log(this.maps)
-            marker.setMap(null);
+            var maps = new google.maps.Map(document.getElementById('map') ,{
+                    center: { lat: this.coordinate.lat, lng: this.coordinate.lng },
+                    scrollwheel: false,
+                    zoom: 12
+                }
+            )
+
+            for(var i = 0; i < res.json.length; i++) {
+
+                if(res.json[i].marker_display && res.json[i].id != id) {
+                    const markerLatLng = new google.maps.LatLng({lat: res.json[i].coordinate[0], lng: res.json[i].coordinate[1]}); // 緯度経度のデータ作成
+                    this.markers[i] = new google.maps.Marker({
+                        position: markerLatLng,
+                        map:maps
+                    });
+                    var description = res.json[i].description
+                    var description_format = res.json[i].description_format
+
+                    if(description_format ==  'text') {
+                        var format: string = description
+                        this.info = new google.maps.InfoWindow({
+                            content:  format
+                        })
+                    } else if (description_format == 'html') {
+                        var format: string =  '<div class="detail">'+ description+'</div>'
+                        this.info = new google.maps.InfoWindow({
+                            content:  format
+                        })
+                    }
+                    this.markerEvent(i);
+                }
+            }
+
         })
+    }
+
+    markerEvent(i:number) {
+        const marker =  this.markers[i]
+        const info =  this.info
+        const map = this.maps
+        this.markers[i].addListener('click', function() {
+            info.open(map, marker);
+        });
     }
 }
 

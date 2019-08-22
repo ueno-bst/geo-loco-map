@@ -11,7 +11,7 @@ export default class RequestUseCase {
     constructor(coordinate: ICoordinate, maps: IMaps) {
         this.coodinate = coordinate
         this.maps = maps
-        this.response =  API.request(maps, coordinate)
+        this.response =  new API( coordinate,maps)
     }
 
 

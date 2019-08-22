@@ -19,8 +19,8 @@ export default class MapsControllers {
     addMarker(coorinate: ICoordinate) {
         new MapsUseCase(this.maps).addMarker(coorinate)
     }
-    deleteMarker(id:number, reponse: any) {
-        new MapsUseCase(this.maps).deleteMarker(id,reponse)
+    deleteMarker(id:number, response: any) {
+        new MapsUseCase(this.maps).deleteMarker(id,response)
     }
 
 }

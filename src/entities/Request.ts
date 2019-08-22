@@ -13,12 +13,12 @@ export class API {
     constructor(coordinate: ICoordinate, maps: IMaps )  {
         this.coordinate = coordinate
         this.maps = maps
-        this.response = API.request(this.maps,this.coordinate)
+        this.response = this.request(maps,coordinate)
     }
 
 
-    static async request(maps: any, coordinate: ICoordinate) {
-        var res = await fetch(maps.maps.api_url)
+    async  request(maps: any, coordinate: ICoordinate) {
+        var res =  await fetch(maps.maps.api_url)
             .then(res => res.json())
 
 
@@ -35,6 +35,7 @@ export class API {
 
 class Marker {
 
+    id: number
     coordinate: number[]
     description:string
     description_format: string
@@ -43,6 +44,7 @@ class Marker {
     url: string
 
     constructor(arg: any) {
+        this.id = arg['id'];
         this.coordinate = arg['coordinate'];
         this.description = arg['description'];
         this.description_format = arg['description_format'];

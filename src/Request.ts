@@ -7,7 +7,7 @@ import {API} from "./entities/Request";
 export class Request {
 
     coordinate: ICoordinate
-    request: RequestControllers
+    private request: RequestControllers
 
     constructor(coordinate: ICoordinate, maps: any) {
 
@@ -22,6 +22,6 @@ export class Request {
     }
 
     deleteMarker(id: number) {
-        new MapsControllers(this.request.request.maps).deleteMarker(id,this.request.request.response)
+        new MapsControllers(this.request.request.maps).deleteMarker(id,this.request.request.response.response)
     }
 }

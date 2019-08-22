@@ -19,9 +19,6 @@ export default class GeoLocoMap {
     request(coordinate: ICoordinate) {
         var response = new Request(coordinate,this.drawMap)
 
-        response.request.request.response.then(res =>
-            console.log(res.json))
-
         return response
 
     }
@@ -74,8 +71,9 @@ export default class GeoLocoMap {
 
 }
 
-var  response  = new GeoLocoMap({map_type: 'yahoo',latlng: [35.658581, 139.745433],selector: 'map', api_url: 'http://localhost:8888/response.php'}).request({lat: 35, lng:135 })
+var  response  = new GeoLocoMap({map_type: 'google',latlng: [35.658581, 139.745433],selector: 'map', api_url: 'http://localhost:8888/response.php'}).request({lat: 35, lng:135 })
 
-//console.log(response.deleteMarker(1))
-console.log(response.addMarker({lat:35,  lng:135}))
+//console.log(response)
+console.log(response.deleteMarker(2))
+//console.log(response.addMarker({lat:35,  lng:135}))
 
