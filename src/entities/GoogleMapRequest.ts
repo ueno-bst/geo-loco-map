@@ -1,6 +1,5 @@
 import { ICoordinate} from "./Coordinate";
 import { IMaps} from "./Maps";
-import {readdirSync} from "fs";
 
 
 export class GoogleMapRequestEntiry {
@@ -13,7 +12,8 @@ export class GoogleMapRequestEntiry {
 
 
 
-    constructor(coordinate: ICoordinate, maps: IMaps, response: any) {
+    constructor(coordinate: ICoordinate, maps: IMaps, response: any, addMarker: boolean = false) {
+
         this.coordinate = coordinate
         this.map = maps
 
@@ -29,6 +29,16 @@ export class GoogleMapRequestEntiry {
 
 
         var marker: google.maps.Marker[] = []
+
+
+        if(addMarker) {
+            var latlng = new google.maps.LatLng({lat: coordinate.lat, lng: coordinate.lng});
+           new google.maps.Marker({
+                position: latlng,
+                map: this.maps
+            });
+        }
+
         for (var i = 0; i < response['data'].length; i++) {
 
 
@@ -51,26 +61,15 @@ export class GoogleMapRequestEntiry {
                     this.info = new google.maps.InfoWindow({
                         content:  format
                     })
-
                 }
+
                 this.markerEvent(i);
-
             }
-
         }
-        this.markers = marker
+
+
     }
 
-
-    addMarker(coordinate: ICoordinate){
-
-        const markerLatLng = new google.maps.LatLng({lat: coordinate.lat, lng: coordinate.lng}); // 緯度経度のデータ作成
-        var marker = new google.maps.Marker({
-            position: markerLatLng,
-            map:this.maps
-        });
-
-    }
 
     deleteMarker(id:number,response: any) {
 

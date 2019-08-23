@@ -31,14 +31,15 @@ export default class MapsUseCase  {
             var yahooMap = new YahooMapEntity(this.imaps)
             yahooMap.addMarker(coordinate,this.imaps, true)
         }else {
-            new GoogleMapRequestEntiry(coordinate,this.imaps.maps, this.imaps.map).addMarker(coordinate)
+            new GoogleMapRequestEntiry(coordinate,this.imaps.maps, this.imaps.map,true)
         }
 
     }
     deleteMarker(id: number, response: any) {
         if (this.imaps.maps.map_type == 'yahoo') {
+            var yahooMap = new YahooMapEntity(this.imaps)
+            yahooMap.deleteMarker(id,response)
         }else {
-
             new GoogleMapRequestEntiry({lat:35, lng: 135}, this.imaps.maps, this.imaps.map).deleteMarker(id,response)
         }
     }

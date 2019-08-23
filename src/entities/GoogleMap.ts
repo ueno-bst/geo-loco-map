@@ -20,8 +20,6 @@ export class GoogleMapEntiry {
     info: any;
 
 
-
-
     constructor(maps: Partial<IMaps> = {}) {
 
         const opts = { ...Maps, ...maps }

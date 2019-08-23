@@ -14,23 +14,4 @@ export default class RequestUseCase {
         this.response =  new API( coordinate,maps)
     }
 
-
-    //static test(maps: IMaps,coordinate: ICoordinate) {
-    //    return async () => {
-    //        await API.request(maps, coordinate)
-    //    }
-    //}
-
-
-
-    //addMarker() {
-    //    const google = new GoogleMapEntiry()
-    //    google.addMarker( this.coodinate)
-    //}
-    //removeMarker() {
-    //    const google = new GoogleMapEntiry()
-    //    google.addMarker( this.coodinate)
-    //}
-
-
 }

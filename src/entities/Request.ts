@@ -25,7 +25,7 @@ export class API {
         if (maps.maps.map_type == 'google') {
             new GoogleMapRequestEntiry(coordinate, maps.maps, res)
         } else if (maps.maps.map_type == 'yahoo') {
-            new YahooMapEntity().addMarker(coordinate, res,true)
+            new YahooMapEntity().addMarker(coordinate, res)
         }
 
        return RequestEntity.fromJSON(res);
