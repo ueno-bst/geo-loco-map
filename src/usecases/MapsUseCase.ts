@@ -2,46 +2,73 @@ import { IMaps } from "../entities/Maps";
 import { GoogleMapEntiry } from "../entities/GoogleMap";
 import { YahooMapEntity } from "../entities/YahooMap";
 import {ICoordinate} from "../entities/Coordinate";
-import {GoogleMapRequestEntiry} from "../entities/GoogleMapRequest";
+import { GeoLocoMapRequest } from "../Request";
 
 export default class MapsUseCase  {
     imaps: IMaps;
+    map: GoogleMapEntiry | YahooMapEntity |  any
 
-    map: any
 
-    response: any
-
-    constructor(maps: IMaps) {
+    constructor(maps: IMaps, geoLocoMapRequest?: GeoLocoMapRequest) {
         this.imaps = maps
+        this.map = this.execute(geoLocoMapRequest)
     }
 
-    execute() {
+    execute(geoLocoMapRequest?: GeoLocoMapRequest) {
+
         if (this.imaps.map_type == 'yahoo') {
-            this.map = new YahooMapEntity(this.imaps)
-            return this.map
-        }else {
-            this.map = new GoogleMapEntiry(this.imaps)
-            return this.map
+            return new YahooMapEntity(this.imaps,geoLocoMapRequest)
+        } else {
+            return new GoogleMapEntiry(this.imaps, geoLocoMapRequest)
+        }
+
+    }
+
+    getZoom(){
+        return this.map.getZoom()
+    }
+
+    setZoom(number: number) {
+        return this.map.setZoom(number)
+    }
+
+
+    getCenter() {
+        return this.map.getCenter()
+    }
+
+    setCenter(coordinate: ICoordinate) {
+        if (this.map.maps.map_type == 'google') {
+
+            this.map.setCenter(coordinate)
+
+        } else if (this.map.maps.map_type == 'yahoo') {
+
+            this.map.setCenter(coordinate)
+
+        }
+    }
+
+    setController() {
+        if (this.map.maps.map_type == 'google') {
+
+            this.map.setOptions()
+
+        } else if (this.map.maps.map_type == 'yahoo') {
+
+            this.map.setOptions()
+
         }
     }
 
     addMarker(coordinate: ICoordinate) {
-
-        if (this.imaps.maps.map_type == 'yahoo') {
-            var yahooMap = new YahooMapEntity(this.imaps)
-            yahooMap.addMarker(coordinate,this.imaps, true)
-        }else {
-            new GoogleMapRequestEntiry(coordinate,this.imaps.maps, this.imaps.map,true)
-        }
+        this.map.addMarker(coordinate)
 
     }
-    deleteMarker(id: number, response: any) {
-        if (this.imaps.maps.map_type == 'yahoo') {
-            var yahooMap = new YahooMapEntity(this.imaps)
-            yahooMap.deleteMarker(id,response)
-        }else {
-            new GoogleMapRequestEntiry({lat:35, lng: 135}, this.imaps.maps, this.imaps.map).deleteMarker(id,response)
-        }
+
+    deleteMarker(id:number) {
+        this.map.deleteMarker(id)
     }
+
 
 }

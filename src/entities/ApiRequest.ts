@@ -1,36 +1,29 @@
 import { ICoordinate } from "./Coordinate";
-import {GoogleMapRequestEntiry} from "./GoogleMapRequest";
-import { IMaps} from "./Maps";
-import {YahooMapEntity} from "./YahooMap";
 
 
-export class API {
+export class ApiRequest {
 
     coordinate: ICoordinate
-    maps: IMaps
     response: any
+    url: string
 
-    constructor(coordinate: ICoordinate, maps: IMaps )  {
+    constructor(coordinate: ICoordinate, url: string)  {
         this.coordinate = coordinate
-        this.maps = maps
-        this.response = this.request(maps,coordinate)
+        this.url = url
+        this.response = this.request()
     }
 
-
-    async  request(maps: any, coordinate: ICoordinate) {
-        var res =  await fetch(maps.maps.api_url)
-            .then(res => res.json())
+    async  request() {
+        var coordinate = Object.entries(this.coordinate)
 
 
-        if (maps.maps.map_type == 'google') {
-            new GoogleMapRequestEntiry(coordinate, maps.maps, res)
-        } else if (maps.maps.map_type == 'yahoo') {
-            new YahooMapEntity().addMarker(coordinate, res)
-        }
+        var res =  await fetch(this.url+"/?latlng="+coordinate[0][1]).then(res =>
+            {
+                return res.json()
+            })
 
        return RequestEntity.fromJSON(res);
     }
-
 }
 
 class Marker {
@@ -53,9 +46,10 @@ class Marker {
         this.url = arg['url'];
     }
 }
-class RequestEntity {
-    json: any[] = []
 
+class RequestEntity {
+
+    json: any[] = []
     static fromJSON(res: any) {
         var obj = new RequestEntity();
 

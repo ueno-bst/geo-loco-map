@@ -6,35 +6,51 @@ declare namespace Y {
   }
   class LatLngBounds {
     constructor(sw: LatLng, ne: LatLng)
-    containsLatLng(lng: LatLng): boolean
-    getCenter(): LatLng
-    getNorthEast(): LatLng
-    getSouthWest(): LatLng
-    extend(latlng: LatLng): void
   }
   class Point {
     x: number
     y: number
     constructor(x: number, y: number)
   }
-  class Projection {
-    constructor()
-    fromLatLngToPixel(latlng: LatLng, zoom: number): Point
-    fromPixelToLatLng(pixel: Point, zoom: number): LatLng
-  }
+
   class Map {
     constructor(id: string)
-    getBounds(): LatLngBounds
-    getProjection(): Projection
     getZoom(): number
+    getCenter(): LatLng
     addFeature(feather: Feather): void
-    drawMap(latlng: LatLng, lng: number, LayerSetId: number): void
-    addFeatures(markers: Y.Marker) :any
     removeFeature(feather: Feather): void
-    getBoundsZoomLevel(bounds: LatLngBounds): number
+    drawMap(latlng: LatLng, zoom: number, LayerSetId: number): void
     setZoom(zoom: number, animation: boolean, latlng: Y.LatLng, center: boolean): void
-    bind(eventName: string, fn: Function): void
+    addControl(layer?: LayerSetControl,
+               center?: CenterMarkControl,
+               home?: HomeControl,
+               scale?: ScaleControl,
+               Zoom?: ZoomControl,
+               SlideZoomh?: SliderZoomControlHorizontal,
+               slideZoomv?: SliderZoomControlVertical,
+               search?: SearchControl
+               ):void
+    removeControl(layer?: LayerSetControl,
+               center?: CenterMarkControl,
+               home?: HomeControl,
+               scale?: ScaleControl,
+               Zoom?: ZoomControl,
+               SlideZoomh?: SliderZoomControlHorizontal,
+               slideZoomv?: SliderZoomControlVertical,
+               search?: SearchControl
+    ):void
+    bind(eventName: string, handler: (...args: any[]) => void):void
   }
+  class LayerSetControl {}
+  class CenterMarkControl {}
+  class HomeControl {}
+  class ScaleControl{}
+  class ZoomControl{}
+  class SliderZoomControlHorizontal{}
+  class SliderZoomControlVertical{}
+  class SearchControl{}
+
+  class Controller{}
 
   class LayerSetId {
     static NORMAL :number
@@ -75,5 +91,9 @@ declare namespace Y {
     getLatLng(): LatLng
     getMap(): Map
     bind(eventName: string, fn: Function): void
+  }
+
+  class MapEvents {
+    Drag():void
   }
 }
