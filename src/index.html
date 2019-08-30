@@ -11,12 +11,12 @@
   <script src="../dist/bundle.js"></script>
   <script type="module">
     var request = GeoLocoMap.Request({lat: 35, lng:135},'http://localhost:8888/response.php')
-    var  geoLocoMap  = new GeoLocoMap({map_type: 'google',
+    var  geoLocoMap  = new GeoLocoMap({map_type: 'yahoo',
       latlng: {lat:35.658581, lng:139.745433},
       selector: 'map',
-      zoom:8
+      zoom:13
     },request)
-    geoLocoMap.deleteMarker(4)
+    //geoLocoMap.deleteMarker(2)
   </script>
 </div>
 </body>

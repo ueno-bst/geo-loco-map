@@ -12,6 +12,7 @@ export class YahooMapEntity {
    response?: any
    latlng: Y.LatLng
    url?: string
+   markers: Y.Marker[] = []
 
    zoomControl: Y.ZoomControl
    homeControl: Y.HomeControl
@@ -55,11 +56,11 @@ export class YahooMapEntity {
 
    }
 
-   request() {
+   request(id?: number) {
 
       this.response
           .then((res:any) => {
-             this.marker(res)
+             this.marker(res,id)
           })
 
    }
@@ -96,45 +97,56 @@ export class YahooMapEntity {
    marker(response: any, id?: number) {
 
 
-      if (response) {
-         for ( var i = 0; i < response.json.length; i++) {
 
-            if(response.json[i]['marker_display'] ) {
+      var response = this.markerConvert(response, id)
 
-               var marker =  new Y.Marker(new Y.LatLng(response.json[i]['coordinate'][0], response.json[i]['coordinate'][1]));
-               var description = response.json[i]['description']
-               var description_format = response.json[i]['description_format']
-               if(description_format ==  'text') {
-                  marker.bindInfoWindow(description);
-               } else if (description_format == 'html') {
-                  marker.bindInfoWindow(`<div class="detail">${description}</div>`);
-               }
-               this.map.addFeature(marker);
+      if (id) {
+         for ( var i = 0; i < this.markers.length; i++) {
+            this.map.removeFeature(this.markers[i]);
+         }
+      }
+
+      for ( var i = 0; i < response.json.length; i++) {
+
+         if(response.json[i]['marker_display'] ) {
+
+            this.markers[i] =  new Y.Marker(new Y.LatLng(response.json[i]['coordinate'][0], response.json[i]['coordinate'][1]));
+            var description = response.json[i]['description']
+            var description_format = response.json[i]['description_format']
+            if(description_format ==  'text') {
+               this.markers[i].bindInfoWindow(description);
+            } else if (description_format == 'html') {
+               this.markers[i].bindInfoWindow(`<div class="detail">${description}</div>`);
             }
+
+            this.map.addFeature(this.markers[i]);
+
          }
       }
    }
 
    // @todo マーカ消せない..
    deleteMarker(id: number) {
+       this.request(id)
+   }
 
-      this.response.then((res: any) => {
-         for ( var i = 0; i < res.json.length; i++) {
-
-            if(res.json[i]['id'] === id ) {
-               var marker =  new Y.Marker(new Y.LatLng(res.json[i]['coordinate'][0], res.json[i]['coordinate'][1]));
-               this.map.removeFeature(marker);
+   markerConvert(res:any, id?:number) {
+      if (id) {
+         for (var i = 0; i < res.json.length; i++) {
+            if (res.json[i]['id'] == id) {
+               const index = res.json.findIndex((v:any) => v.id === id);
+               const removedUser = res.json.splice(index, 1);
+               return res;
             }
          }
-
-      })
-
+      } else {
+         return res
+      }
    }
 
    apiRequest() {
 
       this.map.bind('movestart', () => {
-         console.log('fa')
          countup()
       });
       var countup = () => {

@@ -51,7 +51,7 @@ export class GoogleMapEntiry {
 
 
     request (id?: number) {
-        this.markers = this.response
+        this.response
             .then((res:any) => {
                 this.marker(res,id)
             })
@@ -116,8 +116,15 @@ export class GoogleMapEntiry {
     marker(response: any, id?: number) {
 
 
-        var res = this.markerConert(response, id)
+        var res = this.markerConvert(response, id)
 
+        if(id) {
+            for (var i = 0; i < this.markers.length; i++) {
+                if(this.markers[i]) {
+                    this.markers[i].setMap(null)
+                }
+            }
+        }
 
         for (var i = 0; i < res.json.length; i++) {
             if(res.json[i]['marker_display'] ) {
@@ -126,6 +133,7 @@ export class GoogleMapEntiry {
                 this.markers[i] = new google.maps.Marker({
                     position: markerLatLng,
                 });
+                console.log(this.markers[i])
                 this.markers[i].setMap(this.map)
 
                 var description = res.json[i]['description']
@@ -150,7 +158,7 @@ export class GoogleMapEntiry {
         return this.markers
     }
 
-    markerConert(res:any, id?:number) {
+    markerConvert(res:any, id?:number) {
         if (id) {
             for (var i = 0; i < res.json.length; i++) {
                 if (res.json[i]['id'] == id) {
