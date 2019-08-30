@@ -4,7 +4,7 @@ import { YahooMapEntity } from "../entities/YahooMap";
 import {ICoordinate} from "../entities/Coordinate";
 import { GeoLocoMapRequest } from "../Request";
 
-export default class MapsUseCase  {
+export  class MapsUseCase  {
     imaps: IMaps;
     map: GoogleMapEntiry | YahooMapEntity |  any
 

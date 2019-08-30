@@ -1,7 +1,7 @@
-import RequestUseCase from '../usecases/RequestUseCase'
+import { RequestUseCase } from '../usecases/RequestUseCase'
 import { ICoordinate } from '../entities/Coordinate'
 
-export default class RequestControllers {
+export class RequestControllers {
 
 
     constructor(coordinate: ICoordinate, url: string) {

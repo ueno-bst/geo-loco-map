@@ -1,9 +1,9 @@
-import MapsUseCase from '../usecases/MapsUseCase'
+import { MapsUseCase } from '../usecases/MapsUseCase'
 import { IMaps } from '../entities/Maps'
 import {ICoordinate} from "../entities/Coordinate";
 import { GeoLocoMapRequest } from "../Request";
 
-export default class MapsControllers{
+export  class MapsControllers{
 
     imaps: IMaps
     map: MapsUseCase

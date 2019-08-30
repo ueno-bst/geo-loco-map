@@ -1,3 +1,4 @@
+
 const HTMLWebpackPlugin = require("html-webpack-plugin");
 const webpackMerge = require('webpack-merge');
 
@@ -24,24 +25,20 @@ var baseConfig = {
   })]
 }
 
-var GeoLocoMapRequestConfig = webpackMerge(baseConfig, {
-  entry: ["./src/Request.ts"],
-  output: {
-    filename: "bundle.js",
-    path: __dirname + "/dist",
-    libraryExport: 'GeoLocoMapRequest',
-    library:  'GeoLocoMapRequest',
-  }
-})
 var GeoLocoMapConfig = webpackMerge(baseConfig, {
-  entry: ["./src/GeoLoco.ts"],
   output: {
-    filename: "bundle.js",
+    filename: 'bundle.js',
     path: __dirname + "/dist",
     libraryExport: 'GeoLocoMap',
     library:  'GeoLocoMap',
-    }
-  })
+    libraryTarget: 'umd'
+  },
+  entry: './src/GeoLoco.ts',
+  name: 'umd',
+  mode: 'production',
+})
 
 
-module.exports = [GeoLocoMapRequestConfig,GeoLocoMapConfig];
+
+
+module.exports = GeoLocoMapConfig;

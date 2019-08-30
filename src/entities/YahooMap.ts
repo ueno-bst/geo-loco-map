@@ -3,7 +3,7 @@ import { ICoordinate} from "./Coordinate";
 import {  GeoLocoMapRequest } from "../Request";
 import {ApiRequest} from "./ApiRequest";
 
-/// <reference path="../../typings/browser.d.ts" />
+/// <reference path="../typings/yahoo.d.ts" />
 export class YahooMapEntity {
 
    map: Y.Map
@@ -12,6 +12,11 @@ export class YahooMapEntity {
    response?: any
    latlng: Y.LatLng
    url?: string
+
+   zoomControl: Y.ZoomControl
+   homeControl: Y.HomeControl
+   layerControl: Y.LayerSetControl
+
 
    constructor(maps: Partial<IMaps> = {}, geoLocoMapRequest?: GeoLocoMapRequest) {
 
@@ -39,14 +44,14 @@ export class YahooMapEntity {
          this.request()
       }
 
-      // 以下インターフェースの表示
-      this.map.addControl(new Y.CenterMarkControl())
-      this.map.addControl(new Y.HomeControl())
-      this.map.addControl(new Y.ScaleControl())
-      this.map.addControl(new Y.ZoomControl())
-      this.map.addControl(new Y.SliderZoomControlHorizontal())
-      this.map.addControl(new Y.SliderZoomControlVertical())
-      this.map.addControl(new Y.SearchControl())
+      // インターフェース表示
+      this.zoomControl = new Y.ZoomControl()
+      this.homeControl = new Y.HomeControl()
+      this.layerControl = new Y.LayerSetControl
+
+      this.map.addControl(this.zoomControl)
+      this.map.addControl(this.homeControl)
+      this.map.addControl(this.layerControl)
 
    }
 
@@ -78,15 +83,9 @@ export class YahooMapEntity {
    }
 
    setOptions() {
-       //@todo コントロールが削除できない
-      this.map.removeControl(new Y.LayerSetControl())
-      this.map.removeControl(new Y.CenterMarkControl())
-      this.map.removeControl(new Y.HomeControl())
-      this.map.removeControl(new Y.ScaleControl())
-      this.map.removeControl(new Y.ZoomControl())
-      this.map.removeControl(new Y.SliderZoomControlHorizontal())
-      this.map.removeControl(new Y.SliderZoomControlVertical())
-      this.map.removeControl(new Y.SearchControl())
+      this.map.removeControl(this.zoomControl)
+      this.map.removeControl(this.homeControl)
+      this.map.removeControl(this.layerControl)
    }
 
    addMarker(coordinate: ICoordinate) {

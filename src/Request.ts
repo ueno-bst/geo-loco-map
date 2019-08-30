@@ -1,5 +1,6 @@
-import { ICoordinate} from "./entities/Coordinate";
-import RequestControllers from "./controllers/RequestControllers";
+import { ICoordinate } from "./entities/Coordinate";
+import { RequestControllers } from "./controllers/RequestControllers";
+
 
 export  class GeoLocoMapRequest {
 
@@ -13,8 +14,6 @@ export  class GeoLocoMapRequest {
         this.url = url
         this.response = this.initRequest()
     }
-
-
 
     initRequest() {
         return new RequestControllers(this.coordinate,this.url)

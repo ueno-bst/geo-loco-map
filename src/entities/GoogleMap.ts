@@ -1,7 +1,9 @@
 import { IMaps, Maps } from './Maps'
-import { ICoordinate} from "./Coordinate";
+import { ICoordinate } from "./Coordinate";
 import { GeoLocoMapRequest }  from "../Request";
 import { ApiRequest } from "./ApiRequest";
+import * as ts from "typescript/lib/tsserverlibrary";
+import convertScriptKindName = ts.server.convertScriptKindName;
 
 
 interface option {
@@ -41,20 +43,18 @@ export class GoogleMapEntiry {
             this.url = geoLocoMapRequest.url
             this.response = geoLocoMapRequest.response.response.response
             this.apiRequest()
+            this.request()
         }
-        this.request()
 
     }
 
 
-    request = () =>  {
 
-        this.response
+    request (id?: number) {
+        this.markers = this.response
             .then((res:any) => {
-                this.marker(res)
+                this.marker(res,id)
             })
-
-        console.log(this.markers)
     }
 
 
@@ -66,7 +66,6 @@ export class GoogleMapEntiry {
                 zoom: this.maps.zoom,
             }
         )
-
     }
 
     markerEvent(i:number) {
@@ -110,40 +109,20 @@ export class GoogleMapEntiry {
     }
 
     deleteMarker(id: number) {
-        console.log(this.markers)
-
-        for(var i = 0; this.markers.length; i++) {
-
-        }
-
-        //this.response
-        //    .then(res =>
-        //    {
-        //        for (var i = 0; i < res.json.length; i++) {
-        //            if (res.json[i]['id'] === id) {
-
-        //                var markerLatLng = new google.maps.LatLng({lat: res.json[i]['coordinate'][0], lng: res.json[i]['coordinate'][1]});
-        //                var marker = new google.maps.Marker({
-        //                    position: markerLatLng,
-        //                });
-        //                marker.setMap(null)
-
-        //            }
-        //        }
-
-        //    })
+        this.request(id)
     }
 
-    marker(res: any, id?: number) {
 
+    marker(response: any, id?: number) {
+
+
+        var res = this.markerConert(response, id)
 
 
         for (var i = 0; i < res.json.length; i++) {
-
-
             if(res.json[i]['marker_display'] ) {
 
-                const markerLatLng = new google.maps.LatLng({lat: res.json[i]['coordinate'][0], lng: res.json[i]['coordinate'][1]});
+                var  markerLatLng = new google.maps.LatLng({lat: res.json[i]['coordinate'][0], lng: res.json[i]['coordinate'][1]});
                 this.markers[i] = new google.maps.Marker({
                     position: markerLatLng,
                 });
@@ -168,7 +147,23 @@ export class GoogleMapEntiry {
 
             }
         }
+        return this.markers
     }
+
+    markerConert(res:any, id?:number) {
+        if (id) {
+            for (var i = 0; i < res.json.length; i++) {
+                if (res.json[i]['id'] == id) {
+                    const index = res.json.findIndex((v:any) => v.id === id);
+                    const removedUser = res.json.splice(index, 1);
+                    return res;
+                }
+            }
+        } else {
+            return res
+        }
+    }
+
 
     apiRequest() {
 

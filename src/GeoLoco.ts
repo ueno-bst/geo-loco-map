@@ -1,7 +1,8 @@
-import MapsControllers from './controllers/MapsControllers'
+import { MapsControllers } from './controllers/MapsControllers'
 import { IMaps, Maps }  from './entities/Maps'
 import {ICoordinate} from "./entities/Coordinate";
 import { GeoLocoMapRequest } from "./Request";
+
 
 export class GeoLocoMap {
 
@@ -24,13 +25,17 @@ export class GeoLocoMap {
 
     }
 
+    static Request(coordinate: ICoordinate, url: string) : GeoLocoMapRequest {
+        return new GeoLocoMapRequest(coordinate, url);
+    }
+
     getZoom(){
         return this.maps.getZoom()
     }
+
     setZoom(number: number) {
         return this.maps.setZoom(number)
     }
-
 
     getCenter() {
         return this.maps.getCenter()
@@ -53,8 +58,4 @@ export class GeoLocoMap {
         return this.maps.deleteMarker(id)
     }
 }
-var  geoLocoMap  = new GeoLocoMap({map_type: 'yahoo',
-    latlng: {lat:35.658581, lng:139.745433},
-    selector: 'map',
-    zoom:8
-})
+
