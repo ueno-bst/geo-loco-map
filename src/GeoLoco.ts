@@ -15,7 +15,6 @@ export class GeoLocoMap {
         const map = { ...Maps, ...maps }
         this.imaps = map
 
-
         if (geolocorequest != undefined) {
 
             this.maps =  new MapsControllers(this.imaps, geolocorequest)

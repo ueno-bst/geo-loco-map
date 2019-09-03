@@ -78,7 +78,7 @@ export class GoogleMapEntiry {
     }
 
     getZoom() {
-        this.map.getZoom()
+        return this.map.getZoom()
     }
 
     setZoom(number: number) {
@@ -87,7 +87,7 @@ export class GoogleMapEntiry {
     }
 
     getCenter() {
-        this.map.getCenter()
+        return {lat:this.map.getCenter().lat(),lng:this.map.getCenter().lng()}
     }
     setCenter(coordinate: ICoordinate) {
         this.map.setCenter( new google.maps.LatLng( coordinate.lat, coordinate.lng))
@@ -133,16 +133,18 @@ export class GoogleMapEntiry {
                 this.markers[i] = new google.maps.Marker({
                     position: markerLatLng,
                 });
-                console.log(this.markers[i])
                 this.markers[i].setMap(this.map)
 
-                var description = res.json[i]['description']
+
+                var url = location.host+'?'+'map_type='+ this.maps.map_type+'&lat='+res.json[i]['coordinate'][0]+'&lng='+res.json[i]['coordinate'][0]
+
+                var description = res.json[i]['description']+url
                 var description_format = res.json[i]['description_format']
 
                 if(description_format ==  'text') {
                     var format: string = description
                     this.info = new google.maps.InfoWindow({
-                        content:  format
+                        content:  format,
                     })
                 } else if (description_format == 'html') {
                     var format: string =  '<div class="detail">'+ description+'</div>'
@@ -178,10 +180,10 @@ export class GoogleMapEntiry {
         this.map.addListener('center_changed', () => {
             countup()
         });
+
         var countup = () => {
             setTimeout(request , 500);
         }
-
 
         var request = () => {
             var coordinate = { lat: this.map.getCenter().lat() , lng: this.map.getCenter().lng()}

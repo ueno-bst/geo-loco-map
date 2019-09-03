@@ -76,11 +76,11 @@ export class YahooMapEntity {
 
 
    getCenter() {
-      return this.map.getCenter()
+      return {lat:this.map.getCenter().lat(),lng:this.map.getCenter().lng()}
    }
 
    setCenter(coordinate: ICoordinate) {
-      this.map.drawMap( new Y.LatLng(coordinate.lat, coordinate.lng),coordinate.lng,Y.LayerSetId.NORMAL )
+      this.map.drawMap( new Y.LatLng(coordinate.lat, coordinate.lng),this.maps.zoom!,Y.LayerSetId.NORMAL )
    }
 
    setOptions() {
