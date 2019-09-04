@@ -49,18 +49,6 @@ export  class MapsUseCase  {
         }
     }
 
-    setController() {
-        if (this.map.maps.map_type == 'google') {
-
-            this.map.setOptions()
-
-        } else if (this.map.maps.map_type == 'yahoo') {
-
-            this.map.setOptions()
-
-        }
-    }
-
     addMarker(coordinate: ICoordinate) {
         this.map.addMarker(coordinate)
 

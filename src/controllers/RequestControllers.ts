@@ -4,8 +4,8 @@ import { ICoordinate } from '../entities/Coordinate'
 export class RequestControllers {
 
 
-    constructor(coordinate: ICoordinate, url: string) {
-         return new RequestUseCase(coordinate, url)
+    constructor(coordinate: ICoordinate, url: string,zoom: number) {
+         return new RequestUseCase(coordinate, url,zoom)
     }
 }
 

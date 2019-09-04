@@ -31,10 +31,6 @@ export  class MapsControllers{
         return this.map.setCenter(coodinate)
     }
 
-    setController() {
-        return this.map.setController()
-    }
-
     addMarker(coorinate: ICoordinate) {
         return this.map.addMarker(coorinate)
     }

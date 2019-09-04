@@ -2,9 +2,6 @@ import { IMaps, Maps } from './Maps'
 import { ICoordinate } from "./Coordinate";
 import { GeoLocoMapRequest }  from "../Request";
 import { ApiRequest } from "./ApiRequest";
-import * as ts from "typescript/lib/tsserverlibrary";
-import convertScriptKindName = ts.server.convertScriptKindName;
-
 
 interface option {
     zoom: number
@@ -22,8 +19,6 @@ export class GoogleMapEntiry {
     markers: google.maps.Marker[] = []
     response?: any
     url?: string
-
-
 
     constructor(maps: Partial<IMaps> = {}, geoLocoMapRequest?: GeoLocoMapRequest) {
 
@@ -44,6 +39,13 @@ export class GoogleMapEntiry {
             this.response = geoLocoMapRequest.response.response.response
             this.apiRequest()
             this.request()
+        }
+        if (!this.maps.element_flag) {
+
+            const  options = {
+                disableDefaultUI: true,
+            }
+            this.map.setOptions(options)
         }
 
     }
@@ -93,13 +95,6 @@ export class GoogleMapEntiry {
         this.map.setCenter( new google.maps.LatLng( coordinate.lat, coordinate.lng))
     }
 
-    setOptions() {
-        var options = {
-            disableDefaultUI: true,
-        }
-        this.map.setOptions(options)
-    }
-
     addMarker(coordinate: ICoordinate) {
         var markerLatLng = new google.maps.LatLng({lat: coordinate.lat, lng: coordinate.lng});
         var markers = new google.maps.Marker({
@@ -136,28 +131,36 @@ export class GoogleMapEntiry {
                 this.markers[i].setMap(this.map)
 
 
-                var url = location.host+'?'+'map_type='+ this.maps.map_type+'&lat='+res.json[i]['coordinate'][0]+'&lng='+res.json[i]['coordinate'][0]
-
-                var description = res.json[i]['description']+url
+                var  feed = res.json[i]['feed_flag'] ? `<iframe src=${res.json[i]['feed']} frameborder="0" ></iframe>` : ""
+                var content = feed ? feed : res.json[i]['description']
                 var description_format = res.json[i]['description_format']
-
                 if(description_format ==  'text') {
-                    var format: string = description
+                        var format: string =  feed ? content : this.escapeHtml(content)
                     this.info = new google.maps.InfoWindow({
-                        content:  format,
+                        content:format
                     })
                 } else if (description_format == 'html') {
-                    var format: string =  '<div class="detail">'+ description+'</div>'
+                    var format: string =  '<div id="detail">'+content+'</div>'
                     this.info = new google.maps.InfoWindow({
-                        content:  format
                     })
+                    this.info.setContent(format)
                 }
 
                 this.markerEvent(i);
-
             }
         }
         return this.markers
+    }
+
+    escapeHtml(str: string){
+        str = str.replace(/&/g, '&amp;');
+        str = str.replace(/>/g, '&gt;');
+        str = str.replace(/</g, '&lt;');
+        str = str.replace(/"/g, '&quot;');
+        str = str.replace(/'/g, '&#x27;');
+        str = str.replace(/`/g, '&#x60;');
+        str = str.replace(/\r?\n/g, '<br>')
+        return str;
     }
 
     markerConvert(res:any, id?:number) {
@@ -177,18 +180,20 @@ export class GoogleMapEntiry {
 
     apiRequest() {
 
+        var timer: any = 0
         this.map.addListener('center_changed', () => {
-            countup()
+            clearTimeout(timer)
+            timer = countup()
         });
 
         var countup = () => {
-            setTimeout(request , 500);
+             return setTimeout(request , 500);
         }
 
         var request = () => {
             var coordinate = { lat: this.map.getCenter().lat() , lng: this.map.getCenter().lng()}
             if(this.url) {
-                var res = new ApiRequest(coordinate,this.url)
+                var res = new ApiRequest(coordinate,this.url,this.getZoom())
                 res.response
                     .then((res: any)  =>
                         this.marker(res)

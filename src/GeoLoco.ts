@@ -6,7 +6,6 @@ import { GeoLocoMapRequest } from "./Request";
 
 export class GeoLocoMap {
 
-
     maps: MapsControllers
     imaps: IMaps
 
@@ -16,7 +15,6 @@ export class GeoLocoMap {
         this.imaps = map
 
         if (geolocorequest != undefined) {
-
             this.maps =  new MapsControllers(this.imaps, geolocorequest)
         } else  {
             this.maps =  new MapsControllers(this.imaps)
@@ -24,8 +22,8 @@ export class GeoLocoMap {
 
     }
 
-    static Request(coordinate: ICoordinate, url: string) : GeoLocoMapRequest {
-        return new GeoLocoMapRequest(coordinate, url);
+    static Request(coordinate: ICoordinate, url: string, zoom:number) : GeoLocoMapRequest {
+        return new GeoLocoMapRequest(coordinate, url,zoom);
     }
 
     getZoom(){
@@ -44,12 +42,8 @@ export class GeoLocoMap {
         return this.maps.setCenter(coordinate)
     }
 
-    setController() {
-        return this.maps.setController()
-    }
-
-    addMarker(coorinate: ICoordinate) {
-        return this.maps.addMarker(coorinate)
+    addMarker(coordinate: ICoordinate) {
+        return this.maps.addMarker(coordinate)
 
     }
 

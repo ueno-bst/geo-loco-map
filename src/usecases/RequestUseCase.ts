@@ -4,7 +4,7 @@ import { ApiRequest } from "../entities/ApiRequest"
 export  class RequestUseCase {
     response: any
 
-    constructor(coordinate: ICoordinate, url: string) {
-        this.response =  new ApiRequest(coordinate,url)
+    constructor(coordinate: ICoordinate, url: string,zoom: number) {
+        this.response =  new ApiRequest(coordinate,url,zoom)
     }
 }
