@@ -10,8 +10,9 @@
 <div id="map" style="height: 512px; width: 512px;">
   <script src="../dist/bundle.js"></script>
   <script type="module">
-    var request = GeoLocoMap.Request({lat: 35, lng:134},'http://localhost:8888/response.php',10)
-    var  geoLocoMap  = new GeoLocoMap({map_type: 'yahoo',
+
+    var request = GeoLocoMap.Request({lat: 35, lng:134},'http://localhost:8888/response.php')
+    var  geoLocoMap  = new GeoLocoMap({map_type: 'google',
       latlng: {lat:34.6675858, lng:133.8958007},
       selector: 'map',
       zoom:8

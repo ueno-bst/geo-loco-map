@@ -9,6 +9,7 @@ interface option {
 }
 
 
+var allmarker: any[] = []
 export class GoogleMapEntiry {
 
     maps: IMaps
@@ -20,8 +21,9 @@ export class GoogleMapEntiry {
     response?: any
     url?: string
 
-    constructor(maps: Partial<IMaps> = {}, geoLocoMapRequest?: GeoLocoMapRequest) {
 
+
+    constructor(maps: Partial<IMaps> = {}, geoLocoMapRequest?: GeoLocoMapRequest) {
         const opts = { ...Maps, ...maps }
         this.maps = opts
         this.info = new google.maps.InfoWindow()
@@ -36,7 +38,7 @@ export class GoogleMapEntiry {
 
         if (geoLocoMapRequest != undefined) {
             this.url = geoLocoMapRequest.url
-            this.response = geoLocoMapRequest.response.response.response
+            this.response = geoLocoMapRequest.initRequest(this.getZoom()).response.response
             this.apiRequest()
             this.request()
         }
@@ -111,7 +113,8 @@ export class GoogleMapEntiry {
     marker(response: any, id?: number) {
 
 
-        var res = this.markerConvert(response, id)
+        var response = this.markerConvert(response, id)
+
 
         if(id) {
             for (var i = 0; i < this.markers.length; i++) {
@@ -121,33 +124,73 @@ export class GoogleMapEntiry {
             }
         }
 
-        for (var i = 0; i < res.json.length; i++) {
-            if(res.json[i]['marker_display'] ) {
 
-                var  markerLatLng = new google.maps.LatLng({lat: res.json[i]['coordinate'][0], lng: res.json[i]['coordinate'][1]});
-                this.markers[i] = new google.maps.Marker({
-                    position: markerLatLng,
-                });
-                this.markers[i].setMap(this.map)
+        var res: any = Object.entries(response)
 
+        for (var i = 0; i < res.length; i++) {
+            if(allmarker[i]) {
+                if (allmarker[i]['id']  != res[i][1]['id']) {
 
-                var  feed = res.json[i]['feed_flag'] ? `<iframe src=${res.json[i]['feed']} frameborder="0" ></iframe>` : ""
-                var content = feed ? feed : res.json[i]['description']
-                var description_format = res.json[i]['description_format']
-                if(description_format ==  'text') {
-                        var format: string =  feed ? content : this.escapeHtml(content)
-                    this.info = new google.maps.InfoWindow({
-                        content:format
-                    })
-                } else if (description_format == 'html') {
-                    var format: string =  '<div id="detail">'+content+'</div>'
-                    this.info = new google.maps.InfoWindow({
-                    })
-                    this.info.setContent(format)
+                    if(res[i][1]['marker_display'] ) {
+
+                        var  markerLatLng = new google.maps.LatLng({lat: res[i][1]['coordinate'][0], lng: res[i][1]['coordinate'][1]});
+                        this.markers[i] = new google.maps.Marker({
+                            position: markerLatLng,
+                        });
+                        this.markers[i].setMap(this.map)
+
+                        var  feed = res[i]['feed_flag'] ? `<iframe src=${res[i][1]['feed']} frameborder="0" ></iframe>` : ""
+                        var content = feed ? feed : res[i][1]['description']
+                        var description_format = res[i][1]['description_format']
+                        if(description_format ==  'text') {
+                            var format: string =  feed ? content : this.escapeHtml(content)
+                            this.info = new google.maps.InfoWindow({
+                                content:format
+                            })
+                        } else if (description_format == 'html') {
+                            var format: string =  '<div id="detail">'+content+'</div>'
+                            this.info = new google.maps.InfoWindow({
+                            })
+                            this.info.setContent(format)
+                        }
+
+                        this.markerEvent(i);
+                    }
                 }
 
-                this.markerEvent(i);
+            } else {
+
+                if(res[i][1]['marker_display'] ) {
+
+                    var  markerLatLng = new google.maps.LatLng({lat: res[i][1]['coordinate'][0], lng: res[i][1]['coordinate'][1]});
+                    this.markers[i] = new google.maps.Marker({
+                        position: markerLatLng,
+                    });
+                    this.markers[i].setMap(this.map)
+
+
+                    var  feed = res[i][1]['feed_flag'] ? `<iframe src=${res[i]['feed']} frameborder="0" ></iframe>` : ""
+                    var content = feed ? feed : res[i][1]['description']
+                    var description_format = res[i][1]['description_format']
+                    if(description_format ==  'text') {
+                        var format: string =  feed ? content : this.escapeHtml(content)
+                        this.info = new google.maps.InfoWindow({
+                            content:format
+                        })
+                    } else if (description_format == 'html') {
+                        var format: string =  '<div id="detail">'+content+'</div>'
+                        this.info = new google.maps.InfoWindow({
+                        })
+                        this.info.setContent(format)
+                    }
+
+                    this.markerEvent(i);
+                }
+                res[i][1]['marker_flag'] = true
+                allmarker.push(res[i])
+
             }
+
         }
         return this.markers
     }
@@ -165,10 +208,10 @@ export class GoogleMapEntiry {
 
     markerConvert(res:any, id?:number) {
         if (id) {
-            for (var i = 0; i < res.json.length; i++) {
-                if (res.json[i]['id'] == id) {
-                    const index = res.json.findIndex((v:any) => v.id === id);
-                    const removedUser = res.json.splice(index, 1);
+            for (var i = 0; i < res.length; i++) {
+                if (res[i]['id'] == id) {
+                    const index = res.findIndex((v:any) => v.id === id);
+                    const removedUser = res.splice(index, 1);
                     return res;
                 }
             }
@@ -184,10 +227,11 @@ export class GoogleMapEntiry {
         this.map.addListener('center_changed', () => {
             clearTimeout(timer)
             timer = countup()
+
         });
 
         var countup = () => {
-             return setTimeout(request , 500);
+             return  setTimeout(request , 500);
         }
 
         var request = () => {

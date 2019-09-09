@@ -3,9 +3,10 @@ import { ICoordinate } from '../entities/Coordinate'
 
 export class RequestControllers {
 
+    response:any
 
-    constructor(coordinate: ICoordinate, url: string,zoom: number) {
-         return new RequestUseCase(coordinate, url,zoom)
+    constructor(coordinate: ICoordinate, url: string,zoom?: number) {
+         this.response = new RequestUseCase(coordinate, url,zoom)
     }
 }
 

@@ -3,6 +3,8 @@ import { ICoordinate} from "./Coordinate";
 import {  GeoLocoMapRequest } from "../Request";
 import {ApiRequest} from "./ApiRequest";
 
+var allmarker: any[] = []
+
 /// <reference path="../typings/yahoo.d.ts" />
 export class YahooMapEntity {
 
@@ -39,7 +41,7 @@ export class YahooMapEntity {
 
       // APIからのレスポンス表示
       if (geoLocoMapRequest != undefined) {
-         this.response = geoLocoMapRequest.response.response.response
+         this.response = geoLocoMapRequest.initRequest(this.map.getZoom()).response.response
          this.url = geoLocoMapRequest.url
          this.apiRequest()
          this.request()
@@ -95,9 +97,7 @@ export class YahooMapEntity {
       this.map.addFeature(marker);
    }
 
-   marker(response: any, id?: number) {
-
-
+   marker(res: any, id?: number) {
 
       var response = this.markerConvert(response, id)
 
@@ -107,26 +107,59 @@ export class YahooMapEntity {
          }
       }
 
-      for ( var i = 0; i < response.json.length; i++) {
+      response = Object.entries(res)
 
-         if(response.json[i]['marker_display'] ) {
 
-            this.markers[i] =  new Y.Marker(new Y.LatLng(response.json[i]['coordinate'][0], response.json[i]['coordinate'][1]));
-            var  feed = response.json[i]['feed_flag'] ? `<iframe src=${response.json[i]['feed']} frameborder="0" ></iframe>` : ""
-            var content = feed ? feed : response.json[i]['description']
-            var description_format = response.json[i]['description_format']
-            if(description_format ==  'text') {
-               var format: string =  feed ? content : this.escapeHtml(content)
-               this.markers[i].bindInfoWindow(format);
-            } else if (description_format == 'html') {
-               this.markers[i].bindInfoWindow(`<div class="detail">${content}</div>`);
+       console.log(response)
+      for ( var i = 0; i < response.length; i++) {
+
+
+
+         if(allmarker[i]) {
+            if (allmarker[i]['id']  != response[i][1]['id']) {
+               if(response[i]['marker_display']  ) {
+
+                  this.markers[i] =  new Y.Marker(new Y.LatLng(response[i][1]['coordinate'][0], response[i][1]['coordinate'][1]));
+                  var  feed = response[i][1]['feed_flag'] ? `<iframe src=${response[i][1]['feed']} frameborder="0" ></iframe>` : ""
+                  var content = feed ? feed : response[i][1]['description']
+                  var description_format = response[i][1]['description_format']
+                  if(description_format ==  'text') {
+                     var format: string =  feed ? content : this.escapeHtml(content)
+                     this.markers[i].bindInfoWindow(format);
+                  } else if (description_format == 'html') {
+                     this.markers[i].bindInfoWindow(`<div class="detail">${content}</div>`);
+                  }
+
+                  this.map.addFeature(this.markers[i]);
+
+               }
+
             }
+         } else {
+            if(response[i][1]['marker_display'] ) {
 
-            this.map.addFeature(this.markers[i]);
+               this.markers[i] =  new Y.Marker(new Y.LatLng(response[i][1]['coordinate'][0], response[i][1]['coordinate'][1]));
+               var  feed = response[i]['feed_flag'] ? `<iframe src=${response[i][1]['feed']} frameborder="0" ></iframe>` : ""
+               var content = feed ? feed : response[i][1]['description']
+               var description_format = response[i][1]['description_format']
+               if(description_format ==  'text') {
+                  var format: string =  feed ? content : this.escapeHtml(content)
+                  this.markers[i].bindInfoWindow(format);
+               } else if (description_format == 'html') {
+                  this.markers[i].bindInfoWindow(`<div class="detail">${content}</div>`);
+               }
+
+               this.map.addFeature(this.markers[i]);
+
+            }
+            response[i][1]['marker_flag'] = true
+            allmarker.push(response[i][1])
 
          }
       }
+
    }
+
    escapeHtml(str: string){
       str = str.replace(/&/g, '&amp;');
       str = str.replace(/>/g, '&gt;');
@@ -146,10 +179,10 @@ export class YahooMapEntity {
 
    markerConvert(res:any, id?:number) {
       if (id) {
-         for (var i = 0; i < res.json.length; i++) {
-            if (res.json[i]['id'] == id) {
-               const index = res.json.findIndex((v:any) => v.id === id);
-               const removedUser = res.json.splice(index, 1);
+         for (var i = 0; i < res.length; i++) {
+            if (res[i]['id'] == id) {
+               const index = res.findIndex((v:any) => v.id === id);
+               const removedUser = res.splice(index, 1);
                return res;
             }
          }
@@ -175,9 +208,9 @@ export class YahooMapEntity {
          if (this.url) {
             var res = new ApiRequest(coordinate,this.url,this.getZoom())
             res.response
-                .then((res:any)  =>
-                    this.marker(res)
-                )
+                .then((res:any)  => {
+                       this.marker(res)
+                })
          }
       }
 

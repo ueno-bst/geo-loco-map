@@ -22,8 +22,8 @@ export class GeoLocoMap {
 
     }
 
-    static Request(coordinate: ICoordinate, url: string, zoom:number) : GeoLocoMapRequest {
-        return new GeoLocoMapRequest(coordinate, url,zoom);
+    static Request(coordinate: ICoordinate, url: string) : GeoLocoMapRequest {
+        return new GeoLocoMapRequest(coordinate, url);
     }
 
     getZoom(){

@@ -7,17 +7,14 @@ export  class GeoLocoMapRequest {
     coordinate: ICoordinate
     url: string
     response: any
-    zoom: number
 
 
-    constructor(coordinate: ICoordinate, url: string,zoom: number) {
+    constructor(coordinate: ICoordinate, url: string) {
         this.coordinate = coordinate
         this.url = url
-        this.zoom = zoom
-        this.response = this.initRequest()
     }
 
-    initRequest() {
-        return new RequestControllers(this.coordinate,this.url,this.zoom)
+    initRequest(zoom?:number) {
+        return new RequestControllers(this.coordinate,this.url,zoom)
     }
 }

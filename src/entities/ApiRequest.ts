@@ -1,6 +1,8 @@
 import { ICoordinate } from "./Coordinate";
 
 
+var allmarker:any = {}
+var json: any[] = []
 export class ApiRequest {
 
     coordinate: ICoordinate
@@ -8,10 +10,10 @@ export class ApiRequest {
     url: string
     zoom: number
 
-    constructor(coordinate: ICoordinate, url: string,zoom: number)  {
+    constructor(coordinate: ICoordinate, url: string,zoom?: number)  {
         this.coordinate = coordinate
         this.url = url
-        this.zoom = zoom
+        this.zoom = zoom!
         this.response = this.request()
     }
 
@@ -19,11 +21,7 @@ export class ApiRequest {
         var coordinate = Object.entries(this.coordinate)
 
         var res =  await fetch(this.url+"/?lat="+coordinate[0][1]+"&lng="+coordinate[1][1]+'&zoom='+this.zoom,
-        ).then(res =>
-            {
-                return res.json()
-            })
-
+        ).then(res => res.json())
 
        return RequestEntity.fromJSON(res);
     }
@@ -55,22 +53,44 @@ class Marker {
         this.url = arg['url'];
         this.feed =arg['feed']
         this.feed_flag =arg['feed_flag']
+        this.marker_display = true
     }
 }
+
 
 class RequestEntity {
 
-    json: any[] = []
     static fromJSON(res: any) {
-        var obj = new RequestEntity();
 
-        for (var index = 0; index < res.data.length; index++) {
-            obj.json[index] = new Marker(res.data[index])
+        for (var index = 0; index < res.data.length; index ++) {
+
+            var marker = res.data[index]
+            var id = res.data[index].id
+           if (allmarker[id] === undefined ) {
+                allmarker[id] = new Marker(marker);
+            }
         }
-        return obj;
+        return allmarker
     }
 
+        //allmarker.push(res.data)
+
+        //    var cleanList = allmarker.filter(value => {
+        //        return value.filter(function(v1:any,i1:any,a1:any){
+        //            return (a1.findIndex(function (v2:any) {
+        //                return (v1.id === v2.id)
+        //            }) === i1);
+        //        })
+        //    });
+
+        //for (var index = 0; index < cleanList[0].length; index++) {
+        //    json[index] = new Marker(cleanList[0][index])
+        //}
+        //return json;
+
+
 }
+
 
 
 
