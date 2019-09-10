@@ -9,7 +9,7 @@ interface option {
 }
 
 
-var allmarker: any[] = []
+var allmarker:any = {}
 export class GoogleMapEntiry {
 
     maps: IMaps
@@ -112,10 +112,6 @@ export class GoogleMapEntiry {
 
     marker(response: any, id?: number) {
 
-
-        var response = this.markerConvert(response, id)
-
-
         if(id) {
             for (var i = 0; i < this.markers.length; i++) {
                 if(this.markers[i]) {
@@ -124,75 +120,41 @@ export class GoogleMapEntiry {
             }
         }
 
-
         var res: any = Object.entries(response)
 
         for (var i = 0; i < res.length; i++) {
-            if(allmarker[i]) {
-                if (allmarker[i]['id']  != res[i][1]['id']) {
+            var markerId = res[i][1].id
 
-                    if(res[i][1]['marker_display'] ) {
+            if(res[i][1].marker_display &&  allmarker[markerId] === undefined ) {
 
-                        var  markerLatLng = new google.maps.LatLng({lat: res[i][1]['coordinate'][0], lng: res[i][1]['coordinate'][1]});
-                        this.markers[i] = new google.maps.Marker({
-                            position: markerLatLng,
-                        });
-                        this.markers[i].setMap(this.map)
 
-                        var  feed = res[i]['feed_flag'] ? `<iframe src=${res[i][1]['feed']} frameborder="0" ></iframe>` : ""
-                        var content = feed ? feed : res[i][1]['description']
-                        var description_format = res[i][1]['description_format']
-                        if(description_format ==  'text') {
-                            var format: string =  feed ? content : this.escapeHtml(content)
-                            this.info = new google.maps.InfoWindow({
-                                content:format
-                            })
-                        } else if (description_format == 'html') {
-                            var format: string =  '<div id="detail">'+content+'</div>'
-                            this.info = new google.maps.InfoWindow({
-                            })
-                            this.info.setContent(format)
-                        }
+                var  markerLatLng = new google.maps.LatLng({lat: res[i][1].coordinate[0], lng: res[i][1].coordinate[1]});
+                this.markers[i] = new google.maps.Marker({
+                    position: markerLatLng,
+                });
+                this.markers[i].setMap(this.map)
 
-                        this.markerEvent(i);
-                    }
+                var  feed = res[i].feed_flag ? `<iframe src=${res[i][1].feed} frameborder="0" ></iframe>` : ""
+                var content = feed ? feed : res[i][1].description
+                var description_format = res[i][1].description_format
+                if(description_format ==  'text') {
+                    var format: string =  feed ? content : this.escapeHtml(content)
+                    this.info = new google.maps.InfoWindow({
+                        content:format
+                    })
+                } else if (description_format == 'html') {
+                    var format: string =  '<div id="detail">'+content+'</div>'
+                    this.info = new google.maps.InfoWindow({
+                    })
+                    this.info.setContent(format)
                 }
 
-            } else {
-
-                if(res[i][1]['marker_display'] ) {
-
-                    var  markerLatLng = new google.maps.LatLng({lat: res[i][1]['coordinate'][0], lng: res[i][1]['coordinate'][1]});
-                    this.markers[i] = new google.maps.Marker({
-                        position: markerLatLng,
-                    });
-                    this.markers[i].setMap(this.map)
-
-
-                    var  feed = res[i][1]['feed_flag'] ? `<iframe src=${res[i]['feed']} frameborder="0" ></iframe>` : ""
-                    var content = feed ? feed : res[i][1]['description']
-                    var description_format = res[i][1]['description_format']
-                    if(description_format ==  'text') {
-                        var format: string =  feed ? content : this.escapeHtml(content)
-                        this.info = new google.maps.InfoWindow({
-                            content:format
-                        })
-                    } else if (description_format == 'html') {
-                        var format: string =  '<div id="detail">'+content+'</div>'
-                        this.info = new google.maps.InfoWindow({
-                        })
-                        this.info.setContent(format)
-                    }
-
-                    this.markerEvent(i);
-                }
-                res[i][1]['marker_flag'] = true
-                allmarker.push(res[i])
-
+                this.markerEvent(i);
             }
 
+            allmarker[res[i][1].id] = res[i][1]
         }
-        return this.markers
+
     }
 
     escapeHtml(str: string){

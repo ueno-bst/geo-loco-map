@@ -99,7 +99,6 @@ export class YahooMapEntity {
 
    marker(res: any, id?: number) {
 
-      //var response = this.markerConvert(response, id)
 
       if (id) {
          for ( var i = 0; i < this.markers.length; i++) {
@@ -112,8 +111,6 @@ export class YahooMapEntity {
       for ( var i = 0; i < response.length; i++) {
 
          var markerId = response[i][1].id
-
-         console.log(allmarker[markerId])
 
          if(response[i][1].marker_display && ( allmarker[markerId] === undefined )) {
 
