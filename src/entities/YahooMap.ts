@@ -3,7 +3,7 @@ import { ICoordinate} from "./Coordinate";
 import {  GeoLocoMapRequest } from "../Request";
 import {ApiRequest} from "./ApiRequest";
 
-var allmarker: any[] = []
+var allmarker:any = {}
 
 /// <reference path="../typings/yahoo.d.ts" />
 export class YahooMapEntity {
@@ -99,7 +99,7 @@ export class YahooMapEntity {
 
    marker(res: any, id?: number) {
 
-      var response = this.markerConvert(response, id)
+      //var response = this.markerConvert(response, id)
 
       if (id) {
          for ( var i = 0; i < this.markers.length; i++) {
@@ -107,41 +107,20 @@ export class YahooMapEntity {
          }
       }
 
-      response = Object.entries(res)
+      var response:any = Object.entries(res)
 
-
-       console.log(response)
       for ( var i = 0; i < response.length; i++) {
 
+         var markerId = response[i][1].id
 
+         console.log(allmarker[markerId])
 
-         if(allmarker[i]) {
-            if (allmarker[i]['id']  != response[i][1]['id']) {
-               if(response[i]['marker_display']  ) {
+         if(response[i][1].marker_display && ( allmarker[markerId] === undefined )) {
 
-                  this.markers[i] =  new Y.Marker(new Y.LatLng(response[i][1]['coordinate'][0], response[i][1]['coordinate'][1]));
-                  var  feed = response[i][1]['feed_flag'] ? `<iframe src=${response[i][1]['feed']} frameborder="0" ></iframe>` : ""
-                  var content = feed ? feed : response[i][1]['description']
-                  var description_format = response[i][1]['description_format']
-                  if(description_format ==  'text') {
-                     var format: string =  feed ? content : this.escapeHtml(content)
-                     this.markers[i].bindInfoWindow(format);
-                  } else if (description_format == 'html') {
-                     this.markers[i].bindInfoWindow(`<div class="detail">${content}</div>`);
-                  }
-
-                  this.map.addFeature(this.markers[i]);
-
-               }
-
-            }
-         } else {
-            if(response[i][1]['marker_display'] ) {
-
-               this.markers[i] =  new Y.Marker(new Y.LatLng(response[i][1]['coordinate'][0], response[i][1]['coordinate'][1]));
-               var  feed = response[i]['feed_flag'] ? `<iframe src=${response[i][1]['feed']} frameborder="0" ></iframe>` : ""
-               var content = feed ? feed : response[i][1]['description']
-               var description_format = response[i][1]['description_format']
+               this.markers[i] =  new Y.Marker(new Y.LatLng(response[i][1].coordinate[0], response[i][1].coordinate[1]));
+               var  feed = response[i][1].feed_flag ? `<iframe src=${response[i][1].feed} frameborder="0" ></iframe>` : ""
+               var content = feed ? feed : response[i][1].description
+               var description_format = response[i][1].description_format
                if(description_format ==  'text') {
                   var format: string =  feed ? content : this.escapeHtml(content)
                   this.markers[i].bindInfoWindow(format);
@@ -152,12 +131,9 @@ export class YahooMapEntity {
                this.map.addFeature(this.markers[i]);
 
             }
-            response[i][1]['marker_flag'] = true
-            allmarker.push(response[i][1])
 
+         allmarker[response[i][1].id] = response[i][1]
          }
-      }
-
    }
 
    escapeHtml(str: string){
