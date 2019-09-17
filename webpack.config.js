@@ -28,13 +28,13 @@ var baseConfig = {
 
 var GeoLocoMapConfig = webpackMerge(baseConfig, {
 	output: {
-		filename: 'bundle.js',
+		filename: 'geo-loco-map.js',
 		path: __dirname + "/dist",
 		libraryExport: 'GeoLocoMap',
 		library: 'GeoLocoMap',
 		libraryTarget: 'umd'
 	},
-	entry: './src/GeoLoco.ts',
+	entry: './src/GeoLocoMap.ts',
 	name: 'umd',
 	mode: 'production',
 })

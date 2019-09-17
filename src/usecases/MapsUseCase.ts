@@ -1,26 +1,29 @@
-import { IMaps } from "../entities/Maps";
-import { GoogleMapEntiry } from "../entities/GoogleMap";
-import { YahooMapEntity } from "../entities/YahooMap";
-import {ICoordinate} from "../entities/Coordinate";
+import { IMapConfig } from "../entities/MapConfig";
+import { GoogleMapController } from "../controllers/GoogleMapController";
+import { YahooMapController } from "../controllers/YahooMapController";
+import {ILatLng} from "../entities/LatLng";
 import { GeoLocoMapRequest } from "../Request";
 
 export  class MapsUseCase  {
-    imaps: IMaps;
-    map: GoogleMapEntiry | YahooMapEntity |  any
+    imaps: IMapConfig;
+    map: GoogleMapController | YahooMapController |  any
 
 
-    constructor(maps: IMaps, geoLocoMapRequest?: GeoLocoMapRequest) {
+    constructor(maps: IMapConfig, geoLocoMapRequest?: GeoLocoMapRequest) {
         this.imaps = maps
         this.map = this.execute(geoLocoMapRequest)
     }
 
     execute(geoLocoMapRequest?: GeoLocoMapRequest) {
 
+        /*
         if (this.imaps.map_type == 'yahoo') {
-            return new YahooMapEntity(this.imaps,geoLocoMapRequest)
+            return new YahooMapController(this.imaps,geoLocoMapRequest)
         } else {
-            return new GoogleMapEntiry(this.imaps, geoLocoMapRequest)
+            return new GoogleMapController(this.imaps, geoLocoMapRequest)
         }
+
+         */
 
     }
 
@@ -37,7 +40,7 @@ export  class MapsUseCase  {
         return this.map.getCenter()
     }
 
-    setCenter(coordinate: ICoordinate) {
+    setCenter(coordinate: ILatLng) {
         if (this.map.maps.map_type == 'google') {
 
             this.map.setCenter(coordinate)
@@ -49,7 +52,7 @@ export  class MapsUseCase  {
         }
     }
 
-    addMarker(coordinate: ICoordinate) {
+    addMarker(coordinate: ILatLng) {
         this.map.addMarker(coordinate)
 
     }

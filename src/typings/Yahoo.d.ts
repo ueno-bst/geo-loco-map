@@ -6,6 +6,8 @@ declare namespace Y {
   }
   class LatLngBounds {
     constructor(sw: LatLng, ne: LatLng)
+    ne: LatLng;
+    sw: LatLng;
   }
   class Point {
     x: number
@@ -13,8 +15,31 @@ declare namespace Y {
     constructor(x: number, y: number)
   }
 
+  interface MapOption {
+    configure?: MapConfig,
+  }
+
+  interface MapConfig {
+    doubleClickZoom?: boolean,
+    scrollWheelZoom?: boolean,
+    singleClickPan?: boolean,
+    dragging?: boolean,
+    continuousZoom?: boolean,
+    hybridPhoto?: boolean,
+    enableFlickScroll?: boolean,
+    enableOpenStreetMap?: boolean,
+    mapType?: MapType,
+    weatherOverlay?: boolean,
+  }
+
+  enum MapType {
+    NORMAL,
+    STANDARD,
+    SMARTPHONE,
+  }
+
   class Map {
-    constructor(id: string)
+    constructor(id: string, option: MapOption)
     getZoom(): number
     getCenter(): LatLng
     addFeature(feather: Feather): void
@@ -40,6 +65,7 @@ declare namespace Y {
                search?: SearchControl
     ):void
     bind(eventName: string, handler: (...args: any[]) => void):void
+    getBounds(): LatLngBounds | null;
   }
   class LayerSetControl {}
   class CenterMarkControl {}
@@ -85,6 +111,7 @@ declare namespace Y {
     getMap(): Map
     bind(eventName: string, fn: Function): void
     bindInfoWindow(detail: string): void
+    openInfoWindow(content: string): void
   }
   class Label implements Feather {
     constructor(latlng: LatLng, label: string, option?: LabelOption)

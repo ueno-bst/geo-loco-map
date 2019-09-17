@@ -1,15 +1,15 @@
-import { ICoordinate } from "./entities/Coordinate";
+import { ILatLng } from "./entities/LatLng";
 import { RequestControllers } from "./controllers/RequestControllers";
 
 
 export  class GeoLocoMapRequest {
 
-    coordinate: ICoordinate
+    coordinate: ILatLng
     url: string
     response: any
 
 
-    constructor(coordinate: ICoordinate, url: string) {
+    constructor(coordinate: ILatLng, url: string) {
         this.coordinate = coordinate
         this.url = url
     }
