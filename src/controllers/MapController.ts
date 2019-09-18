@@ -132,7 +132,7 @@ export abstract class MapController<T extends Object> extends IMapController {
     protected onMoveHandler() {
         this.config.center = this.getCenter();
         if (this.config.onMove) {
-            this.config.onMove(this.config.center, this.root);
+            this.config.onMove(this.root, this.config.center);
         }
         this.onChangeHandler();
         this.onApiRequestHandler();
@@ -144,7 +144,7 @@ export abstract class MapController<T extends Object> extends IMapController {
     protected onZoomListener() {
         this.config.zoom = this.getZoom();
         if (this.config.onZoom) {
-            this.config.onZoom(this.config.zoom, this.root);
+            this.config.onZoom(this.root, this.config.zoom);
         }
         this.onChangeHandler();
         this.onApiRequestHandler();
@@ -157,7 +157,7 @@ export abstract class MapController<T extends Object> extends IMapController {
     protected onUIListener(show: boolean) {
         this.config.show_ui = show;
         if (this.config.onUI) {
-            this.config.onUI(this.config.show_ui, this.root);
+            this.config.onUI(this.root, this.config.show_ui,);
         }
         this.onChangeHandler();
     }
@@ -167,6 +167,9 @@ export abstract class MapController<T extends Object> extends IMapController {
      * @param marker
      */
     protected onClickMarkerHandler(marker: IMarkerList<T>) {
+        if (this.config.onClickMarker) {
+            this.config.onClickMarker(marker.marker, this.root);
+        }
         if (this.config.show_info) {
             this.openModal(marker);
         }

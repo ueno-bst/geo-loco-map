@@ -58,21 +58,21 @@ export interface IMapConfig {
      * @param zoom
      * @param ctrl マップコントローラーオブジェクト
      */
-    onZoom?: (zoom: number, ctrl: IController) => void;
+    onZoom?: (ctrl: IController, zoom: number) => void;
 
     /**
      * マップ移動時のイベントリスナー
      * @param coordinate
      * @param ctrl マップコントローラーオブジェクト
      */
-    onMove?: (coordinate: ILatLng, ctrl: IController) => void;
+    onMove?: (ctrl: IController, coordinate: ILatLng) => void;
 
     /**
      * マップコントローラー表示時のイベントリストナー
      * @param flag
      * @param ctrl マップコントローラーオブジェクト
      */
-    onUI?: (flag: boolean, ctrl: IController) => void;
+    onUI?: (ctrl: IController, flag: boolean) => void;
 
     /**
      * マップのパラメータが変更された際に実行されるイベントリスナー
@@ -119,10 +119,10 @@ export class MapConfig implements IMapConfig {
      * マップの初期化・サイズ変更時のイベントリスナー
      */
     onInit?: (ctrl: IController) => void;
-    onZoom?: (zoom: number, ctrl: IController) => void;
-    onMove?: (coordinate: ILatLng, ctrl: IController) => void;
+    onZoom?: (ctrl: IController, zoom: number) => void;
+    onMove?: (ctrl: IController, coordinate: ILatLng) => void;
     onChange?: (ctrl: IController) => void;
-    onUI?: (flag: boolean, ctrl: IController) => void;
+    onUI?: (ctrl: IController, flag: boolean) => void;
     onClickMarker?: (marker: IMarkerData, ctrl: IController) => void;
 
     constructor(params: any) {

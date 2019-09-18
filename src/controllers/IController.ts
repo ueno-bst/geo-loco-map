@@ -2,8 +2,10 @@ import {IMapConfig, MapConfig, MapType} from "../entities/MapConfig";
 import {IMapController} from "./IMapController";
 import {GoogleMapController} from "./GoogleMapController";
 import {YahooMapController} from "./YahooMapController";
+import {ILatLng, ILatLngBound} from "../entities/LatLng";
+import {IMarkerData} from "../entities/Response";
 
-export class IController {
+export abstract class IController {
 
     protected _config: IMapConfig;
 
@@ -32,4 +34,34 @@ export class IController {
     protected get controller(): IMapController {
         return this._controller;
     }
+
+    public abstract getElement(): Element ;
+
+    public abstract getBounds(): ILatLngBound | null;
+
+    public abstract getZoom(): number;
+
+    public abstract setZoom(zoom: number): void;
+
+    public abstract getCenter(): ILatLng;
+
+    public abstract setCenter(lat: number, lng: number): void;
+
+    public abstract addMarker(marker: IMarkerData): IMarkerData;
+
+    public abstract hasMarker(id: string): boolean;
+
+    public abstract getMarker(id: string): IMarkerData | null;
+
+    public abstract removeMarker(id: string): boolean;
+
+    public abstract getViewInMarkers(limit: number): IMarkerData[];
+
+    public abstract getUI(): boolean;
+
+    public abstract setUI(flag: boolean): void;
+
+    public abstract getInfo(): boolean;
+
+    public abstract setInfo(flag: boolean): void;
 }

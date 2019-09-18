@@ -8,6 +8,10 @@
     <script type="text/javascript" charset="utf-8" src="https://map.yahooapis.jp/js/V1/jsapi?appid=dj00aiZpPU51NkFQOFB5N0hZVSZzPWNvbnN1bWVyc2VjcmV0Jng9MDg-"></script>
     <title>sample</title>
     <style>
+        body {
+            font-size: .8em;
+        }
+
         dl {
             display: flex;
             font-size: .7rem;
@@ -25,7 +29,10 @@
         <fieldset style="margin: 0 0 1em 0;">
             <legend>コントロールの表示</legend>
             <label>
-                <input type="checkbox" id="control" value="1"> 表示ステータス
+                <input type="checkbox" id="ui" value="1"> コントローラー表示
+            </label>
+            <label>
+                <input type="checkbox" id="info" value="1"> バルーン表示
             </label>
 
             <table>
@@ -70,14 +77,15 @@
 			map_type: 'yahoo',
 			center: [35, 135],
 			show_ui: true,
+            show_info: false,
 			selector: '.map',
 			api_url: '/geo-loco-map/src/response.json',
-			onMove: function (coordinate) {
+			onMove: function (obj, coordinate) {
 				$("#latitude").val(coordinate.lat);
 				$("#longitude").val(coordinate.lng);
 				console.info("onMove", coordinate.lat, coordinate.lng);
 			},
-			onZoom: function (zoom) {
+			onZoom: function (obj, zoom) {
 				$("#zoom").val(zoom);
 				console.info("onZoom", zoom);
 			},
@@ -103,13 +111,17 @@
 
 				$("#markers").val(t);
 			},
-			onUI: function (f) {
-				$("#control").prop("checked", f);
-			}
+			onUI: function (obj, f) {
+				$("#ui").prop("checked", f);
+			},
+            onClickMarker: function(f) {
+				console.info(f);
+				alert(f.label);
+            },
 		});
 
-		$("#control").on("change", function () {
-			map.setUI($("#control:checked").length > 0);
+		$("#ui").on("change", function () {
+			map.setUI($("#ui:checked").length > 0);
 		});
 
 		var centerTimer;
@@ -117,7 +129,7 @@
 			clearTimeout(centerTimer);
 			centerTimer = setTimeout(function () {
 				map.setCenter($("#latitude").val(), $("#longitude").val());
-			}, 50);
+			}, 100);
 		});
 
 		var zoomTimer;
@@ -125,7 +137,7 @@
 			clearTimeout(zoomTimer);
 			zoomTimer = setTimeout(function () {
 				map.setZoom($("#zoom").val());
-			}, 50);
+			}, 100);
 		});
 
 		map.addMarker({
