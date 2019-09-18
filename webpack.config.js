@@ -6,10 +6,18 @@ var baseConfig = {
 		extensions: ['.js', '.ts'],
 	},
 	module: {
-		rules: [{
-			test: /\.ts$/,
-			use: "ts-loader"
-		}]
+		rules: [
+			{
+				test: /\.ts$/,
+				use: "ts-loader"
+			},
+			{
+				test: /\.html$/,
+				use: {
+					loader: 'html-loader',
+				}
+			}
+		]
 	},
 	mode: process.env.NODE_ENV || "development",
 	devServer: {
@@ -24,7 +32,7 @@ var baseConfig = {
 			template: "./src/index.html"
 		})
 	]
-}
+};
 
 var GeoLocoMapConfig = webpackMerge(baseConfig, {
 	output: {
@@ -37,7 +45,7 @@ var GeoLocoMapConfig = webpackMerge(baseConfig, {
 	entry: './src/GeoLocoMap.ts',
 	name: 'umd',
 	mode: 'production',
-})
+});
 
 
 module.exports = GeoLocoMapConfig;
