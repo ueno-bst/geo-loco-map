@@ -31,15 +31,15 @@
             <table>
                 <tr>
                     <th><label for="latitude">Lat:</label></th>
-                    <td><input id="latitude" type="number" readonly></td>
+                    <td><input id="latitude" type="number" min="-90.00000000" max="90.0000000" step="0.005"></td>
                 </tr>
                 <tr>
                     <th><label for="longitude">Lng:</label></th>
-                    <td><input id="longitude" type="number" readonly></td>
+                    <td><input id="longitude" type="number" min="-180.00000000" max="180.0000000" step="0.005"></td>
                 </tr>
                 <tr>
                     <th><label for="zoom">Zoom:</label></th>
-                    <td><input id="zoom" type="number" readonly></td>
+                    <td><input id="zoom" type="number" min="1" max="20"></td>
                 </tr>
                 <tr>
                     <th rowspan="4">Bounds:</th>
@@ -75,9 +75,11 @@
 			onMove: function (coordinate) {
 				$("#latitude").val(coordinate.lat);
 				$("#longitude").val(coordinate.lng);
+				console.info("onMove", coordinate.lat, coordinate.lng);
 			},
 			onZoom: function (zoom) {
 				$("#zoom").val(zoom);
+				console.info("onZoom", zoom);
 			},
 			onInit: function (e) {
 			},
@@ -92,14 +94,12 @@
 				}
 
 				var
-                    m = map.getViewInMarkers(),
-                    t = "";
+					m = map.getViewInMarkers(),
+					t = "";
 
 				for (var i = 0; i < m.length; i++) {
-					var n = m[i];
-
 					t = t + m[i].id + " : " + m[i].label + "\n";
-                }
+				}
 
 				$("#markers").val(t);
 			},
@@ -112,9 +112,25 @@
 			map.setUI($("#control:checked").length > 0);
 		});
 
+		var centerTimer;
+		$("#latitude, #longitude").on("change input", function () {
+			clearTimeout(centerTimer);
+			centerTimer = setTimeout(function () {
+				map.setCenter($("#latitude").val(), $("#longitude").val());
+			}, 50);
+		});
+
+		var zoomTimer;
+		$("#zoom").on("change input", function () {
+			clearTimeout(zoomTimer);
+			zoomTimer = setTimeout(function () {
+				map.setZoom($("#zoom").val());
+			}, 50);
+		});
+
 		map.addMarker({
 			coordinate: [34.6675858, 133.8958007],
-            label: "岡山県のてけとーな場所",
+			label: "岡山県のてけとーな場所",
 			description: "AAA<strong>A</strong>AA",
 			description_format: "text",
 		});
@@ -127,7 +143,7 @@
 			description_format: "text",
 		});
 
-		map.removeMarker("temp");
+		// map.removeMarker("temp");
 	});
 
 </script>

@@ -17,16 +17,16 @@ export class GeoLocoMap extends IController {
         return this.config.zoom;
     }
 
-    setZoom(number: number): void {
-        return this.controller.setZoom(number);
+    setZoom(zoom: number): void {
+        return this.controller.setZoom(Math.min(20, Math.max(1, zoom)));
     }
 
     getCenter() {
         return this.config.center;
     }
 
-    setCenter(coordinate: ILatLng) {
-        return this.controller.setCenter(coordinate);
+    setCenter(lat: number, lng: number) {
+        return this.controller.setCenter({lat: lat, lng: lng});
     }
 
     addMarker(marker: IMarkerData): IMarkerData {
@@ -45,12 +45,24 @@ export class GeoLocoMap extends IController {
         return this.controller.removeMarker(id)
     }
 
-    getViewInMarkers(limit:number = 10) {
+    getViewInMarkers(limit: number = 10) {
         return this.controller.getViewInMarkers(limit);
+    }
+
+    getUI(): boolean {
+        return this.config.show_ui;
     }
 
     setUI(flag: boolean): void {
         return this.controller.setUI(flag);
+    }
+
+    getInfo(): boolean {
+        return this.config.show_info;
+    }
+
+    setInfo(flag: boolean): void {
+        this.config.show_info = flag;
     }
 }
 
