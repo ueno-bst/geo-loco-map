@@ -1,6 +1,6 @@
 {
   "name": "geo-loco-map",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -8,8 +8,8 @@
     "dev": "webpack-dev-server --open",
     "build": "webpack"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["map", "google-map", "yolp"],
+  "author": "biost.co.jp",
   "license": "ISC",
   "dependencies": {
     "@types/googlemaps": "^3.37.1",
