@@ -54,7 +54,9 @@ export class GeoLocoMap extends IController {
     }
 
     setUI(flag: boolean): void {
-        return this.controller.setUI(flag);
+        if (this.config.show_ui != flag) {
+            return this.controller.setUI(flag);
+        }
     }
 
     getInfo(): boolean {
@@ -62,7 +64,9 @@ export class GeoLocoMap extends IController {
     }
 
     setInfo(flag: boolean): void {
-        this.config.show_info = flag;
+        if (this.config.show_info != flag) {
+            this.config.show_info = flag;
+        }
     }
 }
 

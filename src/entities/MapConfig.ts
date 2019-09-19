@@ -55,24 +55,31 @@ export interface IMapConfig {
 
     /**
      * ズーム率変更時のイベントリスナー
-     * @param zoom
      * @param ctrl マップコントローラーオブジェクト
+     * @param zoom
      */
     onZoom?: (ctrl: IController, zoom: number) => void;
 
     /**
      * マップ移動時のイベントリスナー
-     * @param coordinate
      * @param ctrl マップコントローラーオブジェクト
+     * @param coordinate
      */
     onMove?: (ctrl: IController, coordinate: ILatLng) => void;
 
     /**
-     * マップコントローラー表示時のイベントリストナー
-     * @param flag
+     * マップコントローラー表示時のイベントリスナー
      * @param ctrl マップコントローラーオブジェクト
+     * @param flag
      */
     onUI?: (ctrl: IController, flag: boolean) => void;
+
+    /**
+     * インフォメーションバルーン表示の有効状態変更時のイベントリスナー
+     * @param ctrl マップコントローラーオブジェクト
+     * @param flag
+     */
+    onInfo?: (ctrl: IController, flag: boolean) => void;
 
     /**
      * マップのパラメータが変更された際に実行されるイベントリスナー

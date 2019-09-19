@@ -32,7 +32,7 @@
                 <input type="checkbox" id="ui" value="1"> コントローラー表示
             </label>
             <label>
-                <input type="checkbox" id="info" value="1"> バルーン表示
+                <input type="checkbox" id="info" value="1"> 情報バルーン表示(クリック時)
             </label>
 
             <table>
@@ -63,12 +63,12 @@
                 </tr>
             </table>
         </fieldset>
-        <div style="position:relative; flex-grow: 1;">
-            <textarea id="markers" style="position: absolute; left: 0; top: 0; bottom:0; right: 0; width: 100%; box-sizing: border-box;"></textarea>
-        </div>
+        <fieldset style="position:relative; flex-grow: 1; padding: 1em;">
+            <legend>ビュー内にあるマーカー情報</legend>
+            <div id="markers" style="position: absolute; left: .5em; top: 1.5em; bottom:0; right: .5em; box-sizing: border-box; border:0; overflow: auto;"></div>
+        </fieldset>
     </div>
 </section>
-</div>
 
 <!--<script type="text/javascript" src="../dist/bundle.js"></script>-->
 <script type="module">
@@ -77,28 +77,42 @@
 			map_type: 'yahoo',
 			center: [35, 135],
 			show_ui: true,
-            show_info: false,
+			show_info: true,
 			selector: '.map',
 			api_url: '/geo-loco-map/src/response.json',
+			// api_url: '/geo-loco-map/tools/response.2500.json',
+			onInit: function (e) {
+			},
 			onMove: function (obj, coordinate) {
-				$("#latitude").val(coordinate.lat);
-				$("#longitude").val(coordinate.lng);
 				console.info("onMove", coordinate.lat, coordinate.lng);
 			},
 			onZoom: function (obj, zoom) {
-				$("#zoom").val(zoom);
 				console.info("onZoom", zoom);
 			},
-			onInit: function (e) {
+			onUI: function (obj, f) {
+				console.info("onUI", f);
 			},
 			onChange: function (c) {
-				var b = map.getBounds();
+				var
+					info = c.getInfo(),
+					ui = c.getUI(),
+					center = c.getCenter(),
+					zoom = c.getZoom(),
+					bound = c.getBounds();
 
-				if (b) {
-					$("#bound-ne").val(b.ne.lat);
-					$("#bound-nw").val(b.ne.lng);
-					$("#bound-se").val(b.sw.lat);
-					$("#bound-sw").val(b.sw.lng);
+				$("#latitude").val(center.lat);
+				$("#longitude").val(center.lng);
+
+				$("#zoom").val(zoom);
+
+				$("#ui").prop("checked", ui);
+				$("#info").prop("checked", info);
+
+				if (bound) {
+					$("#bound-ne").val(bound.ne.lat);
+					$("#bound-nw").val(bound.ne.lng);
+					$("#bound-se").val(bound.sw.lat);
+					$("#bound-sw").val(bound.sw.lng);
 				}
 
 				var
@@ -106,18 +120,19 @@
 					t = "";
 
 				for (var i = 0; i < m.length; i++) {
-					t = t + m[i].id + " : " + m[i].label + "\n";
+					t = t + m[i].id + " : " + m[i].label + "<br>";
 				}
 
-				$("#markers").val(t);
+				$("#markers").html(t);
 			},
-			onUI: function (obj, f) {
-				$("#ui").prop("checked", f);
-			},
-            onClickMarker: function(f) {
+			onClickMarker: function (f) {
 				console.info(f);
 				alert(f.label);
-            },
+			},
+		});
+
+		$("#info").on("change", function () {
+			map.setInfo($("#info:checked").length > 0);
 		});
 
 		$("#ui").on("change", function () {

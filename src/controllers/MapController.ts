@@ -167,11 +167,12 @@ export abstract class MapController<T extends Object> extends IMapController {
      * @param marker
      */
     protected onClickMarkerHandler(marker: IMarkerList<T>) {
-        if (this.config.onClickMarker) {
-            this.config.onClickMarker(marker.marker, this.root);
-        }
         if (this.config.show_info) {
             this.openModal(marker);
+        }
+
+        if (this.config.onClickMarker) {
+            this.config.onClickMarker(marker.marker, this.root);
         }
     }
 
