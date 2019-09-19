@@ -45,9 +45,9 @@
 |メソッド名|aaa|説明|
 |:---|---|:---|
 |onInit|(object) => void|地図が初期化された直後に実行されるイベント|
-|onZoom|(int, object) => void|表示地図のズーム率が変更されるごとに実行されるイベント|
-|onMove|(float[], object) => void|表示地図の中心点が変更されるごとに実行されるイベント|
-|onUI|(boolean, object) => void|インターフェイスの表示状態が切り替わるごとに実行されるイベント|
+|onZoom|(object, int) => void|表示地図のズーム率が変更されるごとに実行されるイベント|
+|onMove|(object, float[]) => void|表示地図の中心点が変更されるごとに実行されるイベント|
+|onUI|(object, boolean) => void|インターフェイスの表示状態が切り替わるごとに実行されるイベント|
 |onChange|(object) => void|表示する地図の状態が変更されるごとに実行されるイベント|
 |onClickMarker|(string, object) => void|マーカーがクリックされた際に実行されるイベント|
 
