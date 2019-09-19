@@ -140,7 +140,7 @@ export class MapConfig implements IMapConfig {
         this.show_info = Boolean(p.show_info);
         this.grid = Number(p.grid);
         this.center = new LatLng(p.center);
-        this.zoom = Number(p.center);
+        this.zoom = Number(p.zoom);
         this.lazy_load = Number(p.lazy_load);
 
         const map_type = String(p.map_type);
