@@ -26,14 +26,16 @@ export class GoogleMapController extends MapController<google.maps.Marker> {
 
         // 地図の中心点変更時イベントを登録
         google.maps.event.addListenerOnce(this.map, "idle", () => {
-            // 初期化イベント発行
-            this.onInitHandler();
+            setTimeout(() => {
+                // 初期化イベント発行
+                this.onInitHandler();
 
-            // コントロースの表示制御
-            this.setUI(this.config.show_ui);
+                // コントロースの表示制御
+                this.setUI(this.config.show_ui);
 
-            // APIをリクエスト
-            this.request();
+                // APIをリクエスト
+                this.request();
+            });
         });
 
         this.map.addListener("bounds_changed", () => {

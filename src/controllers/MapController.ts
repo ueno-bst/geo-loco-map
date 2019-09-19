@@ -111,19 +111,13 @@ export abstract class MapController<T extends Object> extends IMapController {
         this.onChangeHandler();
     }
 
-    private changeTimer?: any;
-
     /**
      * パラメータ変更イベントハンドラー
      */
     protected onChangeHandler() {
-        clearTimeout(this.changeTimer);
-
-        this.changeTimer = setTimeout(() => {
-            if (this.config.onChange) {
-                this.config.onChange(this.root);
-            }
-        }, 10);
+        if (this.config.onChange) {
+            this.config.onChange(this.root);
+        }
     }
 
     /**

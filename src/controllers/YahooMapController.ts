@@ -37,14 +37,16 @@ export class YahooMapController extends MapController<Y.Marker> {
 
         // イベント関連付け
         this.map.bind("load", () => {
-            // 初期化イベント発行
-            this.onInitHandler();
+            setTimeout(() => {
+                // 初期化イベント発行
+                this.onInitHandler();
 
-            // インターフェイス制御
-            this.setUI(this.config.show_ui);
+                // インターフェイス制御
+                this.setUI(this.config.show_ui);
 
-            // 初回APIリクエストを発行
-            this.request();
+                // 初回APIリクエストを発行
+                this.request();
+            });
         });
 
         // 地図のレンダリング
