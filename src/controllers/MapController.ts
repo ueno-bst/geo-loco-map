@@ -4,6 +4,7 @@ import {MarkerData, IApiResponse, IMarkerData} from "../entities/Response";
 import {IMarkerList, isIMarkerList} from "./IMarkers";
 import {IController} from "./IController";
 import {isArray, isExist, isFunction, isNull, isString} from "../utils/Types";
+import {URLBuilder} from "../utils/URLBuilder";
 
 export abstract class MapController<T extends Object> extends IMapController {
 
@@ -63,7 +64,11 @@ export abstract class MapController<T extends Object> extends IMapController {
         const centre = this.getCenter();
         const zoom = this.getZoom();
 
-        const request_url = this.config.api_url + "?lat=" + centre.lat.toFixed(5) + "&lng=" + centre.lng.toFixed(5) + "&zoom=" + zoom;
+        const url = new URLBuilder(this.config.api_url);
+
+        url.query.set("lat", centre.lat.toFixed(5));
+        url.query.set("lng", centre.lng.toFixed(5));
+        url.query.set("zoom", String(zoom));
 
         const xhr = new XMLHttpRequest();
 
@@ -75,7 +80,7 @@ export abstract class MapController<T extends Object> extends IMapController {
             }
         };
 
-        xhr.open("GET", request_url, true);
+        xhr.open("GET", url.build(), true);
         xhr.send();
     }
 
