@@ -1,6 +1,8 @@
 import {ILatLng, LatLng} from "./LatLng";
 import {IMarkerData} from "./Response";
 import {IController} from "../controllers/IController";
+import {ILatLngBound, LatLngBound} from "./LatLngBound";
+import {isUndefined} from "../utils/Types";
 
 export enum MapType {
     GoogleMap = "google",
@@ -19,9 +21,24 @@ export interface IMapConfig {
     center: ILatLng;
 
     /**
+     * 地図のスクロール範囲を指定したい場合に
+     */
+    center_bound?: ILatLngBound;
+
+    /**
      * 地図の初期表示状態のズーム率を指定
      */
     zoom: number;
+
+    /**
+     * ズーム率の最小比率
+     */
+    zoom_min: number;
+
+    /**
+     * ズーム率の最大比率
+     */
+    zoom_max: number;
 
     /**
      *　表示対象のHTMLエレメントを指定
@@ -45,7 +62,6 @@ export interface IMapConfig {
 
     grid: number;
     lazy_load: number;
-
 
     /**
      * マップの初期化・サイズ変更時のイベントリスナー
@@ -90,7 +106,7 @@ export interface IMapConfig {
     /**
      *
      */
-    onShowMarker?: (marker: IMarkerData, ctrl: IController) => void;
+    onAddMarker?: (ctrl: IController) => void;
     onHideMarker?: (marker: IMarkerData, ctrl: IController) => void;
 
     /**
@@ -101,67 +117,41 @@ export interface IMapConfig {
     onClickMarker?: (marker: IMarkerData, ctrl: IController) => void;
 }
 
-export class MapConfig implements IMapConfig {
-    show_ui = true;
+export function fixMapConfig(params: IMapConfig) {
+    const def: IMapConfig = {
+        show_ui: true,
+        show_info: true,
+        center: new LatLng(35.681236, 139.767125),
+        center_bound: undefined,
+        zoom: 9,
+        zoom_min: 0,
+        zoom_max: 99,
+        grid: 5,
+        lazy_load: 900,
+        map_type: MapType.GoogleMap,
+        selector: "#map",
+        api_url: "",
+    };
 
-    /**
-     * クリックした際に、地図上にインフォメーションバルーンを表示する
-     */
-    show_info = true;
+    const config: IMapConfig = {
+        ...def,
+        ...params
+    };
 
-    /**
-     *
-     */
-    center = new LatLng(35.681236, 139.767125);
+    config.center = new LatLng(config.center);
 
-    grid = 5;
-    lazy_load = 500;
-    map_type = MapType.GoogleMap;
-    selector = "#map";
-    zoom = 13;
-
-    api_url = "";
-
-    /**
-     * マップの初期化・サイズ変更時のイベントリスナー
-     */
-    onInit?: (ctrl: IController) => void;
-    onZoom?: (ctrl: IController, zoom: number) => void;
-    onMove?: (ctrl: IController, coordinate: ILatLng) => void;
-    onChange?: (ctrl: IController) => void;
-    onUI?: (ctrl: IController, flag: boolean) => void;
-    onClickMarker?: (marker: IMarkerData, ctrl: IController) => void;
-
-    constructor(params: any) {
-
-        const p: MapConfig = {...this, ...params};
-
-        this.show_ui = Boolean(p.show_ui);
-        this.show_info = Boolean(p.show_info);
-        this.grid = Number(p.grid);
-        this.center = new LatLng(p.center);
-        this.zoom = Number(p.zoom);
-        this.lazy_load = Number(p.lazy_load);
-
-        const map_type = String(p.map_type);
-
-        switch (map_type) {
-            case MapType.GoogleMap:
-                this.map_type = MapType.GoogleMap;
-                break;
-            case MapType.YahooMap:
-                this.map_type = MapType.YahooMap;
-                break;
-        }
-
-        this.selector = String(p.selector);
-        this.api_url = String(p.api_url);
-
-        this.onInit = p.onInit;
-        this.onZoom = p.onZoom;
-        this.onMove = p.onMove;
-        this.onChange = p.onChange;
-        this.onUI = p.onUI;
-        this.onClickMarker = p.onClickMarker;
+    if (!isUndefined(config.center_bound)) {
+        config.center_bound = new LatLngBound(config.center_bound);
     }
+
+    switch (config.map_type) {
+        case MapType.YahooMap:
+            break;
+        case MapType.GoogleMap:
+        default:
+            config.map_type = MapType.GoogleMap;
+            break;
+    }
+
+    return config;
 }

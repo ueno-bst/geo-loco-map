@@ -1,8 +1,10 @@
-import {ILatLng, ILatLngBound, LatLng, LatLngBound} from "../entities/LatLng";
+import {ILatLng, LatLng} from "../entities/LatLng";
 import {MapController} from "./MapController";
 import {IMarkerData} from "../entities/Response";
 import {IMarkerList} from "./IMarkers";
 import {IController} from "./IController";
+import {LatLngBound} from "../entities/LatLngBound";
+import {isNumber} from "../utils/Types";
 
 
 export class GoogleMapController extends MapController<google.maps.Marker> {
@@ -16,13 +18,22 @@ export class GoogleMapController extends MapController<google.maps.Marker> {
         super(root);
 
         // 地図をレンダリング
-        this.map = new google.maps.Map(this.element, {
-                center: {lat: this.config.center.lat, lng: this.config.center.lng},
-                scrollwheel: true,
-                zoom: this.config.zoom,
-                disableDefaultUI: !this.config.show_ui,
-            }
-        );
+        const mapConfig: google.maps.MapOptions = {
+            center: {lat: this.config.center.lat, lng: this.config.center.lng},
+            scrollwheel: true,
+            zoom: this.config.zoom,
+            disableDefaultUI: !this.config.show_ui,
+        }
+
+        if (isNumber(this.config.zoom_min)) {
+            mapConfig.minZoom = this.config.zoom_min;
+        }
+
+        if (isNumber(this.config.zoom_max)) {
+            mapConfig.maxZoom = this.config.zoom_max;
+        }
+
+        this.map = new google.maps.Map(this.element, mapConfig);
 
         // 地図の中心点変更時イベントを登録
         google.maps.event.addListenerOnce(this.map, "idle", () => {

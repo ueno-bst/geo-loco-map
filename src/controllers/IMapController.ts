@@ -1,5 +1,6 @@
-import {ILatLng, LatLng, LatLngBound} from "../entities/LatLng";
+import {ILatLng, LatLng} from "../entities/LatLng";
 import {IMarkerData} from "../entities/Response";
+import {LatLngBound} from "../entities/LatLngBound";
 
 
 export abstract class IMapController {

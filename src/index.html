@@ -74,31 +74,36 @@
 <script type="module">
 	require(['GeoLocoMap'], function (a) {
 		var map = new a.GeoLocoMap({
-			map_type: 'yahoo',
+			// map_type: 'yahoo',
 			center: [35, 135],
+            zoom: 16,
+            zoom_min: 9,
+            zoom_max: 15,
 			show_ui: true,
 			show_info: true,
 			selector: '.map',
 			api_url: '/geo-loco-map/src/response.json',
 			// api_url: '/geo-loco-map/tools/response.2500.json',
 			onInit: function (e) {
+				console.info("onInit", map.controller, e.controller);
 			},
 			onMove: function (obj, coordinate) {
-				console.info("onMove", coordinate.lat, coordinate.lng);
+				console.info("onMove", map.controller, obj.controller, coordinate.lat, coordinate.lng);
 			},
 			onZoom: function (obj, zoom) {
-				console.info("onZoom", zoom);
+				console.info("onZoom", map.controller, obj.controller, zoom);
 			},
 			onUI: function (obj, f) {
-				console.info("onUI", f);
+				console.info("onUI", map.controller, obj.controller, f);
 			},
-			onChange: function (c) {
+			onChange: function (obj) {
+				console.info("onChange", map.controller, obj.controller);
 				var
-					info = c.getInfo(),
-					ui = c.getUI(),
-					center = c.getCenter(),
-					zoom = c.getZoom(),
-					bound = c.getBounds();
+					info = obj.getInfo(),
+					ui = obj.getUI(),
+					center = obj.getCenter(),
+					zoom = obj.getZoom(),
+					bound = obj.getBounds();
 
 				$("#latitude").val(center.lat);
 				$("#longitude").val(center.lng);

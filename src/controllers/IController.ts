@@ -1,9 +1,10 @@
-import {IMapConfig, MapConfig, MapType} from "../entities/MapConfig";
+import {fixMapConfig, IMapConfig, MapType} from "../entities/MapConfig";
 import {IMapController} from "./IMapController";
 import {GoogleMapController} from "./GoogleMapController";
 import {YahooMapController} from "./YahooMapController";
-import {ILatLng, ILatLngBound} from "../entities/LatLng";
+import {ILatLng} from "../entities/LatLng";
 import {IMarkerData} from "../entities/Response";
+import {ILatLngBound} from "../entities/LatLngBound";
 
 export abstract class IController {
 
@@ -13,7 +14,7 @@ export abstract class IController {
 
     constructor(params: IMapConfig) {
         // 実行パラメータを正規化
-        this._config = new MapConfig(params);
+        this._config = fixMapConfig(params);
 
         switch (this.config.map_type) {
             case MapType.GoogleMap:

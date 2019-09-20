@@ -1,8 +1,10 @@
-import {ILatLng, ILatLngBound, LatLng, LatLngBound} from "../entities/LatLng";
+import {ILatLng, LatLng} from "../entities/LatLng";
 import {MapController} from "./MapController";
 import {IMarkerData, MarkerData} from "../entities/Response";
 import {IMarkerList} from "./IMarkers";
 import {IController} from "./IController";
+import {LatLngBound} from "../entities/LatLngBound";
+import {isNumber} from "../utils/Types";
 
 
 /// <reference path="../typings/Yahoo.d.ts" />
@@ -57,6 +59,22 @@ export class YahooMapController extends MapController<Y.Marker> {
         });
 
         this.map.bind("zoomend", () => {
+            let zoom = this.getZoom();
+
+            if (isNumber(this.config.zoom_min)) {
+                zoom = Math.max(this.config.zoom_min, zoom);
+            }
+
+            if (isNumber(this.config.zoom_max)) {
+                zoom = Math.min(this.config.zoom_max, zoom);
+            }
+
+            if (zoom != this.getZoom()) {
+                setTimeout(() => {
+                    this.setZoom(zoom);
+                });
+            }
+
             this.onZoomListener();
         });
     }
@@ -83,7 +101,7 @@ export class YahooMapController extends MapController<Y.Marker> {
     }
 
     setZoom(number: number) {
-        this.map.setZoom(number, true, this.map.getCenter(), false)
+        this.map.setZoom(number, true, this.map.getCenter(), true)
     }
 
     getCenter(): LatLng {

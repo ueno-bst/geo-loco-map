@@ -93,8 +93,14 @@ export abstract class MapController<T extends Object> extends IMapController {
      */
     protected onApiReceiveListener(json: IApiResponse) {
         if (isArray(json.data)) {
+            const before = Object.keys(this.markers).length;
             for (let index = 0; index < json.data.length; index++) {
                 this.addMarker(json.data[index]);
+            }
+            const after = Object.keys(this.markers).length;
+
+            if (before != after) {
+                this.onAddMarkerHandler();
             }
         }
     }
@@ -153,6 +159,14 @@ export abstract class MapController<T extends Object> extends IMapController {
         if (this.config.onUI) {
             this.config.onUI(this.root, this.config.show_ui,);
         }
+        this.onChangeHandler();
+    }
+
+    protected onAddMarkerHandler() {
+        if (this.config.onAddMarker) {
+            this.config.onAddMarker(this.root);
+        }
+
         this.onChangeHandler();
     }
 
