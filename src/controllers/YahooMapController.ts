@@ -30,7 +30,7 @@ export class YahooMapController extends MapController<Y.Marker> {
         );
 
         // 地図を初期化
-        this.map = new Y.Map(this.element_id, {
+        this.map = new Y.Map(this.target.id, {
             configure: {
                 scrollWheelZoom: true,
                 continuousZoom: true,
@@ -40,14 +40,7 @@ export class YahooMapController extends MapController<Y.Marker> {
         // イベント関連付け
         this.map.bind("load", () => {
             setTimeout(() => {
-                // 初期化イベント発行
-                this.onInitHandler();
-
-                // インターフェイス制御
-                this.setUI(this.config.show_ui);
-
-                // 初回APIリクエストを発行
-                this.request();
+                this.init();
             });
         });
 
@@ -76,6 +69,15 @@ export class YahooMapController extends MapController<Y.Marker> {
             }
 
             this.onZoomListener();
+        });
+    }
+
+    protected init() {
+        super.init();
+
+        // 出力要素がリサイズされた場合の処理を追加
+        this.target.onResize = (() => {
+            this.map.updateSize();
         });
     }
 

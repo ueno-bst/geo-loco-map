@@ -3,7 +3,7 @@ import {IMapController} from "./IMapController";
 import {MarkerData, IApiResponse, IMarkerData} from "../entities/Response";
 import {IMarkerList, isIMarkerList} from "./IMarkers";
 import {IController} from "./IController";
-import {isArray, isNull, isString} from "../utils/Types";
+import {isArray, isExist, isFunction, isNull, isString} from "../utils/Types";
 
 export abstract class MapController<T extends Object> extends IMapController {
 
@@ -11,9 +11,7 @@ export abstract class MapController<T extends Object> extends IMapController {
 
     protected config: IMapConfig;
 
-    protected element: Element;
-
-    protected element_id: string;
+    protected target: TargetElement;
 
     protected markers: { [key: string]: IMarkerList<T>; } = {};
 
@@ -28,25 +26,19 @@ export abstract class MapController<T extends Object> extends IMapController {
         if (element === null) {
             throw new Error("Cannot find element to display map");
         } else {
-            let element_id = element.getAttribute("id");
-            if (element_id === null || element_id === "") {
-                do {
-                    element_id = this.getUniqueID();
-                } while (document.getElementById(element_id) !== null);
-                element.setAttribute("id", element_id);
-            }
-
-            this.element_id = element_id;
-            this.element = element;
+            this.target = new TargetElement(element);
         }
     }
 
-    private getUniqueID(): string {
-        return 'xxxx-xxxx-xxxxx-xxxxx'.replace(/[x]/g, function (c) {
-            let r = Math.random() * 16 | 0,
-                v = c == 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
+    protected init() {
+        // 初期化イベント発行
+        this.onInitHandler();
+
+        // コントロースの表示制御
+        this.setUI(this.config.show_ui);
+
+        // APIをリクエスト
+        this.request();
     }
 
     /**
@@ -111,7 +103,7 @@ export abstract class MapController<T extends Object> extends IMapController {
      * 初期化完了イベントハンドラー
      */
     protected onInitHandler() {
-        if (this.config.onInit) {
+        if (isFunction(this.config.onInit)) {
             this.config.onInit(this.root);
         }
         this.onChangeHandler();
@@ -121,7 +113,7 @@ export abstract class MapController<T extends Object> extends IMapController {
      * パラメータ変更イベントハンドラー
      */
     protected onChangeHandler() {
-        if (this.config.onChange) {
+        if (isFunction(this.config.onChange)) {
             this.config.onChange(this.root);
         }
     }
@@ -131,7 +123,7 @@ export abstract class MapController<T extends Object> extends IMapController {
      */
     protected onMoveHandler() {
         this.config.center = this.getCenter();
-        if (this.config.onMove) {
+        if (isFunction(this.config.onMove)) {
             this.config.onMove(this.root, this.config.center);
         }
         this.onChangeHandler();
@@ -143,7 +135,7 @@ export abstract class MapController<T extends Object> extends IMapController {
      */
     protected onZoomListener() {
         this.config.zoom = this.getZoom();
-        if (this.config.onZoom) {
+        if (isFunction(this.config.onZoom)) {
             this.config.onZoom(this.root, this.config.zoom);
         }
         this.onChangeHandler();
@@ -156,14 +148,14 @@ export abstract class MapController<T extends Object> extends IMapController {
      */
     protected onUIListener(show: boolean) {
         this.config.show_ui = show;
-        if (this.config.onUI) {
+        if (isFunction(this.config.onUI)) {
             this.config.onUI(this.root, this.config.show_ui,);
         }
         this.onChangeHandler();
     }
 
     protected onAddMarkerHandler() {
-        if (this.config.onAddMarker) {
+        if (isFunction(this.config.onAddMarker)) {
             this.config.onAddMarker(this.root);
         }
 
@@ -194,7 +186,7 @@ export abstract class MapController<T extends Object> extends IMapController {
      * 地図を表示しているHTML要素を返却する
      */
     public getElement(): Element {
-        return this.element;
+        return this.target.node;
     }
 
     /**
@@ -288,5 +280,78 @@ export abstract class MapController<T extends Object> extends IMapController {
         }
 
         return this.markers[id];
+    }
+}
+
+
+class TargetElement {
+    private readonly target: Element;
+
+    private width: number = 0;
+    private height: number = 0;
+
+    get node(): Element {
+        return this.target;
+    }
+
+    get id(): string {
+        let id = this.node.getAttribute("id");
+        return isExist<string>(id) ? id : "";
+    }
+
+    onResize?: (t: TargetElement) => void;
+
+    constructor(target: Element) {
+        // プロパティの初期化
+        this.target = target;
+
+        /**
+         * リサイズ監視イベントを実装
+         */
+        setInterval(() => {
+            this.resizeCheck();
+        }, 300);
+
+        /**
+         * 要素にIDがない場合は、ユニークIDを生成して追加
+         */
+        let id = this.id;
+        console.info(id);
+
+        if (id == "") {
+            // 種を作る
+            let seed = "";
+            do {
+                seed = seed + "x";
+            } while (seed.length < 16);
+
+            // IDを生成して、重複要素がない
+            do {
+                id = "id-" + seed.replace(/[x]/g, function (c) {
+                    let r = Math.random() * 16 | 0,
+                        v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            } while (document.getElementById(id) !== null);
+
+            // 要素に割り当て
+            this.node.setAttribute("id", id);
+        }
+
+        console.info(id);
+    }
+
+    private resizeCheck() {
+        const w = this.node.clientWidth;
+        const h = this.node.clientHeight;
+
+        if (this.width != w || this.height != h) {
+            if (isFunction(this.onResize)) {
+                this.onResize(this);
+            }
+        }
+
+        this.width = w;
+        this.height = h;
     }
 }
