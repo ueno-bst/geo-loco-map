@@ -4,7 +4,7 @@ import {IMarkerData, MarkerData} from "../entities/Response";
 import {IMarkerList} from "./IMarkers";
 import {IController} from "./IController";
 import {LatLngBound} from "../entities/LatLngBound";
-import {isNumber} from "../utils/Types";
+import {isNumber, isUndefined} from "../utils/Types";
 
 
 /// <reference path="../typings/Yahoo.d.ts" />
@@ -19,6 +19,8 @@ export class YahooMapController extends MapController<Y.Marker> {
      * Yahoo Map の表示するコントローラーリスト
      */
     private yc: any[] = [];
+
+    private parentCentre?: LatLng;
 
     constructor(root: IController) {
         super(root);
@@ -51,6 +53,11 @@ export class YahooMapController extends MapController<Y.Marker> {
             this.onMoveHandler();
         });
 
+        this.map.bind("zoomstart", () => {
+            // 縮尺率変更前の中心点を記録する
+            this.parentCentre = this.getCenter();
+        });
+
         this.map.bind("zoomend", () => {
             let zoom = this.getZoom();
 
@@ -63,7 +70,15 @@ export class YahooMapController extends MapController<Y.Marker> {
             }
 
             if (zoom != this.getZoom()) {
+                // 縮尺率が範囲外を超えた場合、適正値に戻す
                 setTimeout(() => {
+                    // 縮尺前から中心点がズレている場合、元の中心点に戻す
+                    if (!isUndefined(this.parentCentre) && !this.parentCentre.equals(this.getCenter())) {
+                        this.setCenter(this.parentCentre);
+                    }
+                    this.parentCentre = undefined;
+
+                    // 縮尺率を戻す
                     this.setZoom(zoom);
                 });
             }
