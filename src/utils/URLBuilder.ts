@@ -26,12 +26,12 @@ function parseURL(obj: URLBuilder, url: string): void {
         obj.host = pattern[4] || "";
         obj.port = pattern[5] || "";
         obj.path = pattern[6] || "";
-        obj.query = new URLQuery(pattern[7] || "");
+        obj.query = new QueryBuilder(pattern[7] || "");
         obj.hash = pattern[8] || "";
     }
 }
 
-function parseQuery(obj: URLQuery, query: string): URLQuery {
+function parseQuery(obj: QueryBuilder, query: string): QueryBuilder {
     const queries = query.split("&");
 
     queries.forEach((value: string, index: number) => {
@@ -94,7 +94,7 @@ function buildURL(obj: URLBuilder): string {
     return url;
 }
 
-function buildQuery(obj: URLQuery): string {
+function buildQuery(obj: QueryBuilder): string {
     const args: string[] = [];
 
     obj.keys.forEach((key) => {
@@ -119,7 +119,7 @@ export class URLBuilder {
     public host: string = "";
     public port: string = "";
     public path: string = "";
-    public query!: URLQuery;
+    public query!: QueryBuilder;
     public hash: string = "";
 
     constructor(url: string) {
@@ -131,7 +131,7 @@ export class URLBuilder {
     }
 }
 
-class URLQuery {
+class QueryBuilder {
     private query: QueryArray = [];
 
     constructor(query: string) {
