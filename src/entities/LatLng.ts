@@ -34,6 +34,14 @@ export class LatLng implements ILatLng {
     }
 
     /**
+     * 2点の値が同一かを検証する
+     * @param p
+     */
+    equals(p: LatLng): boolean {
+        return this.lng == p.lng && this.lat == p.lat;
+    }
+
+    /**
      * ポイント間の距離を計測する
      * @param p
      */
