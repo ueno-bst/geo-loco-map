@@ -321,7 +321,6 @@ class TargetElement {
          * 要素にIDがない場合は、ユニークIDを生成して追加
          */
         let id = this.id;
-        console.info(id);
 
         if (id == "") {
             // 種を作る
@@ -342,8 +341,6 @@ class TargetElement {
             // 要素に割り当て
             this.node.setAttribute("id", id);
         }
-
-        console.info(id);
     }
 
     private resizeCheck() {
