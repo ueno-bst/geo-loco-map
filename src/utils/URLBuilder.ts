@@ -1,12 +1,13 @@
-import {isNull} from "./Types";
+import {isNull, isUndefined} from "./Types";
 
 interface QueryObject {
     key: string,
-    value: QueryValue,
+    value: QueryValueList,
 }
 
-type QueryValue = string[];
-type QueryArray = QueryObject[];
+type QueryValue = string | undefined;
+type QueryValueList = QueryValue[]
+type QueryObjectList = QueryObject[];
 
 function decode(value: string): string {
     return decodeURIComponent(value);
@@ -28,6 +29,7 @@ function parseURL(obj: URLBuilder, url: string): void {
         obj.path = pattern[6] || "";
         obj.query = new QueryBuilder(pattern[7] || "");
         obj.hash = pattern[8] || "";
+
     }
 }
 
@@ -39,12 +41,12 @@ function parseQuery(obj: QueryBuilder, query: string): QueryBuilder {
             return;
         }
 
-        const param = value.match(/^(.*?)(?:=(.+))$/);
+        const param = value.match(/^(.*?)(?:=(.*))$/);
 
         if (param) {
             obj.add(decode(param[1]), decode(param[2]));
         } else {
-            obj.add(decode(value), "");
+            obj.add(decode(value), undefined);
         }
     });
 
@@ -104,8 +106,12 @@ function buildQuery(obj: QueryBuilder): string {
             return;
         }
 
-        values.forEach((value) => {
-            args.push(encode(key) + "=" + encode(value));
+        values.forEach((value: QueryValue) => {
+            if (isUndefined(value)) {
+                args.push(encode(key));
+            } else {
+                args.push(encode(key) + "=" + encode(value));
+            }
         });
     });
 
@@ -132,7 +138,7 @@ export class URLBuilder {
 }
 
 class QueryBuilder {
-    private query: QueryArray = [];
+    private query: QueryObjectList = [];
 
     constructor(query: string) {
         parseQuery(this, query);
@@ -164,7 +170,7 @@ class QueryBuilder {
         return this.indexOf(key) >= 0;
     }
 
-    single(key: string): string | null {
+    single(key: string): QueryValue | null {
         const value = this.get(key);
 
         if (isNull(value) || value.length == 0) {
@@ -174,11 +180,11 @@ class QueryBuilder {
         return value[0];
     }
 
-    get(key: string): QueryValue | null {
+    get(key: string): QueryValueList | null {
         return this.getByIndex(this.indexOf(key));
     }
 
-    getByIndex(index: number): QueryValue | null {
+    getByIndex(index: number): QueryValueList | null {
         if (this.query[index]) {
             return this.query[index].value;
         }
@@ -186,7 +192,7 @@ class QueryBuilder {
         return null;
     }
 
-    set(key: string, ...value: QueryValue): void {
+    set(key: string, ...value: QueryValueList): void {
         const index = this.indexOf(key);
 
         if (index < 0) {
@@ -196,7 +202,7 @@ class QueryBuilder {
         }
     }
 
-    add(key: string, ...value: QueryValue): void {
+    add(key: string, ...value: QueryValueList): void {
         const index = this.indexOf(key);
 
         if (index < 0) {
