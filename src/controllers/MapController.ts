@@ -6,6 +6,10 @@ import {IController} from "./IController";
 import {isArray, isExist, isFunction, isNull, isString} from "../utils/Types";
 import {URLBuilder} from "../utils/URLBuilder";
 
+function numberFixed(value:number, digit: number):string {
+    return value.toFixed(digit).replace(/(\.?0+)$/, "");
+}
+
 export abstract class MapController<T extends Object> extends IMapController {
 
     private readonly root: IController;
@@ -66,8 +70,8 @@ export abstract class MapController<T extends Object> extends IMapController {
 
         const url = new URLBuilder(this.config.api_url);
 
-        url.query.set("lat", centre.lat.toFixed(5));
-        url.query.set("lng", centre.lng.toFixed(5));
+        url.query.set("lat", numberFixed(centre.lat, this.config.grid));
+        url.query.set("lng", numberFixed(centre.lng, this.config.grid));
         url.query.set("zoom", String(zoom));
 
         const xhr = new XMLHttpRequest();
