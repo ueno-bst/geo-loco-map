@@ -1,9 +1,27 @@
 import {ILatLng, LatLng} from "../entities/LatLng";
 import {IMarkerData} from "../entities/Response";
 import {LatLngBound} from "../entities/LatLngBound";
+import {MapEvent} from "../entities/MapEvent";
+import {IController} from "./IController";
+import {IMapConfig} from "../entities/MapConfig";
 
 
 export abstract class IMapController {
+
+    protected readonly root: IController;
+
+    protected readonly config: IMapConfig;
+
+    public readonly emit: MapEvent;
+
+    protected constructor(root: IController) {
+        this.root = root;
+        this.config = root.config;
+
+        // イベントエミッタを定義
+        this.emit = new MapEvent(root);
+    }
+
 
     /**
      * 表示している地図の矩形領域を返却する

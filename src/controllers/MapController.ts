@@ -4,6 +4,7 @@ import {MarkerData, IApiResponse, IMarkerData} from "../entities/Response";
 import {IMarkerList, isIMarkerList} from "./IMarkers";
 import {IController} from "./IController";
 import {isArray, isExist, isFunction, isNull, isString} from "../utils/Types";
+import {MapEventType} from "../entities/MapEvent";
 import {URLBuilder} from "../utils/URLBuilder";
 
 function numberFixed(value:number, digit: number):string {
@@ -12,19 +13,12 @@ function numberFixed(value:number, digit: number):string {
 
 export abstract class MapController<T extends Object> extends IMapController {
 
-    private readonly root: IController;
-
-    protected config: IMapConfig;
-
     protected target: TargetElement;
 
     protected markers: { [key: string]: IMarkerList<T>; } = {};
 
     protected constructor(root: IController) {
-        super();
-
-        this.root = root;
-        this.config = root.config;
+        super(root);
 
         const element = document.querySelector(this.config.selector);
 
@@ -112,6 +106,7 @@ export abstract class MapController<T extends Object> extends IMapController {
      * 初期化完了イベントハンドラー
      */
     protected onInitHandler() {
+        this.emit.fire(MapEventType.init);
         if (isFunction(this.config.onInit)) {
             this.config.onInit(this.root);
         }
@@ -122,6 +117,7 @@ export abstract class MapController<T extends Object> extends IMapController {
      * パラメータ変更イベントハンドラー
      */
     protected onChangeHandler() {
+        this.emit.fire(MapEventType.change);
         if (isFunction(this.config.onChange)) {
             this.config.onChange(this.root);
         }
@@ -131,9 +127,10 @@ export abstract class MapController<T extends Object> extends IMapController {
      * 中心点移動イベントハンドラー
      */
     protected onMoveHandler() {
-        this.config.center = this.getCenter();
+        const center = this.config.center = this.getCenter();
+        this.emit.fire(MapEventType.move, center);
         if (isFunction(this.config.onMove)) {
-            this.config.onMove(this.root, this.config.center);
+            this.config.onMove(this.root, center);
         }
         this.onChangeHandler();
         this.onApiRequestHandler();
@@ -143,9 +140,10 @@ export abstract class MapController<T extends Object> extends IMapController {
      * 地図のズーム率変更イベントハンドラー
      */
     protected onZoomListener() {
-        this.config.zoom = this.getZoom();
+        const zoom = this.config.zoom = this.getZoom();
+        this.emit.fire(MapEventType.zoom, zoom);
         if (isFunction(this.config.onZoom)) {
-            this.config.onZoom(this.root, this.config.zoom);
+            this.config.onZoom(this.root, zoom);
         }
         this.onChangeHandler();
         this.onApiRequestHandler();
@@ -156,14 +154,16 @@ export abstract class MapController<T extends Object> extends IMapController {
      * @param show
      */
     protected onUIListener(show: boolean) {
-        this.config.show_ui = show;
+        const show_uri = this.config.show_ui = show;
+        this.emit.fire(MapEventType.ui, show_uri);
         if (isFunction(this.config.onUI)) {
-            this.config.onUI(this.root, this.config.show_ui,);
+            this.config.onUI(this.root, show_uri);
         }
         this.onChangeHandler();
     }
 
     protected onAddMarkerHandler() {
+        this.emit.fire(MapEventType.addMarker, this.root);
         if (isFunction(this.config.onAddMarker)) {
             this.config.onAddMarker(this.root);
         }
@@ -180,6 +180,7 @@ export abstract class MapController<T extends Object> extends IMapController {
             this.openModal(marker);
         }
 
+        this.emit.fire(MapEventType.clickMarker, this.root);
         if (this.config.onClickMarker) {
             this.config.onClickMarker(marker.marker, this.root);
         }

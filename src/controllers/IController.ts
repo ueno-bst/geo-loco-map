@@ -5,35 +5,28 @@ import {YahooMapController} from "./YahooMapController";
 import {ILatLng} from "../entities/LatLng";
 import {IMarkerData} from "../entities/Response";
 import {ILatLngBound} from "../entities/LatLngBound";
+import {MapEventListener, MapEventType} from "../entities/MapEvent";
 
 export abstract class IController {
 
-    protected _config: IMapConfig;
+    public config: IMapConfig;
 
-    protected _controller: IMapController;
+    protected readonly controller: IMapController;
 
     constructor(params: IMapConfig) {
         // 実行パラメータを正規化
-        this._config = fixMapConfig(params);
+        this.config = fixMapConfig(params);
 
         switch (this.config.map_type) {
             case MapType.GoogleMap:
-                this._controller = new GoogleMapController(this);
+                this.controller = new GoogleMapController(this);
                 break;
             case MapType.YahooMap:
-                this._controller = new YahooMapController(this);
+                this.controller = new YahooMapController(this);
                 break;
             default:
                 throw new Error("Unable to initialize due to map type error.");
         }
-    }
-
-    get config(): IMapConfig {
-        return this._config;
-    }
-
-    protected get controller(): IMapController {
-        return this._controller;
     }
 
     public abstract getElement(): Element ;
@@ -65,4 +58,12 @@ export abstract class IController {
     public abstract getInfo(): boolean;
 
     public abstract setInfo(flag: boolean): void;
+
+    public on(type: MapEventType, callback: MapEventListener): void {
+        this.controller.emit.on(type, callback);
+    }
+
+    public off(type: MapEventType, callback: MapEventListener): boolean {
+        return this.controller.emit.off(type, callback);
+    }
 }
