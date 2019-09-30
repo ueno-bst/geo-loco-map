@@ -1,13 +1,13 @@
 import {ILatLng, LatLng} from "../entities/LatLng";
 import {MapController} from "./MapController";
-import {IMarkerData, MarkerData} from "../entities/Response";
+import {IMarkerData} from "../entities/Response";
 import {IMarkerList} from "./IMarkers";
 import {IController} from "./IController";
 import {LatLngBound} from "../entities/LatLngBound";
 import {isNumber, isUndefined} from "../utils/Types";
 
 
-/// <reference path="../typings/Yahoo.d.ts" />
+/// <reference path="../types/Yahoo.d.ts" />
 export class YahooMapController extends MapController<Y.Marker> {
 
     /**
