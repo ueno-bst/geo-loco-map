@@ -6,6 +6,9 @@ import {IController} from "./IController";
 import {GridFeatureLayer, LoadingLayer, MessageLayer} from "./gmap/Layer";
 import {isNumber} from "../utils/Types";
 
+const
+    is_number = isNumber;
+
 export class GoogleMapController extends MapController<google.maps.Marker> {
 
     /**
@@ -31,11 +34,11 @@ export class GoogleMapController extends MapController<google.maps.Marker> {
             scaleControl: this.config.show_ui,
         };
 
-        if (isNumber(this.config.zoom_min)) {
+        if (is_number(this.config.zoom_min)) {
             mapConfig.minZoom = this.config.zoom_min;
         }
 
-        if (isNumber(this.config.zoom_max)) {
+        if (is_number(this.config.zoom_max)) {
             mapConfig.maxZoom = this.config.zoom_max;
         }
 
