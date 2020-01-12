@@ -17,7 +17,7 @@ export enum ApiType {
 /**
  * マップ情報の設定値
  */
-export interface IMapConfig {
+export interface IConfig {
     /**
      *　表示する地図のタイプを指定する
      */
@@ -72,7 +72,7 @@ export interface IMapConfig {
     /**
      * マーカーを取得するためのAPI設定
      */
-    api: IMapApiConfig;
+    api: IConfigApi;
 
     /**
      * APIに座標を送る際の精度
@@ -147,7 +147,7 @@ export interface IMapConfig {
     onRequest?: (ctrl: IController, url: URLBuilder) => void;
 }
 
-export interface IMapApiConfig {
+export interface IConfigApi {
     url: string,
     user?: string,
     password?: string,
@@ -156,25 +156,32 @@ export interface IMapApiConfig {
     delay: number,
 }
 
-export function fixMapConfig(params: IMapConfig) {
-    const def: IMapConfig = {
-        api: fixMapApi(),
-        api_url: "",
-        show_ui: true,
-        show_info: true,
-        center: new LatLng(35.681236, 139.767125),
-        center_bound: undefined,
-        zoom: 9,
-        zoom_min: 0,
-        zoom_max: 99,
-        grid: 5,
-        lazy_load: 500,
-        map_type: MapType.GoogleMap,
-        selector: "#map",
-    };
+const ConfigDefault: IConfig = {
+    api: fixMapApi(),
+    api_url: "",
+    show_ui: true,
+    show_info: true,
+    center: new LatLng(35.681236, 139.767125),
+    center_bound: undefined,
+    zoom: 9,
+    zoom_min: 0,
+    zoom_max: 99,
+    grid: 5,
+    lazy_load: 500,
+    map_type: MapType.GoogleMap,
+    selector: "#map",
+};
 
-    const config: IMapConfig = {
-        ...def,
+const ConfigApiDefault: IConfigApi = {
+    precision: 0,
+    type: ApiType.CENTER,
+    url: "",
+    delay: 0,
+};
+
+export function fixMapConfig(params: IConfig) {
+    const config: IConfig = {
+        ...ConfigDefault,
         ...params
     };
 
@@ -209,16 +216,16 @@ export function fixMapConfig(params: IMapConfig) {
     return config;
 }
 
-function fixMapApi(params?: IMapApiConfig): IMapApiConfig {
-    const def: IMapApiConfig = {
+function fixMapApi(params?: IConfigApi): IConfigApi {
+    const def: IConfigApi = {
         precision: 0,
         type: ApiType.CENTER,
         url: "",
         delay: 0,
     };
 
-    const config: IMapApiConfig = {
-        ...def,
+    const config: IConfigApi = {
+        ...ConfigApiDefault,
         ...params,
     };
 

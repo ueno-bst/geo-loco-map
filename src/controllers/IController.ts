@@ -1,4 +1,4 @@
-import {fixMapConfig, IMapConfig, MapType} from "../entities/MapConfig";
+import {fixMapConfig, IConfig, MapType} from "../entities/MapConfig";
 import {GoogleMapController} from "./GoogleMapController";
 import {YahooMapController} from "./YahooMapController";
 import {ILatLng, ILatLngBounds} from "../entities/LatLng";
@@ -8,11 +8,11 @@ import {MapController} from "./MapController";
 
 export abstract class IController {
 
-    public config: IMapConfig;
+    public config: IConfig;
 
     protected readonly controller: MapController<Object>;
 
-    constructor(params: IMapConfig) {
+    constructor(params: IConfig) {
         // 実行パラメータを正規化
         this.config = fixMapConfig(params);
 
@@ -62,7 +62,7 @@ export abstract class IController {
         this.controller.emit.on(type, callback);
     }
 
-    public off(type: MapEventType, callback: MapEventListener): boolean {
-        return this.controller.emit.off(type, callback);
+    public off(type: MapEventType, callback: MapEventListener): void {
+        this.controller.emit.off(type, callback);
     }
 }

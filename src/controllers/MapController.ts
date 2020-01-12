@@ -1,13 +1,17 @@
-import {ApiType, IMapConfig, MapType} from '../entities/MapConfig'
+import {ApiType, IConfig, MapType} from '../entities/MapConfig'
 import {IBoundGridContentData, IBoundGridData, IMarkerData, IResponse, MarkerData} from "../entities/Response";
 import {IMarkerList, isIMarkerList} from "./IMarkers";
 import {IController} from "./IController";
-import {isArray, isFunction, isNull, isString} from "../utils/Types";
-import {MapEvent, MapEventType} from "../entities/MapEvent";
+import {isArray, isNull, isString} from "../utils/Types";
+import {MapEventType} from "../entities/MapEvent";
 import {URLBuilder} from "../utils/URLBuilder";
 import {LatLng, LatLngBounds} from "../entities/LatLng";
 import {MapElement} from "./Element";
-import {ElementHelper} from "../utils/ElementHelper";
+import ElementHelper from "../utils/ElementHelper";
+import EventEmitter from "../utils/EventEmitter";
+
+const
+    is_null = isNull;
 
 function numberFixed(value: number, digit: number): string {
     return value.toFixed(digit).replace(/(\.?0+)$/, "");
@@ -20,14 +24,14 @@ export abstract class MapController<T extends Object> {
      */
     protected readonly root: IController;
 
-    get config(): IMapConfig {
+    get config(): IConfig {
         return this.root.config;
     }
 
     /**
      * イベントエミッタ
      */
-    public readonly emit: MapEvent;
+    public readonly emit: EventEmitter<HTMLElement, [IController, ...any[]]>;
 
     protected target: MapElement;
 
@@ -38,24 +42,38 @@ export abstract class MapController<T extends Object> {
     protected constructor(root: IController) {
         this.root = root;
 
-        // イベントエミッタを定義
-        this.emit = new MapEvent(root);
-
         const element = ElementHelper.query(this.config.selector);
 
         if (element) {
-            this.target = new MapElement(element.element);
+            this.target = new MapElement(element.src);
         } else {
             throw new Error("Cannot find element to display map");
         }
+
+        // イベントエミッタを定義
+        this.emit = new EventEmitter(element.src);
     }
 
     protected init() {
+        const
+            type = MapEventType,
+            config = this.config;
+
+        this.emit
+            .on(type.init, config.onInit)
+            .on(type.change, config.onChange)
+            .on(type.move, config.onMove)
+            .on(type.zoom, config.onZoom)
+            .on(type.ui, config.onUI)
+            .on(type.addMarker, config.onAddMarker)
+            .on(type.clickMarker, config.onClickMarker)
+            .on(type.request, config.onRequest);
+
         // 初期化イベント発行
         this.onInitHandler();
 
         // コントロースの表示制御
-        this.setUI(this.config.show_ui);
+        this.setUI(config.show_ui);
 
         // APIをリクエスト
         this.request();
@@ -82,7 +100,8 @@ export abstract class MapController<T extends Object> {
             return;
         }
 
-        let zoom = 0;
+        let zoom: number;
+        
         if (this.config.map_type === MapType.GoogleMap) {
             zoom = this.getZoom() + 1;
         } else {
@@ -101,26 +120,26 @@ export abstract class MapController<T extends Object> {
 
                 bounds.round(zoom);
 
-                url.query.set("nelt", numberFixed(bounds.ne.lat, api.precision));
-                url.query.set("neln", numberFixed(bounds.ne.lng, api.precision));
-                url.query.set("swlt", numberFixed(bounds.sw.lat, api.precision));
-                url.query.set("swln", numberFixed(bounds.sw.lng, api.precision));
+                url.query
+                    .set("nelt", numberFixed(bounds.ne.lat, api.precision))
+                    .set("neln", numberFixed(bounds.ne.lng, api.precision))
+                    .set("swlt", numberFixed(bounds.sw.lat, api.precision))
+                    .set("swln", numberFixed(bounds.sw.lng, api.precision));
+
                 break;
             case ApiType.CENTER:
                 const centre = this.getCenter();
 
-                url.query.set("lat", numberFixed(centre.lat, api.precision));
-                url.query.set("lng", numberFixed(centre.lng, api.precision));
+                url.query
+                    .set("lat", numberFixed(centre.lat, api.precision))
+                    .set("lng", numberFixed(centre.lng, api.precision));
+
                 break;
         }
 
         url.query.set("zoom", String(zoom));
 
-        this.emit.fire(MapEventType.request, url);
-
-        if (isFunction(this.config.onRequest)) {
-            this.config.onRequest(this.root, url);
-        }
+        this.emit.fire(MapEventType.request, this.root, url);
 
         /*
          * XHR リクエスト発信
@@ -200,12 +219,7 @@ export abstract class MapController<T extends Object> {
      * 初期化完了イベントハンドラー
      */
     protected onInitHandler() {
-        this.emit.fire(MapEventType.init);
-
-        if (isFunction(this.config.onInit)) {
-            this.config.onInit(this.root);
-        }
-
+        this.emit.fire(MapEventType.init, this.root);
         this.onChangeHandler();
     }
 
@@ -213,11 +227,7 @@ export abstract class MapController<T extends Object> {
      * パラメータ変更イベントハンドラー
      */
     protected onChangeHandler() {
-        this.emit.fire(MapEventType.change);
-
-        if (isFunction(this.config.onChange)) {
-            this.config.onChange(this.root);
-        }
+        this.emit.fire(MapEventType.change, this.root);
     }
 
     /**
@@ -226,11 +236,7 @@ export abstract class MapController<T extends Object> {
     protected onMoveHandler() {
         const center = this.config.center = this.getCenter();
 
-        this.emit.fire(MapEventType.move, center);
-
-        if (isFunction(this.config.onMove)) {
-            this.config.onMove(this.root, center);
-        }
+        this.emit.fire(MapEventType.move, this.root, center);
 
         this.onChangeHandler();
         this.onApiRequestHandler();
@@ -242,11 +248,7 @@ export abstract class MapController<T extends Object> {
     protected onZoomListener() {
         const zoom = this.config.zoom = this.getZoom();
 
-        this.emit.fire(MapEventType.zoom, zoom);
-
-        if (isFunction(this.config.onZoom)) {
-            this.config.onZoom(this.root, zoom);
-        }
+        this.emit.fire(MapEventType.zoom, this.root, zoom);
 
         this.onChangeHandler();
         this.onApiRequestHandler();
@@ -259,22 +261,13 @@ export abstract class MapController<T extends Object> {
     protected onUIListener(show: boolean) {
         const show_uri = this.config.show_ui = show;
 
-        this.emit.fire(MapEventType.ui, show_uri);
-
-        if (isFunction(this.config.onUI)) {
-            this.config.onUI(this.root, show_uri);
-        }
+        this.emit.fire(MapEventType.ui, this.root, show_uri);
 
         this.onChangeHandler();
     }
 
     protected onAddMarkerHandler() {
         this.emit.fire(MapEventType.addMarker, this.root);
-
-        if (isFunction(this.config.onAddMarker)) {
-            this.config.onAddMarker(this.root);
-        }
-
         this.onChangeHandler();
     }
 
@@ -288,10 +281,6 @@ export abstract class MapController<T extends Object> {
         }
 
         this.emit.fire(MapEventType.clickMarker, this.root);
-
-        if (this.config.onClickMarker) {
-            this.config.onClickMarker(marker.marker, this.root);
-        }
     }
 
     /**
@@ -309,7 +298,7 @@ export abstract class MapController<T extends Object> {
      * 地図の表示要素を取得する
      */
     public getElement(): Element {
-        return this.target.element;
+        return this.target.src;
     }
 
     /**
@@ -375,7 +364,7 @@ export abstract class MapController<T extends Object> {
             bound = this.getBounds(),
             centre = this.getCenter();
 
-        if (isNull(bound) || isNull(centre)) {
+        if (is_null(bound) || is_null(centre)) {
             return ms;
         }
 

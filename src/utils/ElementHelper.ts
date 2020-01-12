@@ -1,27 +1,17 @@
-import {isNumber, isNull, isString, isArray} from "./Types";
+import {isNumber, isNull, isString} from "./Types";
 import {Rectangle, Point} from "../entities/LatLng";
-
-interface IListenerObject {
-    callback: Function,
-    binding: Object
-}
-
-type IListenerList = { [key: string]: IListenerObject[] };
+import EventEmitter from "./EventEmitter";
 
 function isHtmlElement(value: any): value is HTMLElement {
     return value instanceof HTMLElement;
 }
 
-function isHelper(value: any): value is Helper {
-    return value instanceof Helper;
+function isHelper(value: any): value is ElementHelper {
+    return value instanceof ElementHelper;
 }
 
 function toPixel(value?: number): string {
     return isNumber(value) ? value + "px" : "";
-}
-
-function hasListener(listener: IListenerList, type: string) {
-    return type in listener;
 }
 
 const EventRegex: { [s: string]: RegExp } = {
@@ -30,11 +20,17 @@ const EventRegex: { [s: string]: RegExp } = {
     Event: /.*/,
 };
 
-class Helper {
+const document = window.document;
+
+export default class ElementHelper {
     protected node: HTMLElement;
 
-    static query(query: string): Helper | null {
-        const object = Helper.queryAll(query);
+    private readonly emitter: EventEmitter<HTMLElement, [Event]>;
+
+    private readonly callback: (event: Event) => void;
+
+    static query(query: string): ElementHelper | null {
+        const object = ElementHelper.queryAll(query);
 
         if (object.length > 0) {
             return object[0];
@@ -43,7 +39,7 @@ class Helper {
         return null;
     }
 
-    static queryAll(query: string): Helper[] {
+    static queryAll(query: string): ElementHelper[] {
         const elements = [];
 
         const nodes = document.querySelectorAll(query);
@@ -52,26 +48,37 @@ class Helper {
             const node = nodes.item(index);
 
             if (isHtmlElement(node)) {
-                elements.push(new Helper(node));
+                elements.push(new ElementHelper(node));
             }
         }
 
         return elements;
     }
 
-    constructor(node: HTMLElement | Helper | string) {
+    static div() {
+        return new ElementHelper('div');
+    }
+
+    static p() {
+        return new ElementHelper('p');
+    }
+
+    constructor(node: HTMLElement | ElementHelper | string) {
         if (isString(node)) {
             node = document.createElement(node);
         }
 
         if (isHelper(node)) {
-            node = node.element;
+            node = node.src;
         }
 
         this.node = node;
+        this.emitter = new EventEmitter(node);
+
+        this.callback = (event: Event) => this.trigger(event);
     }
 
-    get element(): HTMLElement {
+    get src(): HTMLElement {
         return this.node;
     }
 
@@ -80,8 +87,9 @@ class Helper {
     }
 
     setID(id: string): this {
-        this.node.id = id;
-        return this;
+        const t = this;
+        t.node.id = id;
+        return t;
     }
 
     uniqueID(override: boolean = false): this {
@@ -232,9 +240,9 @@ class Helper {
         return this;
     }
 
-    append(child: Helper | HTMLElement): this {
+    append(child: ElementHelper | HTMLElement): this {
         if (isHelper(child)) {
-            child = child.element;
+            child = child.src;
         }
 
         this.node.appendChild(child);
@@ -242,14 +250,14 @@ class Helper {
         return this;
     }
 
-    parent(): Helper | null {
+    parent(): ElementHelper | null {
         const parent = this.node.parentElement;
 
         if (isNull(parent)) {
             return null;
         }
 
-        return new Helper(parent);
+        return new ElementHelper(parent);
     }
 
     /**
@@ -259,86 +267,65 @@ class Helper {
         const parent = this.parent();
 
         if (!isNull(parent)) {
-            parent.element.removeChild(this.element);
+            parent.src.removeChild(this.src);
         }
 
         return this;
     }
 
     empty(): this {
+        const node = this.node;
         let child: ChildNode | null;
 
-        while ((child = this.node.firstChild)) {
-            this.node.removeChild(child);
+        while ((child = node.firstChild)) {
+            node.removeChild(child);
         }
 
         return this;
     }
 
-    first(): Helper | null {
+    first(): ElementHelper | null {
         const child = this.node.firstChild;
 
         if (!isNull(child) && isHtmlElement(child)) {
-            return new Helper(child);
+            return new ElementHelper(child);
         }
 
         return null;
     }
 
-    private readonly listener: IListenerList = {};
-
     on(types: string | string[], listener: (e: Event) => void, binding?: Object): this {
-        if (!isArray(types)) {
-            types = [types];
-        }
+        const emitter = this.emitter;
 
-        for (let type of types) {
-            if (!hasListener(this.listener, type)) {
-                this.node.addEventListener(type, (e) => (this.emit(e), console.info(e)));
-                this.listener[type] = [];
+        for (let type of emitter.fix(types)) {
+            if (!emitter.has(type)) {
+                this.node.addEventListener(type, this.callback);
             }
 
-            binding = binding || this.element;
-
-            this.listener[type].push({
-                callback: listener,
-                binding: binding,
-            });
+            emitter.on(type, listener, binding);
         }
 
         return this;
     }
 
     off(types: string | string[], listener: (e: Event) => void): this {
-        if (!isArray(types)) {
-            types = [types];
-        }
+        const emitter = this.emitter;
 
-        for (let type of types) {
-            if (!hasListener(this.listener, type)) {
-                continue;
-            }
+        for (let type of emitter.fix(types)) {
+            emitter.off(type, listener);
 
-            for (let index = 0, stack = this.listener[type], length = stack.length; index < length; index++) {
-                if (stack[index].callback === listener) {
-                    stack.splice(index, 1);
-                }
-            }
-
-            if (this.listener[type].length == 0) {
-                this.node.removeEventListener(type, (e) => this.emit(e));
+            if (!emitter.has(type)) {
+                this.node.removeEventListener(type, this.callback);
             }
         }
 
         return this;
     }
 
-    fire(types: string | string[], ...args: any): this {
-        if (isString(types)) {
-            types = [types];
-        }
+    fire(types: string | string[]): this {
+        const emitter = this.emitter;
 
-        for (let type of types) {
+        for (let type of emitter.fix(types)) {
             for (let key in EventRegex) {
                 if (type.match(EventRegex[key])) {
                     const event = document.createEvent(key);
@@ -352,14 +339,7 @@ class Helper {
         return this;
     }
 
-    private emit(event: Event, ...args: any) {
-        if (hasListener(this.listener, event.type)) {
-            for (let index = 0, stack = this.listener[event.type], length = stack.length; index < length; index++) {
-                const _this = stack[index].binding || this.element;
-                stack[index].callback.call(_this, event, ...args);
-            }
-        }
+    private trigger(event: Event) {
+        this.emitter.fire(event.type, event);
     }
 }
-
-export {Helper as ElementHelper};

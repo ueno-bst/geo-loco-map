@@ -39,7 +39,7 @@ export class GoogleMapController extends MapController<google.maps.Marker> {
             mapConfig.maxZoom = this.config.zoom_max;
         }
 
-        this.map = new google.maps.Map(this.target.element, mapConfig);
+        this.map = new google.maps.Map(this.target.src, mapConfig);
 
         // 地図の中心点変更時イベントを登録
         google.maps.event.addListenerOnce(this.map, "idle", () => {

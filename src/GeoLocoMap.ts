@@ -2,17 +2,6 @@ import {IMarkerData} from "./entities/Response";
 import {IController} from "./controllers/IController";
 import {ILatLng, ILatLngBounds, LatLng} from "./entities/LatLng";
 
-// GoogleMapAPIの有効状態を判定する
-const gMapEnable = window.google !== undefined;
-
-// YahooMapAPIの有効状態を判定する
-const yMapEnable = window.Y !== undefined;
-
-// GoogleMapのスコープを初期化する
-window.google = window.google || {'maps': {}};
-// YahooMapのスコープを初期化
-window.Y = window.Y || {};
-
 export class GeoLocoMap extends IController {
 
     getElement(): Element {

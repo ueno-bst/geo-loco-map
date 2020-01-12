@@ -1,14 +1,16 @@
 import {IBoundGridContentData, IBoundGridData} from "../../entities/Response";
-import {ElementHelper} from "../../utils/ElementHelper";
+import ElementHelper from "../../utils/ElementHelper";
 import {getClass} from "../../utils/Mixin";
 import {GridBoundElement, GridMarkerElement, LoadingElement, MessageElement} from "../Element";
 import {Rectangle, LatLngBounds, Point} from "../../entities/LatLng";
 
 window.Y = window.Y || {};
 
-const Layer = getClass(Y.Layer);
-const FeatureLayer = getClass(Y.FeatureLayer);
-const Feature = getClass(Y.Feature);
+const get_class = getClass;
+
+const Layer = get_class(Y.Layer);
+const FeatureLayer = get_class(Y.FeatureLayer);
+const Feature = get_class(Y.Feature);
 
 export class GridFeatureLayer extends FeatureLayer {
     drawLayer(force: boolean): void {
@@ -83,7 +85,7 @@ class GridBound extends Feature {
 
             this.element.setPosition(new Rectangle(ne, sw));
 
-            container.append(this.element.element);
+            container.append(this.element.src);
 
             this.drawn = true;
         }
@@ -125,7 +127,7 @@ class GridMarker extends Feature {
 
             this.element.setPosition(new Point(centre));
 
-            container.append(this.element.element);
+            container.append(this.element.src);
 
             this.drawn = true;
         }
@@ -156,7 +158,7 @@ export class LoadingLayer extends Layer {
 
             container
                 .empty()
-                .append(this.e.element);
+                .append(this.e.src);
         }
 
         const bounds = this.getMap().getBounds();
@@ -185,7 +187,7 @@ export class MessageLayer extends Layer {
 
             container
                 .empty()
-                .append(e.element);
+                .append(e.src);
         }
 
         const bounds = this.getMap().getBounds();

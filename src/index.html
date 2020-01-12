@@ -79,19 +79,19 @@
 				delay: 500,
 			},
 			onInit: function (e) {
-				// console.info("onInit", map.controller, e.controller);
+				console.info("onInit", map.controller, e.controller);
 			},
 			onMove: function (obj, coordinate) {
-				// console.info("onMove", map.controller, obj.controller, coordinate.lat, coordinate.lng);
+				console.info("onMove", map.controller, obj.controller, coordinate.lat, coordinate.lng);
 			},
 			onZoom: function (obj, zoom) {
-				// console.info("onZoom", map.controller, obj.controller, zoom);
+				console.info("onZoom", map.controller, obj.controller, zoom);
 			},
 			onUI: function (obj, f) {
-				// console.info("onUI", map.controller, obj.controller, f);
+				console.info("onUI", map.controller, obj.controller, f);
 			},
 			onChange: function (obj) {
-				// console.info("onChange", map.controller, obj.controller);
+				console.info("onChange", map.controller, obj.controller);
 				var
 					info = obj.getInfo(),
 					ui = obj.getUI(),
@@ -125,12 +125,12 @@
 				$("#markers").html(t);
 			},
 			onClickMarker: function (f) {
-				// console.info(f);
+				console.info("onClickMarker", f);
 				alert(f.label);
 			},
 			onRequest: function (obj, url) {
 				/** @var {URLBuilder} url */
-				// console.info(url.build());
+				console.info("onRequest", url.build());
 			}
 		});
 

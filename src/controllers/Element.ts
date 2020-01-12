@@ -1,15 +1,9 @@
-import {ElementHelper} from "../utils/ElementHelper";
+import ElementHelper from "../utils/ElementHelper";
 import {IBoundGridContentData, IBoundGridData} from "../entities/Response";
 import {Rectangle, LatLng, LatLngBounds, Point} from "../entities/LatLng";
+import EventType from "../utils/EventType";
 
-enum EventName {
-    CLICK = 'click',
-    MOUSE_DOWN = 'mousedown',
-    MOUSE_OVER = 'mouseover',
-    MOUSE_OUT = 'mouseout',
-    MOUSE_MOVE = 'mousemove',
-    MOUSE_UP = 'mouseup',
-}
+const ev = EventType;
 
 abstract class BaseElement extends ElementHelper {
 
@@ -35,13 +29,13 @@ abstract class BaseElement extends ElementHelper {
             .setStyles({
                 position: 'absolute'
             })
-            .on([EventName.MOUSE_DOWN], this.onInactivate, this)
-            .on([EventName.MOUSE_OVER, EventName.MOUSE_OUT], this.onHover, this)
-            .on([EventName.MOUSE_MOVE, EventName.MOUSE_UP], this.onDeactivate, this);
+            .on([ev.MOUSE_DOWN], this.onInactivate, this)
+            .on([ev.MOUSE_OVER, ev.MOUSE_OUT], this.onHover, this)
+            .on([ev.MOUSE_MOVE, ev.MOUSE_UP], this.onDeactivate, this);
     }
 
     private onInactivate(event: Event) {
-        this._active = event.type === EventName.MOUSE_DOWN;
+        this._active = event.type === ev.MOUSE_DOWN;
         this.updateClasses();
     }
 
@@ -55,7 +49,7 @@ abstract class BaseElement extends ElementHelper {
     }
 
     private onHover(event: Event): void {
-        this._hover = event.type === EventName.MOUSE_OVER;
+        this._hover = event.type === ev.MOUSE_OVER;
         this.updateClasses();
     }
 
@@ -96,15 +90,19 @@ export class MapElement extends ElementHelper {
     }
 
     private triggerResize() {
-        const w = this.node.clientWidth;
-        const h = this.node.clientHeight;
+        const
+            t = this,
+            node = t.node;
 
-        if (this.width != w || this.height != h) {
-            this.fire("resize");
+        const w = node.clientWidth;
+        const h = node.clientHeight;
+
+        if (t.width != w || t.height != h) {
+            t.fire("resize");
         }
 
-        this.width = w;
-        this.height = h;
+        t.width = w;
+        t.height = h;
     }
 }
 
@@ -122,9 +120,9 @@ export class GridBoundElement extends OverWrapBaseElement {
 
         this.value = bound;
 
-        const label = new ElementHelper('p').setText(this.value.count + '');
+        const label = ElementHelper.p().setText(this.value.count + '');
 
-        const inner = this.inner = new ElementHelper('div')
+        const inner = this.inner = ElementHelper.div()
             .addClass('gl-inner', "gl-char-" + label.getText().length)
             .setStyles({
                 position: 'absolute'
@@ -169,9 +167,9 @@ export class GridMarkerElement extends BaseElement {
 
         this.value = marker;
 
-        const label = new ElementHelper('p').setText(this.value.count + '');
+        const label = ElementHelper.p().setText(this.value.count + '');
 
-        const inner = new ElementHelper('div')
+        const inner = ElementHelper.div()
             .addClass('gl-inner')
             .toggleClass('is-multiple', this.value.count > 1)
             .append(label);
@@ -192,9 +190,9 @@ export class MessageElement extends OverWrapBaseElement {
     constructor() {
         super();
 
-        const p = this.p = new ElementHelper('p');
+        const p = this.p = ElementHelper.p();
 
-        const div = new ElementHelper('div')
+        const div = ElementHelper.div()
             .append(p);
 
         this
@@ -225,9 +223,10 @@ export class LoadingElement extends OverWrapBaseElement {
     constructor() {
         super();
 
-        const inner = new ElementHelper('div').addClass("gl-inner");
+        const inner = ElementHelper.div()
+            .addClass("gl-inner");
 
-        const layer = new ElementHelper('div')
+        const layer = ElementHelper.div()
             .addClass("gl-layer")
             .append(inner);
 

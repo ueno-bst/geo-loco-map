@@ -1,5 +1,8 @@
 import {isNull, isUndefined} from "./Types";
 
+const
+    is_null = isNull;
+
 interface QueryObject {
     key: string,
     value: QueryValueList,
@@ -20,7 +23,7 @@ function encode(value: string): string {
 function parseURL(obj: URLBuilder, url: string): void {
     const pattern = url.match(/^(?:(\w.+?):)?(?:\/\/(?:(.+?)(?::(.+?))?@)?([^\/:]+)(?::([0-9]+))?\/?)?([^?#]*?)?(?:\?(.*?))?(?:#(.*?))?$/);
 
-    if (!isNull(pattern)) {
+    if (!is_null(pattern)) {
         obj.scheme = pattern[1] || "";
         obj.user = pattern[2] || "";
         obj.password = pattern[3] || "";
@@ -102,17 +105,17 @@ function buildQuery(obj: QueryBuilder): string {
     obj.keys.forEach((key) => {
         const values = obj.get(key);
 
-        if (isNull(values)) {
+        if (is_null(values)) {
             return;
         }
 
-        values.forEach((value: QueryValue) => {
+        for (let value of values) {
             if (isUndefined(value)) {
                 args.push(encode(key));
             } else {
                 args.push(encode(key) + "=" + encode(value));
             }
-        });
+        }
     });
 
     return args.join("&");
@@ -173,7 +176,7 @@ class QueryBuilder {
     single(key: string): QueryValue | null {
         const value = this.get(key);
 
-        if (isNull(value) || value.length == 0) {
+        if (is_null(value) || value.length == 0) {
             return null;
         }
 
@@ -192,7 +195,7 @@ class QueryBuilder {
         return null;
     }
 
-    set(key: string, ...value: QueryValueList): void {
+    set(key: string, ...value: QueryValueList): this {
         const index = this.indexOf(key);
 
         if (index < 0) {
@@ -200,9 +203,11 @@ class QueryBuilder {
         } else {
             this.query[index] = {key: key, value: value};
         }
+
+        return this;
     }
 
-    add(key: string, ...value: QueryValueList): void {
+    add(key: string, ...value: QueryValueList): this {
         const index = this.indexOf(key);
 
         if (index < 0) {
@@ -212,6 +217,8 @@ class QueryBuilder {
                 this.query[index].value.push(v);
             });
         }
+
+        return this;
     }
 
     drop(key: string): boolean {

@@ -1,13 +1,29 @@
 import {isNumber, isArray, isInstanceOf, isNull, isObject} from "../utils/Types";
 
+const
+    math = Math,
+    min = math.min,
+    max = math.max,
+    pow = math.pow;
+
+const
+    is_array = isArray,
+    is_null = isNull,
+    is_number = isNumber,
+    is_object = isObject,
+    is_instance_of = isInstanceOf;
+
 interface IBase {
     gmap(): any;
+
     yolp(): any;
+
     obj(): any;
 }
 
 interface ICoordinate extends IBase {
     fix(): this;
+
     round(base: number): this;
 }
 
@@ -60,23 +76,23 @@ export interface ILatLngBounds {
 }
 
 function isIPoint(args: any): args is IPoint {
-    return !isNull(args) && isObject(args) && isNumber(args.x) && isNumber(args.y);
+    return !is_null(args) && is_object(args) && is_number(args.x) && is_number(args.y);
 }
 
 function isIRectangle(args: any): args is IRectangle {
-    return !isNull(args) && isObject(args) && Point.is(args.lt) && Point.is(args.rb);
+    return !is_null(args) && is_object(args) && Point.is(args.lt) && Point.is(args.rb);
 }
 
 function isILatLng(args: any): args is ILatLng {
-    return !isNull(args) && isObject(args) && isNumber(args.lat) && isNumber(args.lng);
+    return !is_null(args) && is_object(args) && is_number(args.lat) && is_number(args.lng);
 }
 
 function isILatLngBounds(args: any): args is ILatLngBounds {
-    return !isNull(args) && isObject(args) && LatLng.is(args.ne) && LatLng.is(args.sw);
+    return !is_null(args) && is_object(args) && LatLng.is(args.ne) && LatLng.is(args.sw);
 }
 
 function roundnessCoordinate(value: number, base: number): number {
-    return value - Math.round(value / (base * 2)) * (base * 2);
+    return value - math.round(value / (base * 2)) * (base * 2);
 }
 
 export class Point implements IPoint, IBase {
@@ -93,10 +109,10 @@ export class Point implements IPoint, IBase {
         if (Point.is(x)) {
             this.y = x.y;
             this.x = x.x;
-        } else if (isNumber(x) && isNumber(y)) {
+        } else if (is_number(x) && is_number(y)) {
             this.y = y;
             this.x = x;
-        } else if (isArray(x) && x.length > 2) {
+        } else if (is_array(x) && x.length > 2) {
             this.y = x[1];
             this.x = x[0];
         }
@@ -127,17 +143,20 @@ export class Rectangle implements IRectangle {
     constructor(lt: IPoint, rb: IPoint);
 
     constructor(lt: IRectangle | google.maps.Point | Y.Point | IPoint, rb?: google.maps.Point | Y.Point | IPoint) {
-        if (Rectangle.is(lt)) {
+        const r = Rectangle;
+        const p = Point;
+
+        if (r.is(lt)) {
             rb = lt.rb;
             lt = lt.lt;
         }
 
-        if (!Point.is(lt) || !Point.is(rb)) {
+        if (!p.is(lt) || !p.is(rb)) {
             throw new Error("The argument format is incorrect");
         }
 
-        this.lt = new Point(Math.min(lt.x, rb.x), Math.min(lt.y, rb.y));
-        this.rb = new Point(Math.max(lt.x, rb.x), Math.max(lt.y, rb.y));
+        this.lt = new p(min(lt.x, rb.x), min(lt.y, rb.y));
+        this.rb = new p(max(lt.x, rb.x), max(lt.y, rb.y));
     }
 
     get left(): number {
@@ -157,11 +176,13 @@ export class Rectangle implements IRectangle {
     }
 
     get width(): number {
-        return this.right - this.left;
+        const t = this;
+        return t.right - t.left;
     }
 
     get height(): number {
-        return this.bottom - this.top;
+        const t = this;
+        return t.bottom - t.top;
     }
 
     static is = (args: any): args is IRectangle => isIRectangle(args);
@@ -178,23 +199,24 @@ export class LatLng implements ILatLng, ICoordinate {
     constructor(lat: any[]);
 
     constructor(lat?: number | ILatLng | Y.LatLng | google.maps.LatLng | any[] | null, lng?: number | null) {
-        if (isInstanceOf<Y.LatLng>(lat, Y.LatLng)) {
+        const t = this;
+        if (is_instance_of<Y.LatLng>(lat, Y.LatLng)) {
             lng = lat.lng();
             lat = lat.lat();
-        } else if (isInstanceOf<google.maps.LatLng>(lat, google.maps.LatLng)) {
+        } else if (is_instance_of<google.maps.LatLng>(lat, google.maps.LatLng)) {
             lng = lat.lng();
             lat = lat.lat();
         }
 
-        if (isNumber(lat) && isNumber(lng)) {
-            this.lat = lat;
-            this.lng = lng;
+        if (is_number(lat) && is_number(lng)) {
+            t.lat = lat;
+            t.lng = lng;
         } else if (LatLng.is(lat)) {
-            this.lat = lat.lat;
-            this.lng = lat.lng;
-        } else if (isArray(lat) && lat.length >= 2) {
-            this.lat = Number(lat[0]) || this.lat;
-            this.lng = Number(lat[1]) || this.lng;
+            t.lat = lat.lat;
+            t.lng = lat.lng;
+        } else if (is_array(lat) && lat.length >= 2) {
+            t.lat = Number(lat[0]) || t.lat;
+            t.lng = Number(lat[1]) || t.lng;
         }
     }
 
@@ -211,31 +233,34 @@ export class LatLng implements ILatLng, ICoordinate {
      * @param p
      */
     distance(p: LatLng): number {
-        return Math.sqrt(Math.pow(this.lat - p.lat, 2) + Math.pow(this.lng - p.lng, 2));
+        const t = this;
+        return math.sqrt(pow(t.lat - p.lat, 2) + pow(t.lng - p.lng, 2));
     }
 
     fix(): this {
-        this.lat = roundnessCoordinate(this.lat, 90);
-        this.lng = roundnessCoordinate(this.lng, 180);
-        return this;
+        const t = this;
+        t.lat = roundnessCoordinate(t.lat, 90);
+        t.lng = roundnessCoordinate(t.lng, 180);
+        return t;
     }
 
     round(base: number, append: boolean = false): this {
+        const t = this;
         let mod = 360;
 
         for (let index = 1; index < base; index++) {
             mod /= 2;
         }
 
-        this.lat = this.lat - (this.lat % mod);
-        this.lng = this.lng - (this.lng % mod);
+        t.lat = t.lat - (t.lat % mod);
+        t.lng = t.lng - (t.lng % mod);
 
         if (append) {
-            this.lat += mod;
-            this.lng += mod;
+            t.lat += mod;
+            t.lng += mod;
         }
 
-        return this.fix();
+        return t.fix();
     }
 
     gmap(): google.maps.LatLng {
@@ -263,20 +288,22 @@ export class LatLngBounds implements ILatLngBounds, ICoordinate {
     constructor(ne: google.maps.LatLngBounds);
 
     constructor(ne: ILatLng | ILatLngBounds | Y.LatLngBounds | google.maps.LatLngBounds, sw?: ILatLng) {
-        if (isInstanceOf<Y.LatLngBounds>(ne, Y.LatLngBounds)) {
-            sw = new LatLng(ne.sw);
-            ne = new LatLng(ne.ne);
-        } else if (isInstanceOf<google.maps.LatLngBounds>(ne, google.maps.LatLngBounds)) {
-            sw = new LatLng(ne.getSouthWest());
-            ne = new LatLng(ne.getNorthEast());
+        const ll = LatLng;
+
+        if (is_instance_of<Y.LatLngBounds>(ne, Y.LatLngBounds)) {
+            sw = new ll(ne.sw);
+            ne = new ll(ne.ne);
+        } else if (is_instance_of<google.maps.LatLngBounds>(ne, google.maps.LatLngBounds)) {
+            sw = new ll(ne.getSouthWest());
+            ne = new ll(ne.getNorthEast());
         }
 
-        if (LatLng.is(ne) && LatLng.is(sw)) {
-            this.ne = new LatLng(ne);
-            this.sw = new LatLng(sw);
+        if (ll.is(ne) && ll.is(sw)) {
+            this.sw = new ll(sw);
+            this.ne = new ll(ne);
         } else if (LatLngBounds.is(ne)) {
-            this.ne = new LatLng(ne.ne);
-            this.sw = new LatLng(ne.sw);
+            this.sw = new ll(ne.sw);
+            this.ne = new ll(ne.ne);
         } else {
             throw new Error("The argument format is incorrect");
         }
@@ -288,8 +315,10 @@ export class LatLngBounds implements ILatLngBounds, ICoordinate {
      * @param p
      */
     inside(p: LatLng): boolean {
-        return (this.ne.lat >= p.lat && this.ne.lng >= p.lng) &&
-            (this.sw.lat <= p.lat && this.sw.lng <= p.lng);
+        const t = this;
+
+        return (t.ne.lat >= p.lat && t.ne.lng >= p.lng) &&
+            (t.sw.lat <= p.lat && t.sw.lng <= p.lng);
     }
 
     /**
@@ -301,27 +330,39 @@ export class LatLngBounds implements ILatLngBounds, ICoordinate {
     }
 
     fix(): this {
-        this.ne.fix();
-        this.sw.fix();
-        return this;
+        const t = this;
+
+        t.ne.fix();
+        t.sw.fix();
+
+        return t;
     }
 
     round(base: number): this {
-        this.ne.round(base, true);
-        this.sw.round(base);
-        return this;
+        const t = this;
+
+        t.ne.round(base, true);
+        t.sw.round(base);
+
+        return t;
     }
 
     gmap(): google.maps.LatLngBounds {
-        return new google.maps.LatLngBounds(this.sw.gmap(), this.ne.gmap());
+        const t = this;
+
+        return new google.maps.LatLngBounds(t.sw.gmap(), t.ne.gmap());
     }
 
     yolp(): Y.LatLngBounds {
-        return new Y.LatLngBounds(this.sw.yolp(), this.ne.yolp());
+        const t = this;
+
+        return new Y.LatLngBounds(t.sw.yolp(), t.ne.yolp());
     }
 
     obj(): ILatLngBounds {
-        return {ne: this.ne.obj(), sw: this.sw.obj()};
+        const t = this;
+
+        return {ne: t.ne.obj(), sw: t.sw.obj()};
     }
 
     static is = (args: any): args is ILatLngBounds => isILatLngBounds(args);

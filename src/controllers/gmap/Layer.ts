@@ -1,12 +1,14 @@
 import {getClass} from "../../utils/Mixin";
-import {ElementHelper} from "../../utils/ElementHelper";
+import ElementHelper from "../../utils/ElementHelper";
 import {IBoundGridContentData, IBoundGridData} from "../../entities/Response";
 import {GridBoundElement, GridMarkerElement, IOverWrapBaseElement, LoadingElement, MessageElement} from "../Element";
 import {Rectangle, Point} from "../../entities/LatLng";
 
 window.google = window.google || {maps: {}};
 
-const OverlayView = getClass(google.maps.OverlayView);
+const get_class = getClass;
+
+const OverlayView = get_class(google.maps.OverlayView);
 
 class Layer extends OverlayView {
 
