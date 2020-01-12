@@ -1,4 +1,3 @@
-
 /**
  * オブジェクトが numberかを検証
  * @param value
@@ -19,7 +18,7 @@ export function isString(value: any): value is string {
  * オブジェクトが functionかを検証
  * @param value
  */
-export function isFunction(value: any): value is symbol {
+export function isFunction(value: any): value is Function {
     return typeof value == "function";
 }
 
@@ -62,6 +61,10 @@ export function isObject(value: any): value is Object {
  */
 export function isArray<T extends any>(value: any): value is T[] {
     return Array.isArray(value);
+}
+
+export function isInstanceOf<T>(value: any, type: any): value is T {
+    return type && value instanceof type;
 }
 
 /**

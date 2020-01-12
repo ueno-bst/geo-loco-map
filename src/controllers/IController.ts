@@ -1,17 +1,16 @@
 import {fixMapConfig, IMapConfig, MapType} from "../entities/MapConfig";
-import {IMapController} from "./IMapController";
 import {GoogleMapController} from "./GoogleMapController";
 import {YahooMapController} from "./YahooMapController";
-import {ILatLng} from "../entities/LatLng";
+import {ILatLng, ILatLngBounds} from "../entities/LatLng";
 import {IMarkerData} from "../entities/Response";
-import {ILatLngBound} from "../entities/LatLngBound";
 import {MapEventListener, MapEventType} from "../entities/MapEvent";
+import {MapController} from "./MapController";
 
 export abstract class IController {
 
     public config: IMapConfig;
 
-    protected readonly controller: IMapController;
+    protected readonly controller: MapController<Object>;
 
     constructor(params: IMapConfig) {
         // 実行パラメータを正規化
@@ -31,7 +30,7 @@ export abstract class IController {
 
     public abstract getElement(): Element ;
 
-    public abstract getBounds(): ILatLngBound | null;
+    public abstract getBounds(): ILatLngBounds | null;
 
     public abstract getZoom(): number;
 

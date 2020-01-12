@@ -1,31 +1,52 @@
-import {IMapConfig} from '../entities/MapConfig'
-import {IMapController} from "./IMapController";
-import {MarkerData, IApiResponse, IMarkerData} from "../entities/Response";
+import {ApiType, IMapConfig, MapType} from '../entities/MapConfig'
+import {IBoundGridContentData, IBoundGridData, IMarkerData, IResponse, MarkerData} from "../entities/Response";
 import {IMarkerList, isIMarkerList} from "./IMarkers";
 import {IController} from "./IController";
-import {isArray, isExist, isFunction, isNull, isString} from "../utils/Types";
-import {MapEventType} from "../entities/MapEvent";
+import {isArray, isFunction, isNull, isString} from "../utils/Types";
+import {MapEvent, MapEventType} from "../entities/MapEvent";
 import {URLBuilder} from "../utils/URLBuilder";
+import {LatLng, LatLngBounds} from "../entities/LatLng";
+import {MapElement} from "./Element";
+import {ElementHelper} from "../utils/ElementHelper";
 
-function numberFixed(value:number, digit: number):string {
+function numberFixed(value: number, digit: number): string {
     return value.toFixed(digit).replace(/(\.?0+)$/, "");
 }
 
-export abstract class MapController<T extends Object> extends IMapController {
+export abstract class MapController<T extends Object> {
 
-    protected target: TargetElement;
+    /**
+     * ルートコントローラ
+     */
+    protected readonly root: IController;
+
+    get config(): IMapConfig {
+        return this.root.config;
+    }
+
+    /**
+     * イベントエミッタ
+     */
+    public readonly emit: MapEvent;
+
+    protected target: MapElement;
 
     protected markers: { [key: string]: IMarkerList<T>; } = {};
 
+    private xhr: XMLHttpRequest | null = null;
+
     protected constructor(root: IController) {
-        super(root);
+        this.root = root;
 
-        const element = document.querySelector(this.config.selector);
+        // イベントエミッタを定義
+        this.emit = new MapEvent(root);
 
-        if (element === null) {
-            throw new Error("Cannot find element to display map");
+        const element = ElementHelper.query(this.config.selector);
+
+        if (element) {
+            this.target = new MapElement(element.element);
         } else {
-            this.target = new TargetElement(element);
+            throw new Error("Cannot find element to display map");
         }
     }
 
@@ -48,50 +69,123 @@ export abstract class MapController<T extends Object> extends IMapController {
 
         this.requestTimer = setTimeout(() => {
             this.request();
-        }, this.config.lazy_load);
+        }, this.config.api.delay);
     }
 
     /**
      * APIにリクエストを送信する
      */
     protected request(): void {
-        if (this.config.api_url.length === 0) {
+        const api = this.config.api;
+
+        if (api.url.length === 0) {
             return;
         }
 
-        const centre = this.getCenter();
-        const zoom = this.getZoom();
+        let zoom = 0;
+        if (this.config.map_type === MapType.GoogleMap) {
+            zoom = this.getZoom() + 1;
+        } else {
+            zoom = this.getZoom();
+        }
 
-        const url = new URLBuilder(this.config.api_url);
+        const url = new URLBuilder(api.url);
 
-        url.query.set("lat", numberFixed(centre.lat, this.config.grid));
-        url.query.set("lng", numberFixed(centre.lng, this.config.grid));
+        switch (api.type) {
+            case ApiType.BOUNDS:
+                const bounds = this.getBounds();
+
+                if (!bounds) {
+                    return;
+                }
+
+                bounds.round(zoom);
+
+                url.query.set("nelt", numberFixed(bounds.ne.lat, api.precision));
+                url.query.set("neln", numberFixed(bounds.ne.lng, api.precision));
+                url.query.set("swlt", numberFixed(bounds.sw.lat, api.precision));
+                url.query.set("swln", numberFixed(bounds.sw.lng, api.precision));
+                break;
+            case ApiType.CENTER:
+                const centre = this.getCenter();
+
+                url.query.set("lat", numberFixed(centre.lat, api.precision));
+                url.query.set("lng", numberFixed(centre.lng, api.precision));
+                break;
+        }
+
         url.query.set("zoom", String(zoom));
+
+        this.emit.fire(MapEventType.request, url);
+
+        if (isFunction(this.config.onRequest)) {
+            this.config.onRequest(this.root, url);
+        }
+
+        /*
+         * XHR リクエスト発信
+         */
+        // 未完了のAPIリクエストがある場合は終了する
+        if (this.xhr instanceof XMLHttpRequest) {
+            this.xhr.abort();
+            this.xhr = null;
+        }
+
+        console.info(url.build());
 
         const xhr = new XMLHttpRequest();
 
+        // APIレスポンス受信処理
         xhr.onreadystatechange = () => {
             if (xhr.readyState === XMLHttpRequest.DONE) {
+                this.hideLoading();
                 if (xhr.status === 200) {
                     this.onApiReceiveListener(JSON.parse(xhr.responseText));
                 }
             }
+
+            this.xhr = null;
         };
 
-        xhr.open("GET", url.build(), true);
+        // API接続開始
+        xhr.open("GET", url.build(), true, api.user, api.password);
         xhr.send();
+
+        this.showLoading();
+
+        this.xhr = xhr;
     }
 
     /**
      * APIの受信処理
      * @param json
      */
-    protected onApiReceiveListener(json: IApiResponse) {
-        if (isArray(json.data)) {
-            const before = Object.keys(this.markers).length;
-            for (let index = 0; index < json.data.length; index++) {
-                this.addMarker(json.data[index]);
+    protected onApiReceiveListener(json: IResponse) {
+        if (json.type == 'bounds') {
+            this.removeGrids();
+            this.removeMarkers();
+
+            if (json.error) {
+                this.setMessage(json.message, true);
+            } else {
+                this.hideMessage();
+                switch (json.format) {
+                    case 'grid':
+                        this.addGrids(json.data);
+                        break;
+                    case 'content':
+                        this.addGridContents(json.data);
+                        break;
+                }
             }
+
+        } else if (isArray(json.data)) {
+            const before = Object.keys(this.markers).length;
+
+            for (let datum of json.data) {
+                this.addMarker(datum);
+            }
+
             const after = Object.keys(this.markers).length;
 
             if (before != after) {
@@ -107,9 +201,11 @@ export abstract class MapController<T extends Object> extends IMapController {
      */
     protected onInitHandler() {
         this.emit.fire(MapEventType.init);
+
         if (isFunction(this.config.onInit)) {
             this.config.onInit(this.root);
         }
+
         this.onChangeHandler();
     }
 
@@ -118,6 +214,7 @@ export abstract class MapController<T extends Object> extends IMapController {
      */
     protected onChangeHandler() {
         this.emit.fire(MapEventType.change);
+
         if (isFunction(this.config.onChange)) {
             this.config.onChange(this.root);
         }
@@ -128,10 +225,13 @@ export abstract class MapController<T extends Object> extends IMapController {
      */
     protected onMoveHandler() {
         const center = this.config.center = this.getCenter();
+
         this.emit.fire(MapEventType.move, center);
+
         if (isFunction(this.config.onMove)) {
             this.config.onMove(this.root, center);
         }
+
         this.onChangeHandler();
         this.onApiRequestHandler();
     }
@@ -141,10 +241,13 @@ export abstract class MapController<T extends Object> extends IMapController {
      */
     protected onZoomListener() {
         const zoom = this.config.zoom = this.getZoom();
+
         this.emit.fire(MapEventType.zoom, zoom);
+
         if (isFunction(this.config.onZoom)) {
             this.config.onZoom(this.root, zoom);
         }
+
         this.onChangeHandler();
         this.onApiRequestHandler();
     }
@@ -155,15 +258,19 @@ export abstract class MapController<T extends Object> extends IMapController {
      */
     protected onUIListener(show: boolean) {
         const show_uri = this.config.show_ui = show;
+
         this.emit.fire(MapEventType.ui, show_uri);
+
         if (isFunction(this.config.onUI)) {
             this.config.onUI(this.root, show_uri);
         }
+
         this.onChangeHandler();
     }
 
     protected onAddMarkerHandler() {
         this.emit.fire(MapEventType.addMarker, this.root);
+
         if (isFunction(this.config.onAddMarker)) {
             this.config.onAddMarker(this.root);
         }
@@ -181,6 +288,7 @@ export abstract class MapController<T extends Object> extends IMapController {
         }
 
         this.emit.fire(MapEventType.clickMarker, this.root);
+
         if (this.config.onClickMarker) {
             this.config.onClickMarker(marker.marker, this.root);
         }
@@ -193,11 +301,37 @@ export abstract class MapController<T extends Object> extends IMapController {
     protected abstract openModal(marker: IMarkerList<T>): void;
 
     /**
-     * 地図を表示しているHTML要素を返却する
+     * 表示している地図の矩形領域を返却する
+     */
+    public abstract getBounds(): LatLngBounds | null;
+
+    /**
+     * 地図の表示要素を取得する
      */
     public getElement(): Element {
-        return this.target.node;
+        return this.target.element;
     }
+
+    /**
+     * マップのズーム率を取得する
+     */
+    public abstract getZoom(): number;
+
+    /**
+     * マップのズーム率を変更する
+     */
+    public abstract setZoom(zoom: number): void;
+
+    /**
+     * マップの中心座標を取得する
+     */
+    public abstract getCenter(): LatLng;
+
+    /**
+     * マップの中心座標を変更する
+     * @param center
+     */
+    public abstract setCenter(center: LatLng): void;
 
     /**
      * マーカーデータを生成する
@@ -217,6 +351,11 @@ export abstract class MapController<T extends Object> extends IMapController {
             display: false,
         };
     }
+
+    /**
+     * マップにマーカーを追加する
+     */
+    public abstract addMarker(marker: IMarkerData): IMarkerData;
 
     /**
      * マーカー情報を取得する
@@ -291,74 +430,46 @@ export abstract class MapController<T extends Object> extends IMapController {
 
         return this.markers[id];
     }
-}
 
+    /**
+     * マーカーを削除する
+     */
+    public abstract removeMarker(id: string): boolean;
 
-class TargetElement {
-    private readonly target: Element;
-
-    private width: number = 0;
-    private height: number = 0;
-
-    get node(): Element {
-        return this.target;
-    }
-
-    get id(): string {
-        let id = this.node.getAttribute("id");
-        return isExist<string>(id) ? id : "";
-    }
-
-    onResize?: (t: TargetElement) => void;
-
-    constructor(target: Element) {
-        // プロパティの初期化
-        this.target = target;
-
-        /**
-         * リサイズ監視イベントを実装
-         */
-        setInterval(() => {
-            this.resizeCheck();
-        }, 300);
-
-        /**
-         * 要素にIDがない場合は、ユニークIDを生成して追加
-         */
-        let id = this.id;
-
-        if (id == "") {
-            // 種を作る
-            let seed = "";
-            do {
-                seed = seed + "x";
-            } while (seed.length < 16);
-
-            // IDを生成して、重複要素がない
-            do {
-                id = "id-" + seed.replace(/[x]/g, function (c) {
-                    let r = Math.random() * 16 | 0,
-                        v = c == 'x' ? r : (r & 0x3 | 0x8);
-                    return v.toString(16);
-                });
-            } while (document.getElementById(id) !== null);
-
-            // 要素に割り当て
-            this.node.setAttribute("id", id);
+    /**
+     * すべてのマーカーを削除する
+     */
+    public removeMarkers(): void {
+        for (let id in this.markers) {
+            this.removeMarker(id);
         }
     }
 
-    private resizeCheck() {
-        const w = this.node.clientWidth;
-        const h = this.node.clientHeight;
+    /**
+     * グリッドを追加する
+     * @param grids
+     */
+    public abstract addGrids(grids: IBoundGridData[]): void;
 
-        if (this.width != w || this.height != h) {
-            if (isFunction(this.onResize)) {
-                this.onResize(this);
-            }
-        }
+    public abstract addGridContents(contents: IBoundGridContentData[]): void;
 
-        this.width = w;
-        this.height = h;
-    }
+    /**
+     * グリッドをすべて削除する
+     */
+    public abstract removeGrids(): void;
+
+    public abstract setMessage(message: string, show: boolean): void;
+
+    public abstract showMessage(): void;
+
+    public abstract hideMessage(): void;
+
+    public abstract showLoading(): void;
+
+    public abstract hideLoading(): void;
+
+    /**
+     * コントロールの表示状態を設定する
+     */
+    public abstract setUI(show: boolean): void;
 }

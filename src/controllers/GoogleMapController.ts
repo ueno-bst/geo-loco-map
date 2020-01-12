@@ -1,11 +1,10 @@
-import {ILatLng, LatLng} from "../entities/LatLng";
+import {LatLng, LatLngBounds} from "../entities/LatLng";
 import {MapController} from "./MapController";
-import {IMarkerData} from "../entities/Response";
+import {IBoundGridContentData, IBoundGridData, IMarkerData} from "../entities/Response";
 import {IMarkerList} from "./IMarkers";
 import {IController} from "./IController";
-import {LatLngBound} from "../entities/LatLngBound";
+import {GridFeatureLayer, LoadingLayer, MessageLayer} from "./gmap/Layer";
 import {isNumber} from "../utils/Types";
-
 
 export class GoogleMapController extends MapController<google.maps.Marker> {
 
@@ -13,6 +12,12 @@ export class GoogleMapController extends MapController<google.maps.Marker> {
      * 地図オブジェクト
      */
     private readonly map: google.maps.Map;
+
+    private readonly _grid: GridFeatureLayer;
+
+    private readonly _msg: MessageLayer;
+
+    private readonly _loading: LoadingLayer;
 
     constructor(root: IController) {
         super(root);
@@ -23,7 +28,8 @@ export class GoogleMapController extends MapController<google.maps.Marker> {
             scrollwheel: true,
             zoom: this.config.zoom,
             disableDefaultUI: !this.config.show_ui,
-        }
+            scaleControl: this.config.show_ui,
+        };
 
         if (isNumber(this.config.zoom_min)) {
             mapConfig.minZoom = this.config.zoom_min;
@@ -33,7 +39,7 @@ export class GoogleMapController extends MapController<google.maps.Marker> {
             mapConfig.maxZoom = this.config.zoom_max;
         }
 
-        this.map = new google.maps.Map(this.target.node, mapConfig);
+        this.map = new google.maps.Map(this.target.element, mapConfig);
 
         // 地図の中心点変更時イベントを登録
         google.maps.event.addListenerOnce(this.map, "idle", () => {
@@ -53,20 +59,18 @@ export class GoogleMapController extends MapController<google.maps.Marker> {
         this.map.addListener("zoom_changed", () => {
             this.onZoomListener();
         });
+
+        // test
+        this._msg = new MessageLayer(this.map);
+        this._loading = new LoadingLayer(this.map);
+        this._grid = new GridFeatureLayer(this.map);
     }
 
-    getBounds(): LatLngBound | null {
+    getBounds(): LatLngBounds | null {
         const bound = this.map.getBounds();
 
         if (bound instanceof google.maps.LatLngBounds) {
-            const
-                ne = bound.getNorthEast(),
-                sw = bound.getSouthWest();
-
-            return new LatLngBound(
-                {lat: ne.lat(), lng: ne.lng()},
-                {lat: sw.lat(), lng: sw.lng()},
-            );
+            return new LatLngBounds(bound);
         }
 
         return null;
@@ -81,12 +85,11 @@ export class GoogleMapController extends MapController<google.maps.Marker> {
     }
 
     getCenter(): LatLng {
-        const center = this.map.getCenter();
-        return new LatLng(center.lat(), center.lng());
+        return new LatLng(this.map.getCenter());
     }
 
-    setCenter(center: ILatLng): void {
-        this.map.setCenter(new google.maps.LatLng(center.lat, center.lng))
+    setCenter(center: LatLng): void {
+        this.map.setCenter(center.gmap());
     }
 
     addMarker(marker: IMarkerData): IMarkerData {
@@ -146,5 +149,41 @@ export class GoogleMapController extends MapController<google.maps.Marker> {
 
             info.open(this.map, marker.origin);
         }
+    }
+
+    public addGrids(grids: IBoundGridData[]): void {
+        this._grid.addBounds(grids);
+    }
+
+    public addGridContents(contents: IBoundGridContentData[]): void {
+        this._grid.addMarkers(contents);
+    }
+
+    public removeGrids(): void {
+        this._grid.removeBounds();
+    }
+
+    public setMessage(message: string, show: boolean): void {
+        this._msg.setHtml(message);
+
+        if (show) {
+            this.showMessage();
+        }
+    }
+
+    public showMessage(): void {
+        this._msg.show();
+    }
+
+    public hideMessage(): void {
+        this._msg.hide();
+    }
+
+    public showLoading(): void {
+        this._loading.show();
+    }
+
+    public hideLoading(): void {
+        this._loading.hide();
     }
 }

@@ -1,14 +1,22 @@
-import {ILatLng, LatLng} from "./LatLng";
+import {ILatLng, ILatLngBounds, LatLng, LatLngBounds} from "./LatLng";
 import {IMarkerData} from "./Response";
 import {IController} from "../controllers/IController";
-import {ILatLngBound, LatLngBound} from "./LatLngBound";
-import {isUndefined} from "../utils/Types";
+import {isNumber, isExist, isString, isUndefined} from "../utils/Types";
+import {URLBuilder} from "../utils/URLBuilder";
 
 export enum MapType {
     GoogleMap = "google",
-    YahooMap = "yahoo"
+    YahooMap = "yahoo",
 }
 
+export enum ApiType {
+    CENTER = "center",
+    BOUNDS = "bounds",
+}
+
+/**
+ * マップ情報の設定値
+ */
 export interface IMapConfig {
     /**
      *　表示する地図のタイプを指定する
@@ -23,7 +31,7 @@ export interface IMapConfig {
     /**
      * 地図のスクロール範囲を指定したい場合に
      */
-    center_bound?: ILatLngBound;
+    center_bound?: ILatLngBounds;
 
     /**
      * 地図の初期表示状態のズーム率を指定
@@ -57,10 +65,25 @@ export interface IMapConfig {
 
     /**
      * マーカーを取得するためのAPIのURL
+     * @deprecated
      */
-    api_url: string;
+    api_url?: string;
 
+    /**
+     * マーカーを取得するためのAPI設定
+     */
+    api: IMapApiConfig;
+
+    /**
+     * APIに座標を送る際の精度
+     * @deprecated
+     */
     grid: number;
+
+    /**
+     * マップの静止から、APIにリクエストを送るまでのタイムラグ
+     * @deprecated
+     */
     lazy_load: number;
 
     /**
@@ -115,10 +138,28 @@ export interface IMapConfig {
      * @param ctrl マップコントローラーオブジェクト
      */
     onClickMarker?: (marker: IMarkerData, ctrl: IController) => void;
+
+    /**
+     * APIをリクエストする処理
+     * @param ctrl
+     * @param url
+     */
+    onRequest?: (ctrl: IController, url: URLBuilder) => void;
+}
+
+export interface IMapApiConfig {
+    url: string,
+    user?: string,
+    password?: string,
+    type: ApiType,
+    precision: number,
+    delay: number,
 }
 
 export function fixMapConfig(params: IMapConfig) {
     const def: IMapConfig = {
+        api: fixMapApi(),
+        api_url: "",
         show_ui: true,
         show_info: true,
         center: new LatLng(35.681236, 139.767125),
@@ -127,10 +168,9 @@ export function fixMapConfig(params: IMapConfig) {
         zoom_min: 0,
         zoom_max: 99,
         grid: 5,
-        lazy_load: 900,
+        lazy_load: 500,
         map_type: MapType.GoogleMap,
         selector: "#map",
-        api_url: "",
     };
 
     const config: IMapConfig = {
@@ -138,10 +178,23 @@ export function fixMapConfig(params: IMapConfig) {
         ...params
     };
 
+    config.api = fixMapApi(config.api);
     config.center = new LatLng(config.center);
 
+    if (!isExist(config.api.url) && isString(config.api_url)) {
+        config.api.url = config.api_url;
+    }
+
+    if (!isExist(config.api.precision) && isNumber(config.grid)) {
+        config.api.precision = config.grid;
+    }
+
+    if (!isExist(config.api.delay) && isNumber(config.lazy_load)) {
+        config.api.delay = config.lazy_load;
+    }
+
     if (!isUndefined(config.center_bound)) {
-        config.center_bound = new LatLngBound(config.center_bound);
+        config.center_bound = new LatLngBounds(config.center_bound);
     }
 
     switch (config.map_type) {
@@ -151,6 +204,39 @@ export function fixMapConfig(params: IMapConfig) {
         default:
             config.map_type = MapType.GoogleMap;
             break;
+    }
+
+    return config;
+}
+
+function fixMapApi(params?: IMapApiConfig): IMapApiConfig {
+    const def: IMapApiConfig = {
+        precision: 0,
+        type: ApiType.CENTER,
+        url: "",
+        delay: 0,
+    };
+
+    const config: IMapApiConfig = {
+        ...def,
+        ...params,
+    };
+
+    switch (config.type) {
+        case ApiType.BOUNDS:
+            break;
+        case ApiType.CENTER:
+        default:
+            config.type = ApiType.CENTER;
+            break;
+    }
+
+    if (!isNumber(config.precision)) {
+        config.precision = def.precision;
+    }
+
+    if (!isNumber(config.delay)) {
+        config.delay = def.delay;
     }
 
     return config;

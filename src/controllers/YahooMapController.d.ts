@@ -1,35 +1,32 @@
-import { MapConfig } from '../entities/Maps';
-import { ICoordinate } from "../entities/Coordinate";
+import { LatLng, LatLngBounds } from "../entities/LatLng";
 import { MapController } from "./MapController";
-import { IMapController } from "./IMapController";
-interface IYahooMap {
-    map: Y.Map;
-    latlng: Y.LatLng;
-    markers: Y.Marker[];
-    zoomControl: Y.ZoomControl;
-    homeControl: Y.HomeControl;
-    layerControl: Y.LayerSetControl;
-}
-export declare class YahooMapController extends MapController implements IMapController {
-    y: IYahooMap;
-    response?: any;
-    url?: string;
-    constructor(config: MapConfig);
-    request(id?: number): void;
+import { IBoundGridContentData, IBoundGridData, IMarkerData } from "../entities/Response";
+import { IMarkerList } from "./IMarkers";
+import { IController } from "./IController";
+export declare class YahooMapController extends MapController<Y.Marker> {
+    private map;
+    private yc;
+    private parentCentre?;
+    private readonly _grid;
+    private readonly _msg;
+    private readonly _loading;
+    constructor(root: IController);
+    protected init(): void;
+    getBounds(): LatLngBounds | null;
     getZoom(): number;
     setZoom(number: number): void;
-    getCenter(): {
-        lat: number;
-        lng: number;
-    };
-    setCenter(coordinate: ICoordinate): void;
-    addMarker(coordinate: ICoordinate): boolean;
-    marker(res: any, id?: number): void;
-    setControl(flag: boolean): void;
-    escapeHtml(str: string): string;
-    deleteMarker(id: number): void;
-    markerConvert(res: any, id?: number): any;
-    apiRequest(): void;
+    getCenter(): LatLng;
+    setCenter(coordinate: LatLng): void;
+    addMarker(marker: IMarkerData): IMarkerData;
+    removeMarker(id: string): boolean;
+    setUI(show: boolean): void;
+    protected openModal(marker: IMarkerList<Y.Marker>): void;
+    addGrids(grids: IBoundGridData[]): void;
+    addGridContents(contents: IBoundGridContentData[]): void;
+    removeGrids(): void;
+    setMessage(message: string, show: boolean): void;
+    showMessage(): void;
+    hideMessage(): void;
+    showLoading(): void;
+    hideLoading(): void;
 }
-export {};
-//# sourceMappingURL=YahooMapController.d.ts.map

@@ -1,4 +1,4 @@
-import {LatLng, ILatLng} from "./LatLng";
+import {LatLng, ILatLng, ILatLngBounds} from "./LatLng";
 import {JsonHelper} from "../utils/JsonHelper";
 
 enum FormatType {
@@ -6,8 +6,55 @@ enum FormatType {
     TEXT = "text",
 }
 
-export interface IApiResponse {
-    count: number;
+enum ResponseType {
+    BOUNDS = 'bounds',
+}
+
+enum ResponseFormat {
+    MARKER = 'marker',
+    GRID = 'grid',
+}
+
+export interface IResponse {
+    datetime: string,
+    timestamp: number,
+    error: boolean,
+    message: string,
+    type: string,
+    format: string,
+    zoom: number,
+    bounds: ILatLngBounds,
+    count: number,
+    data: any[],
+}
+
+export interface IBoundGridData {
+    id: string,
+    url: string,
+    bounds: ILatLngBounds,
+    label?: string,
+    count: number,
+}
+
+export interface IBoundGridContent extends IResponse {
+    data: IBoundGridContentData[],
+}
+
+export interface IBoundGridContentData {
+    id?: string,
+    count: number,
+    coordinate: LatLng,
+    features: IBoundGridContentDataFeature[],
+}
+
+export interface IBoundGridContentDataFeature {
+    id: string,
+    url: string,
+    label: string,
+    description: string,
+}
+
+export interface IApiMarkerResponse extends IResponse {
     data: IMarkerData[];
 }
 

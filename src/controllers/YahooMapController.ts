@@ -1,13 +1,11 @@
-import {ILatLng, LatLng} from "../entities/LatLng";
+import {LatLng, LatLngBounds} from "../entities/LatLng";
 import {MapController} from "./MapController";
-import {IMarkerData} from "../entities/Response";
+import {IBoundGridContentData, IBoundGridData, IMarkerData} from "../entities/Response";
 import {IMarkerList} from "./IMarkers";
 import {IController} from "./IController";
-import {LatLngBound} from "../entities/LatLngBound";
 import {isNumber, isUndefined} from "../utils/Types";
+import {GridFeatureLayer, LoadingLayer, MessageLayer} from "./yolp/Layer";
 
-
-/// <reference path="../types/Yahoo.d.ts" />
 export class YahooMapController extends MapController<Y.Marker> {
 
     /**
@@ -22,6 +20,12 @@ export class YahooMapController extends MapController<Y.Marker> {
 
     private parentCentre?: LatLng;
 
+    private readonly _grid: GridFeatureLayer;
+
+    private readonly _msg: MessageLayer;
+
+    private readonly _loading: LoadingLayer;
+
     constructor(root: IController) {
         super(root);
 
@@ -29,10 +33,11 @@ export class YahooMapController extends MapController<Y.Marker> {
         this.yc.push(
             new Y.SliderZoomControlVertical(),
             new Y.LayerSetControl(),
+            new Y.ScaleControl(),
         );
 
         // 地図を初期化
-        this.map = new Y.Map(this.target.id, {
+        this.map = new Y.Map(this.target.getID(), {
             configure: {
                 scrollWheelZoom: true,
                 continuousZoom: true,
@@ -46,8 +51,21 @@ export class YahooMapController extends MapController<Y.Marker> {
             });
         });
 
+
         // 地図のレンダリング
         this.map.drawMap(new Y.LatLng(this.config.center.lat, this.config.center.lng), this.config.zoom, Y.LayerSetId.NORMAL);
+
+        // test
+        this._grid = new GridFeatureLayer('grid');
+        this.map.addLayer(this._grid);
+
+        this._msg = new MessageLayer('message');
+        this.map.addLayer(this._msg);
+        this._msg.hide();
+
+        this._loading = new LoadingLayer('loading');
+        this.map.addLayer(this._loading);
+        // this._loading.hide();
 
         this.map.bind("moveend", () => {
             this.onMoveHandler();
@@ -91,23 +109,14 @@ export class YahooMapController extends MapController<Y.Marker> {
         super.init();
 
         // 出力要素がリサイズされた場合の処理を追加
-        this.target.onResize = (() => {
-            this.map.updateSize();
-        });
+        this.target.on("resize", this.map.updateSize, this.map);
     }
 
-    getBounds(): LatLngBound | null {
+    getBounds(): LatLngBounds | null {
         const bound = this.map.getBounds();
 
         if (bound instanceof Y.LatLngBounds) {
-            const
-                ne = bound.ne,
-                sw = bound.sw;
-
-            return new LatLngBound(
-                {lat: ne.lat(), lng: ne.lng()},
-                {lat: sw.lat(), lng: sw.lng()},
-            );
+            return new LatLngBounds(bound);
         }
 
         return null;
@@ -122,12 +131,11 @@ export class YahooMapController extends MapController<Y.Marker> {
     }
 
     getCenter(): LatLng {
-        const center = this.map.getCenter();
-        return new LatLng({lat: center.lat(), lng: center.lng()});
+        return new LatLng(this.map.getCenter());
     }
 
-    setCenter(coordinate: ILatLng) {
-        this.map.drawMap(new Y.LatLng(coordinate.lat, coordinate.lng), this.getZoom(), Y.LayerSetId.NORMAL)
+    setCenter(coordinate: LatLng) {
+        this.map.drawMap(coordinate.yolp(), this.getZoom(), Y.LayerSetId.NORMAL)
     }
 
     addMarker(marker: IMarkerData): IMarkerData {
@@ -162,13 +170,14 @@ export class YahooMapController extends MapController<Y.Marker> {
     }
 
     setUI(show: boolean): void {
-        for (let index = 0; index < this.yc.length; index++) {
+        for (let yc of this.yc) {
             if (show) {
-                this.map.addControl(this.yc[index]);
+                this.map.addControl(yc);
             } else {
-                this.map.removeControl(this.yc[index]);
+                this.map.removeControl(yc);
             }
         }
+
         this.onUIListener(show);
     }
 
@@ -179,5 +188,41 @@ export class YahooMapController extends MapController<Y.Marker> {
         if (marker.origin instanceof Y.Marker && content !== "") {
             marker.origin.openInfoWindow(content);
         }
+    }
+
+    public addGrids(grids: IBoundGridData[]): void {
+        this._grid.addBounds(grids);
+    }
+
+    public addGridContents(contents: IBoundGridContentData[]): void {
+        this._grid.addMarkers(contents);
+    }
+
+    public removeGrids(): void {
+        this._grid.removeBounds();
+    }
+
+    public setMessage(message: string, show: boolean): void {
+        this._msg.setMessage(message);
+
+        if (show) {
+            this.showMessage();
+        }
+    }
+
+    public showMessage(): void {
+        this._msg.show();
+    }
+
+    public hideMessage(): void {
+        this._msg.hide();
+    }
+
+    public showLoading(): void {
+        this._loading.show();
+    }
+
+    public hideLoading(): void {
+        this._loading.hide();
     }
 }

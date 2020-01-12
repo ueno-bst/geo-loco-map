@@ -1,8 +1,17 @@
-import {ILatLng} from "./entities/LatLng";
 import {IMarkerData} from "./entities/Response";
 import {IController} from "./controllers/IController";
-import {ILatLngBound} from "./entities/LatLngBound";
+import {ILatLng, ILatLngBounds, LatLng} from "./entities/LatLng";
 
+// GoogleMapAPIの有効状態を判定する
+const gMapEnable = window.google !== undefined;
+
+// YahooMapAPIの有効状態を判定する
+const yMapEnable = window.Y !== undefined;
+
+// GoogleMapのスコープを初期化する
+window.google = window.google || {'maps': {}};
+// YahooMapのスコープを初期化
+window.Y = window.Y || {};
 
 export class GeoLocoMap extends IController {
 
@@ -10,7 +19,7 @@ export class GeoLocoMap extends IController {
         return this.controller.getElement();
     }
 
-    getBounds(): ILatLngBound | null {
+    getBounds(): ILatLngBounds | null {
         return this.controller.getBounds();
     }
 
@@ -22,12 +31,12 @@ export class GeoLocoMap extends IController {
         return this.controller.setZoom(Math.min(20, Math.max(1, zoom)));
     }
 
-    getCenter() {
+    getCenter(): ILatLng {
         return this.config.center;
     }
 
     setCenter(lat: number, lng: number) {
-        return this.controller.setCenter({lat: lat, lng: lng});
+        return this.controller.setCenter(new LatLng(lat, lng));
     }
 
     addMarker(marker: IMarkerData): IMarkerData {
@@ -70,4 +79,3 @@ export class GeoLocoMap extends IController {
         }
     }
 }
-
