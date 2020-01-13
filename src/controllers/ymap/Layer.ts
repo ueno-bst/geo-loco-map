@@ -80,8 +80,8 @@ class GridBound extends Feature {
 
             const container = this.layer.getContainer();
             const bound = this.element.bounds;
-            const sw = this.layer.fromLatLngToDivPixel(bound.sw.yolp());
-            const ne = this.layer.fromLatLngToDivPixel(bound.ne.yolp());
+            const sw = this.layer.fromLatLngToDivPixel(bound.sw.ymap());
+            const ne = this.layer.fromLatLngToDivPixel(bound.ne.ymap());
 
             this.element.setPosition(new Rectangle(ne, sw));
 
@@ -97,7 +97,7 @@ class GridBound extends Feature {
 
     protected onClick(event: MouseEvent) {
         if (this.element.active) {
-            const bound = this.element.bounds.yolp();
+            const bound = this.element.bounds.ymap();
             const map = this.getMap();
             const zoom = map.getBoundsZoomLevel(bound);
 
@@ -123,7 +123,7 @@ class GridMarker extends Feature {
         if (force) {
 
             const container = this.layer.getContainer();
-            const centre = this.layer.fromLatLngToDivPixel(this.element.point.yolp());
+            const centre = this.layer.fromLatLngToDivPixel(this.element.point.ymap());
 
             this.element.setPosition(new Point(centre));
 

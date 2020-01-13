@@ -1,12 +1,12 @@
-import {LatLng, LatLngBounds} from "../entities/LatLng";
-import {MapController} from "./MapController";
-import {IBoundGridContentData, IBoundGridData, IMarkerData} from "../entities/Response";
-import {IMarkerList} from "./IMarkers";
-import {IController} from "./IController";
-import {isNumber, isUndefined} from "../utils/Types";
-import {GridFeatureLayer, LoadingLayer, MessageLayer} from "./yolp/Layer";
+import {LatLng, LatLngBounds} from "../../entities/LatLng";
+import {MapController} from "../MapController";
+import {IBoundGridContentData, IBoundGridData, IMarkerData} from "../../entities/Response";
+import {IMarkerList} from "../IMarkers";
+import {IController} from "../IController";
+import {isNumber, isUndefined} from "../../utils/Types";
+import {GridFeatureLayer, LoadingLayer, MessageLayer} from "./Layer";
 
-export class YahooMapController extends MapController<Y.Marker> {
+export class YMapController extends MapController<Y.Marker> {
 
     /**
      * 地図オブジェクト
@@ -135,7 +135,7 @@ export class YahooMapController extends MapController<Y.Marker> {
     }
 
     setCenter(coordinate: LatLng) {
-        this.map.drawMap(coordinate.yolp(), this.getZoom(), Y.LayerSetId.NORMAL)
+        this.map.drawMap(coordinate.ymap(), this.getZoom(), Y.LayerSetId.NORMAL)
     }
 
     addMarker(marker: IMarkerData): IMarkerData {

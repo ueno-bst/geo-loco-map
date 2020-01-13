@@ -16,7 +16,7 @@ const
 interface IBase {
     gmap(): any;
 
-    yolp(): any;
+    ymap(): any;
 
     obj(): any;
 }
@@ -124,7 +124,7 @@ export class Point implements IPoint, IBase {
         return new google.maps.Point(this.x, this.y);
     }
 
-    yolp(): Y.Point {
+    ymap(): Y.Point {
         return new Y.Point(this.x, this.y);
     }
 
@@ -267,7 +267,7 @@ export class LatLng implements ILatLng, ICoordinate {
         return new google.maps.LatLng(this.lat, this.lng);
     }
 
-    yolp(): Y.LatLng {
+    ymap(): Y.LatLng {
         return new Y.LatLng(this.lat, this.lng);
     }
 
@@ -353,10 +353,10 @@ export class LatLngBounds implements ILatLngBounds, ICoordinate {
         return new google.maps.LatLngBounds(t.sw.gmap(), t.ne.gmap());
     }
 
-    yolp(): Y.LatLngBounds {
+    ymap(): Y.LatLngBounds {
         const t = this;
 
-        return new Y.LatLngBounds(t.sw.yolp(), t.ne.yolp());
+        return new Y.LatLngBounds(t.sw.ymap(), t.ne.ymap());
     }
 
     obj(): ILatLngBounds {

@@ -1,15 +1,15 @@
-import {LatLng, LatLngBounds} from "../entities/LatLng";
-import {MapController} from "./MapController";
-import {IBoundGridContentData, IBoundGridData, IMarkerData} from "../entities/Response";
-import {IMarkerList} from "./IMarkers";
-import {IController} from "./IController";
-import {GridFeatureLayer, LoadingLayer, MessageLayer} from "./gmap/Layer";
-import {isNumber} from "../utils/Types";
+import {LatLng, LatLngBounds} from "../../entities/LatLng";
+import {MapController} from "../MapController";
+import {IBoundGridContentData, IBoundGridData, IMarkerData} from "../../entities/Response";
+import {IMarkerList} from "../IMarkers";
+import {IController} from "../IController";
+import {GridFeatureLayer, LoadingLayer, MessageLayer} from "./Layer";
+import {isNumber} from "../../utils/Types";
 
 const
     is_number = isNumber;
 
-export class GoogleMapController extends MapController<google.maps.Marker> {
+export class GMapController extends MapController<google.maps.Marker> {
 
     /**
      * 地図オブジェクト

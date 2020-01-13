@@ -1,6 +1,6 @@
 import {fixMapConfig, IConfig, MapType} from "../entities/MapConfig";
-import {GoogleMapController} from "./GoogleMapController";
-import {YahooMapController} from "./YahooMapController";
+import {GMapController} from "./gmap/GMapController";
+import {YMapController} from "./ymap/YMapController";
 import {ILatLng, ILatLngBounds} from "../entities/LatLng";
 import {IMarkerData} from "../entities/Response";
 import {MapEventListener, MapEventType} from "../entities/MapEvent";
@@ -18,10 +18,10 @@ export abstract class IController {
 
         switch (this.config.map_type) {
             case MapType.GoogleMap:
-                this.controller = new GoogleMapController(this);
+                this.controller = new GMapController(this);
                 break;
             case MapType.YahooMap:
-                this.controller = new YahooMapController(this);
+                this.controller = new YMapController(this);
                 break;
             default:
                 throw new Error("Unable to initialize due to map type error.");
