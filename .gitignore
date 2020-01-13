@@ -5,6 +5,7 @@ dist/
 src/**/*.d.ts
 src/**/*.js
 src/**/*.js.map
+test/**/*.d.ts
 test/**/*.js
 test/**/*.js.map
 sample/
