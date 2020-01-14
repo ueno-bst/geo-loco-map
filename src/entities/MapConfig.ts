@@ -156,6 +156,13 @@ export interface IConfigApi {
     delay: number,
 }
 
+const ConfigApiDefault: IConfigApi = {
+    precision: 0,
+    type: ApiType.CENTER,
+    url: "",
+    delay: 0,
+};
+
 const ConfigDefault: IConfig = {
     api: fixMapApi(),
     api_url: "",
@@ -170,13 +177,6 @@ const ConfigDefault: IConfig = {
     lazy_load: 500,
     map_type: MapType.GoogleMap,
     selector: "#map",
-};
-
-const ConfigApiDefault: IConfigApi = {
-    precision: 0,
-    type: ApiType.CENTER,
-    url: "",
-    delay: 0,
 };
 
 export function fixMapConfig(params: IConfig) {
