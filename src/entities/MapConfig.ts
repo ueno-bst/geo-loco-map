@@ -4,6 +4,10 @@ import {IController} from "../controllers/IController";
 import {isNumber, isExist, isString, isUndefined} from "../utils/Types";
 import {URLBuilder} from "../utils/URLBuilder";
 
+const
+    is_exist = isExist,
+    is_number = isNumber;
+
 export enum MapType {
     GoogleMap = "google",
     YahooMap = "yahoo",
@@ -188,15 +192,15 @@ export function fixMapConfig(params: IConfig) {
     config.api = fixMapApi(config.api);
     config.center = new LatLng(config.center);
 
-    if (!isExist(config.api.url) && isString(config.api_url)) {
+    if (!is_exist(config.api.url) && isString(config.api_url)) {
         config.api.url = config.api_url;
     }
 
-    if (!isExist(config.api.precision) && isNumber(config.grid)) {
+    if (!is_exist(config.api.precision) && is_number(config.grid)) {
         config.api.precision = config.grid;
     }
 
-    if (!isExist(config.api.delay) && isNumber(config.lazy_load)) {
+    if (!is_exist(config.api.delay) && is_number(config.lazy_load)) {
         config.api.delay = config.lazy_load;
     }
 
@@ -238,11 +242,11 @@ function fixMapApi(params?: IConfigApi): IConfigApi {
             break;
     }
 
-    if (!isNumber(config.precision)) {
+    if (!is_number(config.precision)) {
         config.precision = def.precision;
     }
 
-    if (!isNumber(config.delay)) {
+    if (!is_number(config.delay)) {
         config.delay = def.delay;
     }
 

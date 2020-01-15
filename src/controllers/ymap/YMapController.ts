@@ -4,14 +4,14 @@ import {IBoundGridContentData, IBoundGridData, IMarkerData} from "../../entities
 import {IMarkerList} from "../IMarkers";
 import {IController} from "../IController";
 import {isNumber, isUndefined} from "../../utils/Types";
-import {GridFeatureLayer, LoadingLayer, MessageLayer} from "./Layer";
+import {GridFeatureLayer, YLoadingLayer, YMessageLayer} from "./YLayer";
 
 export class YMapController extends MapController<Y.Marker> {
 
     /**
      * 地図オブジェクト
      */
-    private map: Y.Map;
+    readonly map: Y.Map;
 
     /**
      * Yahoo Map の表示するコントローラーリスト
@@ -22,9 +22,9 @@ export class YMapController extends MapController<Y.Marker> {
 
     private readonly _grid: GridFeatureLayer;
 
-    private readonly _msg: MessageLayer;
+    private readonly _msg: YMessageLayer;
 
-    private readonly _loading: LoadingLayer;
+    private readonly _loading: YLoadingLayer;
 
     constructor(root: IController) {
         super(root);
@@ -59,12 +59,10 @@ export class YMapController extends MapController<Y.Marker> {
         this._grid = new GridFeatureLayer('grid');
         this.map.addLayer(this._grid);
 
-        this._msg = new MessageLayer('message');
-        this.map.addLayer(this._msg);
+        this._msg = new YMessageLayer(this, 'message');
         this._msg.hide();
 
-        this._loading = new LoadingLayer('loading');
-        this.map.addLayer(this._loading);
+        this._loading = new YLoadingLayer(this,'loading');
         // this._loading.hide();
 
         this.map.bind("moveend", () => {
@@ -203,7 +201,7 @@ export class YMapController extends MapController<Y.Marker> {
     }
 
     public setMessage(message: string, show: boolean): void {
-        this._msg.setMessage(message);
+        this._msg.html(message);
 
         if (show) {
             this.showMessage();

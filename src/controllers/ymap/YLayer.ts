@@ -1,14 +1,16 @@
 import {IBoundGridContentData, IBoundGridData} from "../../entities/Response";
 import ElementHelper from "../../utils/ElementHelper";
 import {getClass} from "../../utils/Mixin";
-import {GridBoundElement, GridMarkerElement, LoadingElement, MessageElement} from "../Element";
+import {GridBoundElement, GridMarkerElement} from "../Element";
 import {Rectangle, LatLngBounds, Point} from "../../entities/LatLng";
+import {YLayerController} from "./YLayerController";
+import {LoadingLayerMixin, MessageLayerMixin} from "../Layer";
 
 window.Y = window.Y || {};
 
 const get_class = getClass;
 
-const Layer = get_class(Y.Layer);
+const YLayer = get_class(Y.Layer);
 const FeatureLayer = get_class(Y.FeatureLayer);
 const Feature = get_class(Y.Feature);
 
@@ -146,66 +148,8 @@ class GridMarker extends Feature {
     }
 }
 
-export class LoadingLayer extends Layer {
-
-    protected e?: LoadingElement;
-
-    drawLayer(force: boolean): void {
-        const container = this.getContainer();
-
-        if (!this.e || force) {
-            this.e = new LoadingElement();
-
-            container
-                .empty()
-                .append(this.e.src);
-        }
-
-        const bounds = this.getMap().getBounds();
-
-        if (!bounds) {
-            return;
-        }
-
-        const ne = this.fromLatLngToDivPixel(bounds.ne);
-        const sw = this.fromLatLngToDivPixel(bounds.sw);
-
-        this.e.setPosition(new Rectangle(ne, sw));
-    }
+export class YLoadingLayer extends LoadingLayerMixin(YLayerController) {
 }
 
-export class MessageLayer extends Layer {
-    protected e?: MessageElement;
-
-    protected message: string = 'MessageBox';
-
-    drawLayer(force: boolean): void {
-        const container = this.getContainer();
-
-        if (!this.e || force) {
-            const e = this.e = new MessageElement();
-
-            container
-                .empty()
-                .append(e.src);
-        }
-
-        const bounds = this.getMap().getBounds();
-
-        if (!bounds) {
-            return;
-        }
-
-        const ne = this.fromLatLngToDivPixel(bounds.ne);
-        const sw = this.fromLatLngToDivPixel(bounds.sw);
-
-        this.e
-            .setPosition(new Rectangle(ne, sw))
-            .setHtml(this.message);
-    }
-
-    setMessage(message: string) {
-        this.message = message;
-        this.drawLayer(false);
-    }
+export class YMessageLayer extends MessageLayerMixin(YLayerController) {
 }

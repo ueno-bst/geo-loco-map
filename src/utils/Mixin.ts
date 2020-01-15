@@ -1,6 +1,6 @@
 import {isFunction} from "./Types";
 
-type Constructor<T> = new (...args: any[]) => T;
+export type Constructor<T = {}> = new (...args: any[]) => T;
 
 class dummy {
 }

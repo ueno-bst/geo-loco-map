@@ -3,6 +3,8 @@ import ElementHelper from "../../utils/ElementHelper";
 import {IBoundGridContentData, IBoundGridData} from "../../entities/Response";
 import {GridBoundElement, GridMarkerElement, IOverWrapBaseElement, LoadingElement, MessageElement} from "../Element";
 import {Rectangle, Point} from "../../entities/LatLng";
+import {LoadingLayerMixin, MessageLayerMixin} from "../Layer";
+import {GLayerController} from "./GLayerController";
 
 window.google = window.google || {maps: {}};
 
@@ -192,41 +194,8 @@ export class GridFeatureLayer extends Layer {
     }
 }
 
-export class LoadingLayer extends OverWrapLayer<LoadingElement> {
-    onAdd(): void {
-        super.onAdd();
-
-        if (this.layer) {
-            this.element = new LoadingElement();
-
-            this.layer
-                .append(this.element);
-        }
-    }
+export class LoadingLayer extends LoadingLayerMixin(GLayerController) {
 }
 
-export class MessageLayer extends OverWrapLayer<MessageElement> {
-
-    onAdd(): void {
-        super.onAdd();
-
-        if (this.layer) {
-            this.element = new MessageElement();
-
-            this.layer
-                .append(this.element);
-        }
-    }
-
-    setText(text: string) {
-        if (this.element) {
-            this.element.setText(text);
-        }
-    }
-
-    setHtml(html: string) {
-        if (this.element) {
-            this.element.setHtml(html);
-        }
-    }
+export class MessageLayer extends MessageLayerMixin(GLayerController) {
 }

@@ -3,7 +3,7 @@ import {MapController} from "../MapController";
 import {IBoundGridContentData, IBoundGridData, IMarkerData} from "../../entities/Response";
 import {IMarkerList} from "../IMarkers";
 import {IController} from "../IController";
-import {GridFeatureLayer, LoadingLayer, MessageLayer} from "./Layer";
+import {GridFeatureLayer, LoadingLayer, MessageLayer} from "./GLayer";
 import {isNumber} from "../../utils/Types";
 
 const
@@ -14,7 +14,7 @@ export class GMapController extends MapController<google.maps.Marker> {
     /**
      * 地図オブジェクト
      */
-    private readonly map: google.maps.Map;
+    readonly map: google.maps.Map;
 
     private readonly _grid: GridFeatureLayer;
 
@@ -64,8 +64,8 @@ export class GMapController extends MapController<google.maps.Marker> {
         });
 
         // test
-        this._msg = new MessageLayer(this.map);
-        this._loading = new LoadingLayer(this.map);
+        this._msg = new MessageLayer(this, "message");
+        this._loading = new LoadingLayer(this, "loading");
         this._grid = new GridFeatureLayer(this.map);
     }
 
@@ -167,7 +167,7 @@ export class GMapController extends MapController<google.maps.Marker> {
     }
 
     public setMessage(message: string, show: boolean): void {
-        this._msg.setHtml(message);
+        this._msg.html(message);
 
         if (show) {
             this.showMessage();
