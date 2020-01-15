@@ -2,11 +2,7 @@ import {IMarkerData} from "./entities/Response";
 import {IController} from "./controllers/IController";
 import {ILatLng, ILatLngBounds, LatLng} from "./entities/LatLng";
 
-export const testaaaaaaaaaaaaaa = (): string => "test";
-
 export class GeoLocoMap extends IController {
-
-    static testbbbbbbbbbbbbbb = (): string => "testbbbbbbbbbbbb";
 
     getElement(): Element {
         return this.controller.getElement();
