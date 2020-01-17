@@ -28,7 +28,9 @@ export abstract class IController {
         }
     }
 
-    public abstract getElement(): Element ;
+    public abstract request(): void;
+
+    public abstract getElement(): Element;
 
     public abstract getBounds(): ILatLngBounds | null;
 

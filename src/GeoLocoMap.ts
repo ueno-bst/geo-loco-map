@@ -4,6 +4,10 @@ import {ILatLng, ILatLngBounds, LatLng} from "./entities/LatLng";
 
 export class GeoLocoMap extends IController {
 
+    request(): void {
+        this.controller.request();
+    }
+
     getElement(): Element {
         return this.controller.getElement();
     }
