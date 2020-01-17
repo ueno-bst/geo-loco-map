@@ -1,4 +1,8 @@
 import {isNumber, isArray, isInstanceOf, isNull, isObject} from "../utils/Types";
+import {init} from "./Initialize";
+import {GeoHash} from "./GeoHash";
+
+init();
 
 const
     math = Math,
@@ -196,7 +200,7 @@ export class LatLng implements ILatLng, ICoordinate {
     constructor(lat: ILatLng);
     constructor(lat: Y.LatLng);
     constructor(lat: google.maps.LatLng);
-    constructor(lat: any[]);
+    constructor(lat: number[]);
 
     constructor(lat?: number | ILatLng | Y.LatLng | google.maps.LatLng | any[] | null, lng?: number | null) {
         const t = this;
@@ -218,6 +222,14 @@ export class LatLng implements ILatLng, ICoordinate {
             t.lat = Number(lat[0]) || t.lat;
             t.lng = Number(lat[1]) || t.lng;
         }
+    }
+
+    static fromHash(hash: string): LatLng {
+        return GeoHash.decode(hash);
+    }
+
+    hash(length: number): string {
+        return GeoHash.encode(this, length);
     }
 
     /**
@@ -286,9 +298,16 @@ export class LatLngBounds implements ILatLngBounds, ICoordinate {
     constructor(ne: ILatLngBounds);
     constructor(ne: Y.LatLngBounds);
     constructor(ne: google.maps.LatLngBounds);
+    constructor(ne: ILatLng[]);
+    constructor(ne: number[][]);
 
-    constructor(ne: ILatLng | ILatLngBounds | Y.LatLngBounds | google.maps.LatLngBounds, sw?: ILatLng) {
+    constructor(ne: ILatLng | ILatLng[] | number[][] | ILatLngBounds | Y.LatLngBounds | google.maps.LatLngBounds, sw?: ILatLng) {
         const ll = LatLng;
+
+        if (is_array(ne) && ne.length >= 2) {
+            sw = is_array<number>(ne[1]) ? new ll(ne[1]) : ne[1];
+            ne = is_array<number>(ne[0]) ? new ll(ne[0]) : ne[0];
+        }
 
         if (is_instance_of<Y.LatLngBounds>(ne, Y.LatLngBounds)) {
             sw = new ll(ne.sw);
@@ -305,6 +324,7 @@ export class LatLngBounds implements ILatLngBounds, ICoordinate {
             this.sw = new ll(ne.sw);
             this.ne = new ll(ne.ne);
         } else {
+            console.info(ne, sw);
             throw new Error("The argument format is incorrect");
         }
 

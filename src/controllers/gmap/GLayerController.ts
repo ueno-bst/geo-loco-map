@@ -4,7 +4,6 @@ import {LatLng, LatLngBounds, Point, Rectangle} from "../../entities/LatLng";
 import ElementHelper from "../../utils/ElementHelper";
 import {GMapController} from "./GMapController";
 
-
 const
     get_class = getClass;
 
@@ -20,17 +19,17 @@ class GLayer extends Layer implements ILayer {
         this.name = name;
     }
 
-    onAdd(): void {
+    onAdd = (): void => {
         this.root.onAdd();
-    }
+    };
 
-    draw(): void {
+    draw = (): void => {
         this.root.onDraw();
-    }
+    };
 
-    onRemove(): void {
+    onRemove = (): void => {
         this.root.onRemove();
-    }
+    };
 }
 
 export class GLayerController extends ILayerController {
@@ -43,7 +42,7 @@ export class GLayerController extends ILayerController {
         this.map = map;
         this.layer = new GLayer(this, name);
 
-        this.layer.setMap(map.map);
+        this.layer.setMap(map.getMap());
     }
 
     coordinateToPixel = (latlng: LatLng): Point => new Point(this.layer.getProjection().fromLatLngToDivPixel(latlng.gmap()));
@@ -53,25 +52,38 @@ export class GLayerController extends ILayerController {
         this.coordinateToPixel(bounds.sw)
     );
 
-    refresh = (): void => this.layer.onAdd();
+    refresh = (): this => {
+        this.layer.onAdd();
+        this.layer.draw();
+        return this;
+    };
 
-    remove = (): void => this.layer.onRemove();
+    remove = (): this => {
+        this.layer.onRemove();
+        return this
+    };
 
-    show = (): void => this.layer.setMap(this.map.map);
+    show = (): this => {
+        this.layer.setMap(this.map.getMap());
+        return this
+    };
 
-    hide = (): void => this.layer.setMap(null);
+    hide = (): this => {
+        this.layer.setMap(null);
+        return this;
+    };
 
-    target(clickable: boolean): ElementHelper | null {
+    target = (clickable: boolean): ElementHelper | null => {
         const panes = this.layer.getPanes();
         return new ElementHelper((clickable ? panes.overlayMouseTarget : panes.overlayLayer) as HTMLElement);
-    }
+    };
 
     onAdd(): void {
-    }
+    };
 
     onDraw(): void {
-    }
+    };
 
     onRemove(): void {
-    }
+    };
 }

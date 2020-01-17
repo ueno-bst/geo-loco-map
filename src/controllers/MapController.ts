@@ -1,5 +1,5 @@
 import {ApiType, IConfig, MapType} from '../entities/MapConfig'
-import {IBoundGridContentData, IBoundGridData, IMarkerData, IResponse, MarkerData} from "../entities/Response";
+import {IMarkerData, IResponse, MarkerData} from "../entities/Response";
 import {IMarkerList, isIMarkerList} from "./IMarkers";
 import {IController} from "./IController";
 import {isArray, isNull, isString} from "../utils/Types";
@@ -9,6 +9,7 @@ import {LatLng, LatLngBounds} from "../entities/LatLng";
 import {MapElement} from "./Element";
 import ElementHelper from "../utils/ElementHelper";
 import EventEmitter from "../utils/EventEmitter";
+import {IGridLayerController, ILayerController, IMessageLayerController} from "./ILayerController";
 
 const
     is_null = isNull;
@@ -17,7 +18,13 @@ function numberFixed(value: number, digit: number): string {
     return value.toFixed(digit).replace(/(\.?0+)$/, "");
 }
 
-export abstract class MapController<T extends Object> {
+export interface ILayers {
+    grid: IGridLayerController,
+    load: ILayerController,
+    message: IMessageLayerController
+}
+
+export abstract class MapController<M extends Object = {}, T extends Object = {}> {
 
     /**
      * ルートコントローラ
@@ -27,6 +34,18 @@ export abstract class MapController<T extends Object> {
     get config(): IConfig {
         return this.root.config;
     }
+
+    /**
+     * 地図オブジェクト
+     */
+    protected readonly abstract map: M;
+
+    public getMap = (): M => this.map;
+
+    /**
+     * レイヤー定義
+     */
+    protected readonly abstract layers: ILayers;
 
     /**
      * イベントエミッタ
@@ -77,6 +96,9 @@ export abstract class MapController<T extends Object> {
 
         // APIをリクエスト
         this.request();
+
+        this.layers.message.hide();
+        this.layers.load.hide();
     }
 
     /**
@@ -93,7 +115,7 @@ export abstract class MapController<T extends Object> {
     /**
      * APIにリクエストを送信する
      */
-    protected request(): void {
+    public request(): void {
         const api = this.config.api;
 
         if (api.url.length === 0) {
@@ -101,7 +123,7 @@ export abstract class MapController<T extends Object> {
         }
 
         let zoom: number;
-        
+
         if (this.config.map_type === MapType.GoogleMap) {
             zoom = this.getZoom() + 1;
         } else {
@@ -157,7 +179,7 @@ export abstract class MapController<T extends Object> {
         // APIレスポンス受信処理
         xhr.onreadystatechange = () => {
             if (xhr.readyState === XMLHttpRequest.DONE) {
-                this.hideLoading();
+                this.layers.load.hide();
                 if (xhr.status === 200) {
                     this.onApiReceiveListener(JSON.parse(xhr.responseText));
                 }
@@ -170,7 +192,7 @@ export abstract class MapController<T extends Object> {
         xhr.open("GET", url.build(), true, api.user, api.password);
         xhr.send();
 
-        this.showLoading();
+        this.layers.load.show();
 
         this.xhr = xhr;
     }
@@ -180,22 +202,26 @@ export abstract class MapController<T extends Object> {
      * @param json
      */
     protected onApiReceiveListener(json: IResponse) {
-        if (json.type == 'bounds') {
-            this.removeGrids();
-            this.removeMarkers();
+        const layers = this.layers;
 
-            if (json.error) {
-                this.setMessage(json.message, true);
-            } else {
-                this.hideMessage();
-                switch (json.format) {
-                    case 'grid':
-                        this.addGrids(json.data);
-                        break;
-                    case 'content':
-                        this.addGridContents(json.data);
-                        break;
-                }
+        layers.grid.clear();
+
+        if (json.error) {
+            layers.message.show().html(json.message);
+            return;
+        }
+
+        layers.message.hide();
+
+        if (json.type == 'bounds') {
+
+            switch (json.format) {
+                case 'grid':
+                    layers.grid.addBound(...json.data);
+                    break;
+                case 'content':
+                    layers.grid.addMarker(...json.data);
+                    break;
             }
 
         } else if (isArray(json.data)) {
@@ -211,6 +237,8 @@ export abstract class MapController<T extends Object> {
                 this.onAddMarkerHandler();
             }
         }
+
+        this.emit.fire(MapEventType.response, this.root, json);
     }
 
     private requestTimer?: any;
@@ -293,6 +321,12 @@ export abstract class MapController<T extends Object> {
      * 表示している地図の矩形領域を返却する
      */
     public abstract getBounds(): LatLngBounds | null;
+
+    /**
+     * 地図の指定の矩形領域に収まるように表示する
+     * @param bounds
+     */
+    public abstract setBounds(bounds: LatLngBounds): void;
 
     /**
      * 地図の表示要素を取得する
@@ -433,29 +467,6 @@ export abstract class MapController<T extends Object> {
             this.removeMarker(id);
         }
     }
-
-    /**
-     * グリッドを追加する
-     * @param grids
-     */
-    public abstract addGrids(grids: IBoundGridData[]): void;
-
-    public abstract addGridContents(contents: IBoundGridContentData[]): void;
-
-    /**
-     * グリッドをすべて削除する
-     */
-    public abstract removeGrids(): void;
-
-    public abstract setMessage(message: string, show: boolean): void;
-
-    public abstract showMessage(): void;
-
-    public abstract hideMessage(): void;
-
-    public abstract showLoading(): void;
-
-    public abstract hideLoading(): void;
 
     /**
      * コントロールの表示状態を設定する

@@ -1,5 +1,5 @@
 import ElementHelper from "../utils/ElementHelper";
-import {IBoundGridContentData, IBoundGridData} from "../entities/Response";
+import {IBoundGridData} from "../entities/Response";
 import {Rectangle, LatLng, LatLngBounds, Point} from "../entities/LatLng";
 import EventType from "../utils/EventType";
 
@@ -156,30 +156,45 @@ export class GridBoundElement extends OverWrapBaseElement {
 
 export class GridMarkerElement extends BaseElement {
 
-    public value: IBoundGridContentData;
+    readonly point: LatLng;
 
-    get point(): LatLng {
-        return new LatLng(this.value.coordinate);
-    }
+    protected readonly refs:string[] = [];
 
-    constructor(marker: IBoundGridContentData) {
+    private readonly label: ElementHelper;
+    private readonly inner: ElementHelper;
+
+    constructor(latlng: LatLng, ...ids: string[]) {
         super("gl-feature");
 
-        this.value = marker;
+        this.point = latlng;
 
-        const label = ElementHelper.p().setText(this.value.count + '');
+        const label = this.label = ElementHelper.p();
 
-        const inner = ElementHelper.div()
+        const inner = this.inner = ElementHelper.div()
             .addClass('gl-inner')
-            .toggleClass('is-multiple', this.value.count > 1)
             .append(label);
 
         this
             .append(inner);
 
-        if (this.value.id) {
-            this.setID(this.value.id);
+        this.addRefs(...ids);
+    }
+
+    addRefs(...refs: string[]): number {
+        for (let ref of refs) {
+            this.refs.push(ref);
         }
+
+        const count = this.refs.length;
+
+        this.label.setText(count + '');
+        this.inner.toggleClass('is-multiple', count > 1);
+
+        return count;
+    }
+
+    getRefs(): string[] {
+        return this.refs;
     }
 }
 

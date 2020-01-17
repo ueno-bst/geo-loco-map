@@ -1,46 +1,32 @@
 import {LatLng, LatLngBounds, Point, Rectangle} from "../entities/LatLng";
 import ElementHelper from "../utils/ElementHelper";
 import {MapController} from "./MapController";
-import {IBoundGridContentData, IBoundGridData} from "../entities/Response";
+import {IBoundGridContentData, IBoundGridData, IMarkerData} from "../entities/Response";
 
 export interface ILayer {
+    /**
+     * 親レイヤーコントローラー
+     */
     root?: ILayerController;
 }
 
-export abstract class ILayerHookController {
-    /**
-     * レイヤー初期化時の処理を行う
-     */
-    abstract onAdd(): void;
-
-    /**
-     * レイヤー更新時の処理を行う
-     */
-    abstract onDraw(): void;
-
-    /**
-     * レイヤー削除処理
-     */
-    abstract onRemove(): void;
-}
-
-export abstract class ILayerController extends ILayerHookController{
+export abstract class ILayerController {
     abstract map: MapController<Object>;
     abstract layer: ILayer;
 
     /**
      * レイヤーの再描写
      */
-    abstract refresh(): void;
+    abstract refresh(): this;
 
     /**
      * レイヤー削除実行
      */
-    abstract remove(): void;
+    abstract remove(): this;
 
-    abstract show(): void;
+    abstract show(): this;
 
-    abstract hide(): void;
+    abstract hide(): this;
 
     /**
      * レイヤーラッパーを取得する
@@ -59,18 +45,52 @@ export abstract class ILayerController extends ILayerHookController{
      * @param bounds
      */
     abstract boundToRect(bounds: LatLngBounds): Rectangle;
+
+    /**
+     * レイヤー初期化時の処理を行う
+     */
+    abstract onAdd(): void;
+
+    /**
+     * レイヤー更新時の処理を行う
+     */
+    abstract onDraw(): void;
+
+    /**
+     * レイヤー削除処理
+     */
+    abstract onRemove(): void;
 }
 
-export abstract class IMessageLayerController extends ILayerHookController {
+export abstract class IMessageLayerController extends ILayerController {
+    /**
+     * HTMLをメッセージとして出力する
+     * @param html
+     */
     abstract html(html?: string): string | void;
 
+    /**
+     * プレインテキストをメッセージとして出力する
+     * @param text
+     */
     abstract text(text?: string): string | void;
 }
 
-export abstract class IGridLayerController extends ILayerHookController {
+export abstract class IGridLayerController extends ILayerController {
+    /**
+     * 範囲要素を追加する
+     * @param bounds
+     */
     abstract addBound(...bounds: IBoundGridData[]): void;
 
-    abstract addMarker(...markers: IBoundGridContentData[]): void;
+    /**
+     * マーカー要素を追加する
+     * @param markers
+     */
+    abstract addMarker(...markers: IMarkerData[]): void;
 
+    /**
+     * レイヤー内の地物全てを削除する
+     */
     abstract clear(): void;
 }

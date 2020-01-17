@@ -1,6 +1,7 @@
 node_modules/
 .idea
 /*.log
+@types/GeoLocoMap
 dist/
 src/**/*.d.ts
 src/**/*.js

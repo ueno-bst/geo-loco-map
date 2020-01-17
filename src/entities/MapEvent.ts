@@ -12,6 +12,7 @@ export enum MapEventType {
     clickMarker = "marker.click",
     hoverMarker = "marker.hover",
     request = "request",
+    response = "response",
 }
 
 export interface MapEventListener {

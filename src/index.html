@@ -61,7 +61,7 @@
 <script type="module">
 	require(['GeoLocoMap'], function (a) {
 		var map = new a.GeoLocoMap({
-			// map_type: 'yahoo',
+			map_type: 'yahoo',
 			center: [35.6525164, 139.7366392],
 			zoom: 15,
 			zoom_min: 1,
@@ -79,16 +79,16 @@
 				delay: 500,
 			},
 			onInit: function (e) {
-				console.info("onInit", map.controller, e.controller);
+				// console.info("onInit", map.controller, e.controller);
 			},
 			onMove: function (obj, coordinate) {
 				console.info("onMove", map.controller, obj.controller, coordinate.lat, coordinate.lng);
 			},
 			onZoom: function (obj, zoom) {
-				console.info("onZoom", map.controller, obj.controller, zoom);
+				console.info("onZoom", map.controller, obj.controller, zoom, obj.getBounds().ne, obj.getBounds().sw);
 			},
 			onUI: function (obj, f) {
-				console.info("onUI", map.controller, obj.controller, f);
+				// console.info("onUI", map.controller, obj.controller, f);
 			},
 			onChange: function (obj) {
 				console.info("onChange", map.controller, obj.controller);
@@ -125,12 +125,12 @@
 				$("#markers").html(t);
 			},
 			onClickMarker: function (f) {
-				console.info("onClickMarker", f);
+				// console.info("onClickMarker", f);
 				alert(f.label);
 			},
 			onRequest: function (obj, url) {
 				/** @var {URLBuilder} url */
-				console.info("onRequest", url.build());
+				// console.info("onRequest", url.build());
 			}
 		});
 

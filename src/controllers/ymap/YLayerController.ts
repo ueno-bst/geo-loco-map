@@ -1,8 +1,9 @@
-import {ILayer, ILayerController, ILayerHookController} from "../ILayerController";
+import {ILayer, ILayerController} from "../ILayerController";
 import {Constructor, getClass} from "../../utils/Mixin";
 import {LatLng, LatLngBounds, Point, Rectangle} from "../../entities/LatLng";
 import ElementHelper from "../../utils/ElementHelper";
 import {YMapController} from "./YMapController";
+import {MapEventType} from "../../entities/MapEvent";
 
 const
     get_class = getClass;
@@ -14,7 +15,7 @@ function YLayerBase<T extends Constructor<Y.Layer>>(base: T) {
 
         root?: ILayerController;
 
-        drawLayer(force: boolean): void {
+        drawLayer = (force: boolean): void => {
             const root = this.root;
 
             if (root) {
@@ -24,9 +25,9 @@ function YLayerBase<T extends Constructor<Y.Layer>>(base: T) {
 
                 root.onDraw();
             }
-        }
+        };
 
-        remove(): void {
+        remove = (): void => {
             const root = this.root;
 
             if (root) {
@@ -46,7 +47,7 @@ class YLayer extends Layer implements ILayer {
     root?: ILayerController;
 
     constructor(controller: YLayerController, name: string, options?: Object) {
-        super(name);
+        super(name, options);
         this.root = controller;
     }
 }
@@ -76,6 +77,11 @@ abstract class YLayerControllerBase<L extends YLayer> extends ILayerController {
     protected constructor(map: YMapController) {
         super();
         this.map = map;
+
+        // ズーム率変更時の、地物再配置を行う
+        map.emit.on(MapEventType.zoom, () => {
+            this.onDraw();
+        });
     }
 
     coordinateToPixel = (latlng: LatLng): Point => new Point(this.layer.fromLatLngToDivPixel(latlng.ymap()));
@@ -85,18 +91,30 @@ abstract class YLayerControllerBase<L extends YLayer> extends ILayerController {
         this.coordinateToPixel(bounds.sw)
     );
 
-    refresh = (): void => this.layer.drawLayer(true);
+    refresh = (): this => {
+        this.layer.drawLayer(true);
+        return this;
+    };
 
-    remove = (): void => this.layer.remove();
+    remove = (): this => {
+        this.layer.remove();
+        return this;
+    };
 
-    show = (): void => this.layer.show();
+    show = (): this => {
+        this.layer.show();
+        return this;
+    };
 
-    hide = (): void => this.layer.hide();
+    hide = (): this => {
+        this.layer.hide();
+        return this;
+    };
 
-    target(clickable: boolean): ElementHelper | null {
+    target = (clickable: boolean): ElementHelper | null => {
         const container = this.layer.getContainer();
         return container && container.length > 0 ? new ElementHelper(container[0]) : null;
-    }
+    };
 
     onAdd(): void {
     }
@@ -116,7 +134,7 @@ export class YLayerController extends YLayerControllerBase<YLayer> {
 
         this.layer = new YLayer(this, name, options);
 
-        map.map.addLayer(this.layer);
+        map.getMap().addLayer(this.layer);
     }
 }
 
@@ -127,5 +145,7 @@ export class YFeatureLayerController extends YLayerControllerBase<YFeatureLayer>
         super(map);
 
         this.layer = new YFeatureLayer(this, name);
+
+        map.getMap().addLayer(this.layer);
     }
 }

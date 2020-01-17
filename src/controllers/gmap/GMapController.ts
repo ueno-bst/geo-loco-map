@@ -1,26 +1,19 @@
 import {LatLng, LatLngBounds} from "../../entities/LatLng";
-import {MapController} from "../MapController";
-import {IBoundGridContentData, IBoundGridData, IMarkerData} from "../../entities/Response";
+import {ILayers, MapController} from "../MapController";
+import {IMarkerData} from "../../entities/Response";
 import {IMarkerList} from "../IMarkers";
 import {IController} from "../IController";
-import {GridFeatureLayer, LoadingLayer, MessageLayer} from "./GLayer";
+import {GGridMarkerLayer, GLoadingLayer, GMessageLayer} from "./GLayer";
 import {isNumber} from "../../utils/Types";
 
 const
     is_number = isNumber;
 
-export class GMapController extends MapController<google.maps.Marker> {
+export class GMapController extends MapController<google.maps.Map, google.maps.Marker> {
 
-    /**
-     * 地図オブジェクト
-     */
-    readonly map: google.maps.Map;
+    protected readonly map: google.maps.Map;
 
-    private readonly _grid: GridFeatureLayer;
-
-    private readonly _msg: MessageLayer;
-
-    private readonly _loading: LoadingLayer;
+    protected readonly layers: ILayers;
 
     constructor(root: IController) {
         super(root);
@@ -64,9 +57,13 @@ export class GMapController extends MapController<google.maps.Marker> {
         });
 
         // test
-        this._msg = new MessageLayer(this, "message");
-        this._loading = new LoadingLayer(this, "loading");
-        this._grid = new GridFeatureLayer(this.map);
+        this.layers = {
+            grid: new GGridMarkerLayer(this, "grid"),
+            load: new GLoadingLayer(this, "loading"),
+            message: new GMessageLayer(this, "message")
+        };
+
+        console.info(this.layers);
     }
 
     getBounds(): LatLngBounds | null {
@@ -77,6 +74,10 @@ export class GMapController extends MapController<google.maps.Marker> {
         }
 
         return null;
+    }
+
+    setBounds(bounds: LatLngBounds): void {
+        this.map.fitBounds(bounds.gmap());
     }
 
     getZoom(): number {
@@ -152,41 +153,5 @@ export class GMapController extends MapController<google.maps.Marker> {
 
             info.open(this.map, marker.origin);
         }
-    }
-
-    public addGrids(grids: IBoundGridData[]): void {
-        this._grid.addBounds(grids);
-    }
-
-    public addGridContents(contents: IBoundGridContentData[]): void {
-        this._grid.addMarkers(contents);
-    }
-
-    public removeGrids(): void {
-        this._grid.removeBounds();
-    }
-
-    public setMessage(message: string, show: boolean): void {
-        this._msg.html(message);
-
-        if (show) {
-            this.showMessage();
-        }
-    }
-
-    public showMessage(): void {
-        this._msg.show();
-    }
-
-    public hideMessage(): void {
-        this._msg.hide();
-    }
-
-    public showLoading(): void {
-        this._loading.show();
-    }
-
-    public hideLoading(): void {
-        this._loading.hide();
     }
 }

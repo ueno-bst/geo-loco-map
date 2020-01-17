@@ -1,17 +1,20 @@
 import {LatLng, LatLngBounds} from "../../entities/LatLng";
-import {MapController} from "../MapController";
-import {IBoundGridContentData, IBoundGridData, IMarkerData} from "../../entities/Response";
+import {ILayers, MapController} from "../MapController";
+import {IMarkerData} from "../../entities/Response";
 import {IMarkerList} from "../IMarkers";
 import {IController} from "../IController";
 import {isNumber, isUndefined} from "../../utils/Types";
-import {GridFeatureLayer, YLoadingLayer, YMessageLayer} from "./YLayer";
+import {YGridMarkerLayer, YLoadingLayer, YMessageLayer} from "./YLayer";
+import EventType from "../../utils/EventType";
 
-export class YMapController extends MapController<Y.Marker> {
+export class YMapController extends MapController<Y.Map, Y.Marker> {
 
     /**
      * 地図オブジェクト
      */
-    readonly map: Y.Map;
+    protected readonly map: Y.Map;
+
+    protected readonly layers: ILayers;
 
     /**
      * Yahoo Map の表示するコントローラーリスト
@@ -19,12 +22,6 @@ export class YMapController extends MapController<Y.Marker> {
     private yc: any[] = [];
 
     private parentCentre?: LatLng;
-
-    private readonly _grid: GridFeatureLayer;
-
-    private readonly _msg: YMessageLayer;
-
-    private readonly _loading: YLoadingLayer;
 
     constructor(root: IController) {
         super(root);
@@ -37,7 +34,8 @@ export class YMapController extends MapController<Y.Marker> {
         );
 
         // 地図を初期化
-        this.map = new Y.Map(this.target.getID(), {
+        const config = this.config;
+        const map = this.map = new Y.Map(this.target.getID(), {
             configure: {
                 scrollWheelZoom: true,
                 continuousZoom: true,
@@ -45,7 +43,7 @@ export class YMapController extends MapController<Y.Marker> {
         });
 
         // イベント関連付け
-        this.map.bind("load", () => {
+        map.bind("load", () => {
             setTimeout(() => {
                 this.init();
             });
@@ -53,36 +51,33 @@ export class YMapController extends MapController<Y.Marker> {
 
 
         // 地図のレンダリング
-        this.map.drawMap(new Y.LatLng(this.config.center.lat, this.config.center.lng), this.config.zoom, Y.LayerSetId.NORMAL);
+        map.drawMap(new Y.LatLng(config.center.lat, config.center.lng), config.zoom, Y.LayerSetId.NORMAL);
 
-        // test
-        this._grid = new GridFeatureLayer('grid');
-        this.map.addLayer(this._grid);
+        // レイヤーの実装
+        this.layers = {
+            grid: new YGridMarkerLayer(this, 'grid'),
+            message: new YMessageLayer(this, 'message'),
+            load: new YLoadingLayer(this,'loading')
+        };
 
-        this._msg = new YMessageLayer(this, 'message');
-        this._msg.hide();
-
-        this._loading = new YLoadingLayer(this,'loading');
-        // this._loading.hide();
-
-        this.map.bind("moveend", () => {
+        map.bind("moveend", () => {
             this.onMoveHandler();
         });
 
-        this.map.bind("zoomstart", () => {
+        map.bind("zoomstart", () => {
             // 縮尺率変更前の中心点を記録する
             this.parentCentre = this.getCenter();
         });
 
-        this.map.bind("zoomend", () => {
+        map.bind("zoomend", () => {
             let zoom = this.getZoom();
 
-            if (isNumber(this.config.zoom_min)) {
-                zoom = Math.max(this.config.zoom_min, zoom);
+            if (isNumber(config.zoom_min)) {
+                zoom = Math.max(config.zoom_min, zoom);
             }
 
-            if (isNumber(this.config.zoom_max)) {
-                zoom = Math.min(this.config.zoom_max, zoom);
+            if (isNumber(config.zoom_max)) {
+                zoom = Math.min(config.zoom_max, zoom);
             }
 
             if (zoom != this.getZoom()) {
@@ -107,7 +102,7 @@ export class YMapController extends MapController<Y.Marker> {
         super.init();
 
         // 出力要素がリサイズされた場合の処理を追加
-        this.target.on("resize", this.map.updateSize, this.map);
+        this.target.on(EventType.RESIZE, this.map.updateSize, this.map);
     }
 
     getBounds(): LatLngBounds | null {
@@ -118,6 +113,12 @@ export class YMapController extends MapController<Y.Marker> {
         }
 
         return null;
+    }
+
+    setBounds(bounds: LatLngBounds): void {
+        const b = bounds.ymap();
+        const zoom = this.map.getBoundsZoomLevel(b);
+        this.map.setZoom(zoom, true, b.getCenter(), true);
     }
 
     getZoom() {
@@ -186,41 +187,5 @@ export class YMapController extends MapController<Y.Marker> {
         if (marker.origin instanceof Y.Marker && content !== "") {
             marker.origin.openInfoWindow(content);
         }
-    }
-
-    public addGrids(grids: IBoundGridData[]): void {
-        this._grid.addBounds(grids);
-    }
-
-    public addGridContents(contents: IBoundGridContentData[]): void {
-        this._grid.addMarkers(contents);
-    }
-
-    public removeGrids(): void {
-        this._grid.removeBounds();
-    }
-
-    public setMessage(message: string, show: boolean): void {
-        this._msg.html(message);
-
-        if (show) {
-            this.showMessage();
-        }
-    }
-
-    public showMessage(): void {
-        this._msg.show();
-    }
-
-    public hideMessage(): void {
-        this._msg.hide();
-    }
-
-    public showLoading(): void {
-        this._loading.show();
-    }
-
-    public hideLoading(): void {
-        this._loading.hide();
     }
 }
