@@ -1,44 +1,39 @@
-import {fixMapConfig, IMapConfig, MapType} from "../entities/MapConfig";
-import {IMapController} from "./IMapController";
-import {GoogleMapController} from "./GoogleMapController";
-import {YahooMapController} from "./YahooMapController";
-import {ILatLng} from "../entities/LatLng";
+import {Config, IConfig, MapType} from "./Config";
+import {GMapController} from "./gmap/GMapController";
+import {YMapController} from "./ymap/YMapController";
+import {ILatLng, ILatLngBounds} from "../entities/LatLng";
 import {IMarkerData} from "../entities/Response";
-import {ILatLngBound} from "../entities/LatLngBound";
+import {MapEventListener, MapEventType} from "./MapEventType";
+import {MapController} from "./MapController";
+import {IEventTypes} from "../utils/EventEmitter";
 
 export abstract class IController {
 
-    protected _config: IMapConfig;
+    public config: Config;
 
-    protected _controller: IMapController;
+    protected readonly controller: MapController<Object>;
 
-    constructor(params: IMapConfig) {
+    constructor(params: IConfig) {
         // 実行パラメータを正規化
-        this._config = fixMapConfig(params);
+        this.config = new Config(params);
 
         switch (this.config.map_type) {
             case MapType.GoogleMap:
-                this._controller = new GoogleMapController(this);
+                this.controller = new GMapController(this);
                 break;
             case MapType.YahooMap:
-                this._controller = new YahooMapController(this);
+                this.controller = new YMapController(this);
                 break;
             default:
                 throw new Error("Unable to initialize due to map type error.");
         }
     }
 
-    get config(): IMapConfig {
-        return this._config;
-    }
+    public abstract request(): void;
 
-    protected get controller(): IMapController {
-        return this._controller;
-    }
+    public abstract getElement(): Element;
 
-    public abstract getElement(): Element ;
-
-    public abstract getBounds(): ILatLngBound | null;
+    public abstract getBounds(): ILatLngBounds | null;
 
     public abstract getZoom(): number;
 
@@ -48,13 +43,13 @@ export abstract class IController {
 
     public abstract setCenter(lat: number, lng: number): void;
 
-    public abstract addMarker(marker: IMarkerData): IMarkerData;
+    public abstract addMarker(marker: IMarkerData): void;
 
     public abstract hasMarker(id: string): boolean;
 
     public abstract getMarker(id: string): IMarkerData | null;
 
-    public abstract removeMarker(id: string): boolean;
+    public abstract removeMarker(...ids: string[]): number;
 
     public abstract getViewInMarkers(limit: number): IMarkerData[];
 
@@ -65,4 +60,14 @@ export abstract class IController {
     public abstract getInfo(): boolean;
 
     public abstract setInfo(flag: boolean): void;
+
+    public on(types: IEventTypes<MapEventType | string>, callback: MapEventListener): this {
+        this.controller.emit.on(types, callback);
+        return this;
+    }
+
+    public off(types: IEventTypes<MapEventType | string>, callback: MapEventListener): this {
+        this.controller.emit.off(types, callback);
+        return this;
+    }
 }

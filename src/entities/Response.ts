@@ -1,4 +1,4 @@
-import {LatLng, ILatLng} from "./LatLng";
+import {LatLng, ILatLng, ILatLngBounds} from "./LatLng";
 import {JsonHelper} from "../utils/JsonHelper";
 
 enum FormatType {
@@ -6,9 +6,34 @@ enum FormatType {
     TEXT = "text",
 }
 
-export interface IApiResponse {
-    count: number;
-    data: IMarkerData[];
+enum ResponseType {
+    BOUNDS = 'bounds',
+}
+
+enum ResponseFormat {
+    MARKER = 'marker',
+    GRID = 'grid',
+}
+
+export interface IResponse {
+    datetime: string,
+    timestamp: number,
+    error: boolean,
+    message: string,
+    type: string,
+    format: string,
+    zoom: number,
+    bounds: ILatLngBounds,
+    count: number,
+    data: any[],
+}
+
+export interface IBoundData {
+    id: string,
+    url: string,
+    bounds: ILatLngBounds,
+    label?: string,
+    count: number,
 }
 
 export interface IMarkerData {
@@ -21,6 +46,7 @@ export interface IMarkerData {
     feed_flag: boolean;
     marker_display: boolean;
     coordinate: ILatLng;
+    user: boolean;
 }
 
 export class MarkerData implements IMarkerData {
@@ -33,6 +59,7 @@ export class MarkerData implements IMarkerData {
     label = "";
     marker_display = true;
     url = "";
+    user = false;
 
     static index: number = 1;
 
@@ -47,6 +74,7 @@ export class MarkerData implements IMarkerData {
         this.id = c.string('id', this.id);
         this.marker_display = c.boolean('marker_display', this.marker_display);
         this.url = c.string('url', this.url);
+        this.user = c.boolean("user", this.user);
 
         let coordinate = data['coordinate'];
         if (Array.isArray(coordinate)) {

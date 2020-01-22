@@ -1,16 +1,18 @@
-import {ILatLng} from "./entities/LatLng";
 import {IMarkerData} from "./entities/Response";
 import {IController} from "./controllers/IController";
-import {ILatLngBound} from "./entities/LatLngBound";
-
+import {ILatLng, ILatLngBounds, LatLng} from "./entities/LatLng";
 
 export class GeoLocoMap extends IController {
+
+    request(): void {
+        this.controller.apiRequest();
+    }
 
     getElement(): Element {
         return this.controller.getElement();
     }
 
-    getBounds(): ILatLngBound | null {
+    getBounds(): ILatLngBounds | null {
         return this.controller.getBounds();
     }
 
@@ -22,16 +24,21 @@ export class GeoLocoMap extends IController {
         return this.controller.setZoom(Math.min(20, Math.max(1, zoom)));
     }
 
-    getCenter() {
+    getCenter(): ILatLng {
         return this.config.center;
     }
 
     setCenter(lat: number, lng: number) {
-        return this.controller.setCenter({lat: lat, lng: lng});
+        return this.controller.setCenter(new LatLng(lat, lng));
     }
 
-    addMarker(marker: IMarkerData): IMarkerData {
-        return this.controller.addMarker(marker);
+    addMarker(...markers: IMarkerData[]): void {
+        // ユーザー用マーカーとして認識する
+        for (let marker of markers) {
+            marker.user = true;
+        }
+
+        return this.controller.addMarker(...markers);
     }
 
     hasMarker(id: string): boolean {
@@ -42,12 +49,12 @@ export class GeoLocoMap extends IController {
         return this.controller.getMarker(id);
     }
 
-    removeMarker(id: string): boolean {
-        return this.controller.removeMarker(id)
+    removeMarker(...ids: string[]): number {
+        return this.controller.removeMarker(...ids)
     }
 
     getViewInMarkers(limit: number = 10) {
-        return this.controller.getViewInMarkers(limit);
+        return this.controller.getDisplayMarkers(limit);
     }
 
     getUI(): boolean {
@@ -70,4 +77,3 @@ export class GeoLocoMap extends IController {
         }
     }
 }
-

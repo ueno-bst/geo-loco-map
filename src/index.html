@@ -2,25 +2,12 @@
 <html>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <script data-main="GeoLocoMap" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.20/require.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script type="text/javascript" src="http://maps.google.com/maps/api/js?key=AIzaSyDys3l0fXuc1b39XjRGoHdhP24N3Ovg1iI"></script>
     <script type="text/javascript" charset="utf-8" src="https://map.yahooapis.jp/js/V1/jsapi?appid=dj00aiZpPU51NkFQOFB5N0hZVSZzPWNvbnN1bWVyc2VjcmV0Jng9MDg-"></script>
+    <script data-main="GeoLocoMap" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.20/require.js"></script>
     <title>sample</title>
-    <style>
-        body {
-            font-size: .8em;
-        }
-
-        dl {
-            display: flex;
-            font-size: .7rem;
-        }
-
-        dl > dt {
-
-        }
-    </style>
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body style="margin: 0; padding: 0;">
 <section style="display: flex; width: 100vw; height: 100vh;">
@@ -62,9 +49,11 @@
                     <td><input id="bound-sw" type="number" readonly></td>
                 </tr>
             </table>
+            <input type="button" id="request" value="APIリクエスト">
+            <label><input type="checkbox" id="auto-request" value="1"></label>
         </fieldset>
         <fieldset style="position:relative; flex-grow: 1; padding: 1em;">
-            <legend>ビュー内にあるマーカー情報</legend>
+            <legend>ビュー内にあるマーカー情報 (<var id="marker-count">0</var> / <var id="marker-total">0</var>)</legend>
             <div id="markers" style="position: absolute; left: .5em; top: 1.5em; bottom:0; right: .5em; box-sizing: border-box; border:0; overflow: auto;"></div>
         </fieldset>
     </div>
@@ -73,28 +62,38 @@
 <!--<script type="text/javascript" src="../dist/bundle.js"></script>-->
 <script type="module">
 	require(['GeoLocoMap'], function (a) {
+		var markers = [];
 		var map = new a.GeoLocoMap({
-			// map_type: 'yahoo',
-			center: [35, 135],
-            zoom: 16,
-            zoom_min: 9,
-            zoom_max: 15,
+			map_type: 'yahoo',
+			center: [35.6525164, 139.7366392],
+			// center: [35, 135],
+			zoom: 15,
+			// zoom_min: 1,
+			zoom_max: 20,
 			show_ui: true,
 			show_info: true,
 			selector: '.map',
-			api_url: '/geo-loco-map/src/response.json',
-			// api_url: '/geo-loco-map/tools/response.2500.json',
+			api: {
+				url: 'http://oshigoto-lab.aldev.designserver.space/rest-api/gis/v1/bounds/item',
+				// url: '/geo-loco-map/src/response.json',
+				user: 'oshigoto-dev',
+				password: 'sMlre20Y3CUO1xMxlejq',
+				precision: 10,
+				type: 'bounds',
+				delay: 500,
+				auto: true
+			},
 			onInit: function (e) {
-				console.info("onInit", map.controller, e.controller);
+				// console.info("onInit", map.controller, e.controller);
 			},
 			onMove: function (obj, coordinate) {
-				console.info("onMove", map.controller, obj.controller, coordinate.lat, coordinate.lng);
+				console.info("onMove", obj.controller, coordinate.lat, coordinate.lng);
 			},
 			onZoom: function (obj, zoom) {
-				console.info("onZoom", map.controller, obj.controller, zoom);
+				console.info("onZoom", obj.controller, zoom, obj.getBounds().ne, obj.getBounds().sw);
 			},
 			onUI: function (obj, f) {
-				console.info("onUI", map.controller, obj.controller, f);
+				// console.info("onUI", map.controller, obj.controller, f);
 			},
 			onChange: function (obj) {
 				console.info("onChange", map.controller, obj.controller);
@@ -113,6 +112,8 @@
 				$("#ui").prop("checked", ui);
 				$("#info").prop("checked", info);
 
+				$("#auto-request").prop("checked", map.config.api.auto);
+
 				if (bound) {
 					$("#bound-ne").val(bound.ne.lat);
 					$("#bound-nw").val(bound.ne.lng);
@@ -120,20 +121,62 @@
 					$("#bound-sw").val(bound.sw.lng);
 				}
 
-				var
-					m = map.getViewInMarkers(),
-					t = "";
+				renderMarkers();
+			}
+		});
 
-				for (var i = 0; i < m.length; i++) {
-					t = t + m[i].id + " : " + m[i].label + "<br>";
+		map
+            .on("request", function(o, url) {
+            	console.info(url.build());
+            })
+            .on("response", function(o, response) {
+            	$("#marker-total").text(response.totalCount || 0);
+            })
+			.on("marker.disable", function (o, ids) {
+				markers = [];
+				renderMarkers();
+			})
+			.on("marker.active", function (o, ids) {
+				markers = ids;
+				renderMarkers();
+			});
+
+		var timer;
+		function renderMarkers() {
+			clearTimeout(timer);
+
+			timer = setTimeout(function() {
+				var
+					i,
+					data = [];
+
+				if (markers && markers.length > 0) {
+					for ( i = 0; i < markers.length; i++) {
+						data.push(map.getMarker(markers[i]));
+					}
+				} else {
+					data = map.getViewInMarkers(30);
 				}
 
-				$("#markers").html(t);
-			},
-			onClickMarker: function (f) {
-				console.info(f);
-				alert(f.label);
-			},
+				var $node = $("<ol>").appendTo($("#markers").empty());
+
+				for ( i = 0; i < data.length; i ++) {
+					var datum = data[i];
+
+					$node.append($("<li>").html(datum.id + ":" + datum.label));
+				}
+
+				$("#marker-count").text(data.length);
+            }, 200);
+        }
+
+		$("#request").on("click", function () {
+			map.request();
+		});
+
+		$("#auto-request").on("click", function () {
+			var $node = $(this);
+			map.config.api.auto = $node.is(":checked");
 		});
 
 		$("#info").on("change", function () {
@@ -174,6 +217,16 @@
 			description: "AAA<strong>A</strong>AA",
 			description_format: "text",
 		});
+
+		map.addMarker({
+			id: "temp2",
+			label: "花屋敷へそ公園店",
+			coordinate: [35, 135],
+			description: "AAA<strong>A</strong>AA",
+			description_format: "text",
+		});
+
+		console.info(map);
 
 		// map.removeMarker("temp");
 	});
