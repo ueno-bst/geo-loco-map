@@ -11,7 +11,7 @@ interface IListener<T> {
 
 type IListenerList<T> = { [key: string]: IListener<T>[] };
 
-type ITypes = string | string[];
+export type IEventTypes<T extends string = string> = T | T[];
 
 export default class EventEmitter<T, C extends any[]> {
     private readonly bind: any;
@@ -22,7 +22,7 @@ export default class EventEmitter<T, C extends any[]> {
         this.bind = bind;
     }
 
-    fix(types: ITypes): string[] {
+    fix(types: IEventTypes): string[] {
         return isArray(types) ? types : [types];
     }
 
@@ -34,7 +34,7 @@ export default class EventEmitter<T, C extends any[]> {
         return type in this.listeners ? this.listeners[type].length : 0;
     }
 
-    on(types: ITypes, listener?: ICallback<T>, bind?: Object): this {
+    on(types: IEventTypes, listener?: ICallback<T>, bind?: Object): this {
         if (!isFunction(listener)) {
             return this;
         }
@@ -53,7 +53,7 @@ export default class EventEmitter<T, C extends any[]> {
         return this;
     }
 
-    off(types: ITypes, fn: ICallback<T>): this {
+    off(types: IEventTypes, fn: ICallback<T>): this {
         for (let type of this.fix(types)) {
             if (this.has(type)) {
                 const listeners = this.listeners[type];
