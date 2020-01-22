@@ -28,34 +28,12 @@ export interface IResponse {
     data: any[],
 }
 
-export interface IBoundGridData {
+export interface IBoundData {
     id: string,
     url: string,
     bounds: ILatLngBounds,
     label?: string,
     count: number,
-}
-
-export interface IBoundGridContent extends IResponse {
-    data: IBoundGridContentData[],
-}
-
-export interface IBoundGridContentData {
-    id?: string,
-    count: number,
-    coordinate: LatLng,
-    features: IBoundGridContentDataFeature[],
-}
-
-export interface IBoundGridContentDataFeature {
-    id: string,
-    url: string,
-    label: string,
-    description: string,
-}
-
-export interface IApiMarkerResponse extends IResponse {
-    data: IMarkerData[];
 }
 
 export interface IMarkerData {
@@ -68,6 +46,7 @@ export interface IMarkerData {
     feed_flag: boolean;
     marker_display: boolean;
     coordinate: ILatLng;
+    user: boolean;
 }
 
 export class MarkerData implements IMarkerData {
@@ -80,6 +59,7 @@ export class MarkerData implements IMarkerData {
     label = "";
     marker_display = true;
     url = "";
+    user = false;
 
     static index: number = 1;
 
@@ -94,6 +74,7 @@ export class MarkerData implements IMarkerData {
         this.id = c.string('id', this.id);
         this.marker_display = c.boolean('marker_display', this.marker_display);
         this.url = c.string('url', this.url);
+        this.user = c.boolean("user", this.user);
 
         let coordinate = data['coordinate'];
         if (Array.isArray(coordinate)) {
