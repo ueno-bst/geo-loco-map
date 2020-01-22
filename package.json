@@ -2,7 +2,9 @@
 	"name": "geo-loco-map",
 	"version": "2.0.0",
 	"description": "",
-	"main": "index.js",
+	"author": "biost.co.jp",
+	"license": "ISC",
+	"main": "src/GeoLocoMap.ts",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"dev": "webpack-dev-server --open",
@@ -14,8 +16,10 @@
 		"google-map",
 		"yolp"
 	],
-	"author": "biost.co.jp",
-	"license": "ISC",
+	"repository": {
+		"type": "git",
+		"url": "git@gitlab.com:bst-co/geo-loco-project/geo-loco-map.git"
+	},
 	"devDependencies": {
 		"sass": "^1.24.2",
 		"mocha": "^6.2.2",
