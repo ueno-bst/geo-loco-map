@@ -1,18 +1,14 @@
-import {ApiType, IConfig, MapType} from '../entities/MapConfig'
+import {ApiType, Config, MapType} from './Config'
 import {IMarkerData, IResponse, MarkerData} from "../entities/Response";
-import {IMarkerList, isIMarkerList} from "./IMarkers";
 import {IController} from "./IController";
-import {isArray, isNull, isString} from "../utils/Types";
-import {MapEventType} from "../entities/MapEvent";
+import {isArray} from "../utils/Types";
+import {MapEventType} from "./MapEventType";
 import {URLBuilder} from "../utils/URLBuilder";
 import {LatLng, LatLngBounds} from "../entities/LatLng";
 import {MapElement} from "./Element";
 import ElementHelper from "../utils/ElementHelper";
 import EventEmitter from "../utils/EventEmitter";
 import {IGridLayerController, ILayerController, IMessageLayerController} from "./ILayerController";
-
-const
-    is_null = isNull;
 
 function numberFixed(value: number, digit: number): string {
     return value.toFixed(digit).replace(/(\.?0+)$/, "");
@@ -31,7 +27,7 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
      */
     protected readonly root: IController;
 
-    get config(): IConfig {
+    get config(): Config {
         return this.root.config;
     }
 
@@ -53,8 +49,6 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
     public readonly emit: EventEmitter<HTMLElement, [IController, ...any[]]>;
 
     protected target: MapElement;
-
-    protected markers: { [key: string]: IMarkerList<T>; } = {};
 
     private xhr: XMLHttpRequest | null = null;
 
@@ -79,43 +73,55 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
             config = this.config;
 
         this.emit
-            .on(type.init, config.onInit)
-            .on(type.change, config.onChange)
-            .on(type.move, config.onMove)
-            .on(type.zoom, config.onZoom)
-            .on(type.ui, config.onUI)
-            .on(type.addMarker, config.onAddMarker)
-            .on(type.clickMarker, config.onClickMarker)
-            .on(type.request, config.onRequest);
+            .on(type.INIT, config.onInit)
+            .on(type.CHANGE, config.onChange)
+            .on(type.MOVE, config.onMove)
+            .on(type.ZOOM, config.onZoom)
+            .on(type.UI, config.onUI)
+            .on(type.MARKER_ADD, config.onAddMarker)
+            .on(type.MARKER_SELECT, config.onClickMarker)
+            .on(type.API_REQUEST, config.onRequest);
 
         // 初期化イベント発行
-        this.onInitHandler();
+        this.fire(MapEventType.INIT, true);
 
         // コントロースの表示制御
         this.setUI(config.show_ui);
 
         // APIをリクエスト
-        this.request();
+        this.apiRequestAwait();
 
         this.layers.message.hide();
         this.layers.load.hide();
     }
 
+    public fire(type: MapEventType, change: boolean, ...args: any) {
+        if (this.emit.has(type)) {
+            this.emit.fire(type, this.root, ...args);
+        }
+
+        if (change && type !== MapEventType.CHANGE) {
+            this.fire(MapEventType.CHANGE, false);
+        }
+    }
+
     /**
-     * APIリクエストを実行
+     * APIリクエストを遅延実行
      */
-    protected onApiRequestHandler() {
+    protected apiRequestAwait() {
         clearTimeout(this.requestTimer);
 
-        this.requestTimer = setTimeout(() => {
-            this.request();
-        }, this.config.api.delay);
+        if (this.config.api.auto) {
+            this.requestTimer = setTimeout(() => {
+                this.apiRequest();
+            }, this.config.api.delay);
+        }
     }
 
     /**
      * APIにリクエストを送信する
      */
-    public request(): void {
+    public apiRequest(): void {
         const api = this.config.api;
 
         if (api.url.length === 0) {
@@ -161,7 +167,7 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
 
         url.query.set("zoom", String(zoom));
 
-        this.emit.fire(MapEventType.request, this.root, url);
+        this.fire(MapEventType.API_REQUEST, false, url);
 
         /*
          * XHR リクエスト発信
@@ -172,8 +178,6 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
             this.xhr = null;
         }
 
-        console.info(url.build());
-
         const xhr = new XMLHttpRequest();
 
         // APIレスポンス受信処理
@@ -181,7 +185,7 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 this.layers.load.hide();
                 if (xhr.status === 200) {
-                    this.onApiReceiveListener(JSON.parse(xhr.responseText));
+                    this.apiResponse(JSON.parse(xhr.responseText));
                 }
             }
 
@@ -201,7 +205,7 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
      * APIの受信処理
      * @param json
      */
-    protected onApiReceiveListener(json: IResponse) {
+    protected apiResponse(json: IResponse) {
         const layers = this.layers;
 
         layers.grid.clear();
@@ -225,37 +229,19 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
             }
 
         } else if (isArray(json.data)) {
-            const before = Object.keys(this.markers).length;
-
-            for (let datum of json.data) {
-                this.addMarker(datum);
-            }
-
-            const after = Object.keys(this.markers).length;
-
-            if (before != after) {
-                this.onAddMarkerHandler();
-            }
+            this.addMarker(...json.data);
         }
 
-        this.emit.fire(MapEventType.response, this.root, json);
+        this.fire(MapEventType.API_RESPONSE, false, json);
     }
 
     private requestTimer?: any;
 
     /**
-     * 初期化完了イベントハンドラー
-     */
-    protected onInitHandler() {
-        this.emit.fire(MapEventType.init, this.root);
-        this.onChangeHandler();
-    }
-
-    /**
      * パラメータ変更イベントハンドラー
      */
     protected onChangeHandler() {
-        this.emit.fire(MapEventType.change, this.root);
+        this.fire(MapEventType.CHANGE, false);
     }
 
     /**
@@ -264,10 +250,9 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
     protected onMoveHandler() {
         const center = this.config.center = this.getCenter();
 
-        this.emit.fire(MapEventType.move, this.root, center);
+        this.fire(MapEventType.MOVE, true, center);
 
-        this.onChangeHandler();
-        this.onApiRequestHandler();
+        this.apiRequestAwait();
     }
 
     /**
@@ -276,10 +261,9 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
     protected onZoomListener() {
         const zoom = this.config.zoom = this.getZoom();
 
-        this.emit.fire(MapEventType.zoom, this.root, zoom);
+        this.fire(MapEventType.ZOOM, true, zoom);
 
-        this.onChangeHandler();
-        this.onApiRequestHandler();
+        this.apiRequestAwait();
     }
 
     /**
@@ -289,33 +273,14 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
     protected onUIListener(show: boolean) {
         const show_uri = this.config.show_ui = show;
 
-        this.emit.fire(MapEventType.ui, this.root, show_uri);
-
-        this.onChangeHandler();
-    }
-
-    protected onAddMarkerHandler() {
-        this.emit.fire(MapEventType.addMarker, this.root);
-        this.onChangeHandler();
-    }
-
-    /**
-     * マーカークリック時イベントハンドラー
-     * @param marker
-     */
-    protected onClickMarkerHandler(marker: IMarkerList<T>) {
-        if (this.config.show_info) {
-            this.openModal(marker);
-        }
-
-        this.emit.fire(MapEventType.clickMarker, this.root);
+        this.fire(MapEventType.UI, true, show_uri);
     }
 
     /**
      * モーダル表示用の継承メソッド
-     * @param marker
+     * @param markers
      */
-    protected abstract openModal(marker: IMarkerList<T>): void;
+    protected abstract openModal(markers: MarkerData[]): void;
 
     /**
      * 表示している地図の矩形領域を返却する
@@ -357,116 +322,26 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
     public abstract setCenter(center: LatLng): void;
 
     /**
-     * マーカーデータを生成する
-     * @param marker
-     */
-    protected createMarker(marker: IMarkerData): IMarkerList<T> {
-        let new_marker = new MarkerData(marker);
-        const current_marker = this.findMarker(new_marker);
-
-        if (current_marker !== null) {
-            return current_marker;
-        }
-
-        return this.markers[new_marker.id] = {
-            marker: new_marker,
-            origin: null,
-            display: false,
-        };
-    }
-
-    /**
      * マップにマーカーを追加する
      */
-    public abstract addMarker(marker: IMarkerData): IMarkerData;
+    public addMarker = (...markers: IMarkerData[]): void  => this.layers.grid.addMarker(...markers);
 
     /**
      * マーカー情報を取得する
      * @param id
      */
-    public getMarker(id: string): IMarkerData | null {
-        const m = this.findMarker(id);
-        return m === null ? null : m.marker;
-    }
+    public getMarker = (id: string): IMarkerData | null => this.layers.grid.getMarker(id);
 
     /**
      * 表示中のマーカーを中心点からの距離順にソートして返却する
      * @param limit
      */
-    public getViewInMarkers(limit: number = 10): IMarkerData[] {
-        const ms: MarkerData[] = [],
-            bound = this.getBounds(),
-            centre = this.getCenter();
-
-        if (is_null(bound) || is_null(centre)) {
-            return ms;
-        }
-
-        for (let id in this.markers) {
-            const m = this.markers[id];
-
-            if (!m.display) {
-                continue;
-            }
-
-            if (!bound.inside(m.marker.coordinate)) {
-                continue;
-            }
-
-            ms.push(m.marker);
-        }
-
-        ms.sort((a: MarkerData, b: MarkerData): number => {
-            const ad = centre.distance(a.coordinate), bd = centre.distance(b.coordinate);
-            if (ad < bd) {
-                return -1;
-            }
-
-            if (ad > bd) {
-                return 1;
-            }
-
-            return 0;
-        });
-
-        return ms.slice(0, limit);
-    }
-
-    protected findMarker(target: MarkerData): IMarkerList<T> | null;
-    protected findMarker(target: IMarkerList<T>): IMarkerList<T> | null;
-    protected findMarker(target: string): IMarkerList<T> | null
-    protected findMarker(target: string | MarkerData | IMarkerList<T>): IMarkerList<T> | null {
-
-        let id: string = "";
-
-        if (isString(target)) {
-            id = target as string;
-        } else if (target instanceof MarkerData) {
-            id = target.id;
-        } else if (isIMarkerList<T>(target)) {
-            id = target.marker.id;
-        }
-
-        if (id === "" || this.markers[id] === undefined) {
-            return null;
-        }
-
-        return this.markers[id];
-    }
+    public getDisplayMarkers = (limit: number = 10): IMarkerData[] => this.layers.grid.getDisplayMarkers(limit);
 
     /**
      * マーカーを削除する
      */
-    public abstract removeMarker(id: string): boolean;
-
-    /**
-     * すべてのマーカーを削除する
-     */
-    public removeMarkers(): void {
-        for (let id in this.markers) {
-            this.removeMarker(id);
-        }
-    }
+    public removeMarker = (... ids: string[]): number => this.layers.grid.removeMarker(...ids);
 
     /**
      * コントロールの表示状態を設定する

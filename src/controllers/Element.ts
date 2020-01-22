@@ -1,5 +1,5 @@
 import ElementHelper from "../utils/ElementHelper";
-import {IBoundGridData} from "../entities/Response";
+import {IBoundData} from "../entities/Response";
 import {Rectangle, LatLng, LatLngBounds, Point} from "../entities/LatLng";
 import EventType from "../utils/EventType";
 
@@ -107,7 +107,7 @@ export class MapElement extends ElementHelper {
 }
 
 export class GridBoundElement extends OverWrapBaseElement {
-    public value: IBoundGridData;
+    public value: IBoundData;
 
     protected inner: ElementHelper;
 
@@ -115,7 +115,7 @@ export class GridBoundElement extends OverWrapBaseElement {
         return new LatLngBounds(this.value.bounds);
     }
 
-    constructor(bound: IBoundGridData) {
+    constructor(bound: IBoundData) {
         super("gl-bound");
 
         this.value = bound;

@@ -1,7 +1,6 @@
 import {LatLng, LatLngBounds} from "../../entities/LatLng";
 import {ILayers, MapController} from "../MapController";
-import {IMarkerData} from "../../entities/Response";
-import {IMarkerList} from "../IMarkers";
+import {MarkerData} from "../../entities/Response";
 import {IController} from "../IController";
 import {isNumber, isUndefined} from "../../utils/Types";
 import {YGridMarkerLayer, YLoadingLayer, YMessageLayer} from "./YLayer";
@@ -137,37 +136,6 @@ export class YMapController extends MapController<Y.Map, Y.Marker> {
         this.map.drawMap(coordinate.ymap(), this.getZoom(), Y.LayerSetId.NORMAL)
     }
 
-    addMarker(marker: IMarkerData): IMarkerData {
-        const m = super.createMarker(marker);
-
-        if (m.origin === null) {
-            m.origin = new Y.Marker(new Y.LatLng(m.marker.lat, m.marker.lng));
-
-            m.origin.bind("click", () => {
-                this.onClickMarkerHandler(m);
-            });
-        }
-
-        if (!m.display && m.marker.display()) {
-            m.display = true;
-            this.map.addFeature(m.origin);
-        }
-
-        return m.marker;
-    }
-
-    removeMarker(id: string): boolean {
-        const m = this.findMarker(id);
-
-        if (m !== null && m.origin !== null) {
-            m.display = false;
-            this.map.removeFeature(m.origin);
-            return true;
-        }
-
-        return false;
-    }
-
     setUI(show: boolean): void {
         for (let yc of this.yc) {
             if (show) {
@@ -180,12 +148,14 @@ export class YMapController extends MapController<Y.Map, Y.Marker> {
         this.onUIListener(show);
     }
 
-    protected openModal(marker: IMarkerList<Y.Marker>): void {
+    protected openModal(markers: MarkerData[]): void {
+        /*
         const
             content = marker.marker.content();
 
         if (marker.origin instanceof Y.Marker && content !== "") {
             marker.origin.openInfoWindow(content);
         }
+         */
     }
 }

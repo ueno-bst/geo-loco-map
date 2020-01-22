@@ -2,9 +2,9 @@ import {Constructor} from "../utils/Mixin";
 import {IGridLayerController, ILayerController, IMessageLayerController} from "./ILayerController";
 import ElementHelper from "../utils/ElementHelper";
 import {GridBoundElement, GridMarkerElement, LoadingElement, MessageElement} from "./Element";
-import {IBoundGridData, IMarkerData, MarkerData} from "../entities/Response";
+import {IBoundData, IMarkerData, MarkerData} from "../entities/Response";
 import EventType from "../utils/EventType";
-import {GeoHash} from "../entities/GeoHash";
+import {MapEventType} from "./MapEventType";
 
 function FullSizeLayer<T extends Constructor<ILayerController>>(base: T) {
     abstract class FullSizeLayer extends base implements ILayerController {
@@ -125,7 +125,24 @@ export function GridLayerController<T extends Constructor<ILayerController>>(bas
         /**
          * マーカー用 HTMLElement リスト
          */
-        me: {[hash: string]: GridMarkerElement } = {};
+        me: { [hash: string]: GridMarkerElement } = {};
+
+        /**
+         * アクティブなマーカーグリッドのリスト
+         */
+        _selected: string | null = null;
+
+        init(): void {
+            const t = this;
+
+            t.mo = t.mo || {};
+            t.me = t.me || {};
+            t.be = t.be || [];
+
+            this.selected(null);
+
+            super.init();
+        }
 
         onAdd(): void {
             let e = this.e;
@@ -141,62 +158,78 @@ export function GridLayerController<T extends Constructor<ILayerController>>(bas
             if (e) {
                 e.empty();
 
-                for (let bound of this.be || []) {
+                let hasBound = false;
+
+                for (let bound of this.be) {
                     e.append(bound);
+                    hasBound = true;
                 }
 
-                const markers = this.me || {};
-
-                if (o.keys(markers).length === 0) {
-                    for (let id in this.mo || {}) {
+                if (o.keys(this.me).length === 0) {
+                    for (let id in this.mo) {
                         const data = this.mo[id];
 
                         if (!data.marker_display) {
                             continue;
                         }
 
-                        const hash = GeoHash.encode(data.coordinate, 8);
+                        const hash = data.coordinate.hash(8);
+                        const mid = "gl-marker-" + hash;
 
-                        let marker = markers[hash];
+                        let marker = this.me[mid];
 
                         if (!marker) {
                             marker = new GridMarkerElement(data.coordinate)
-                                .setID("gl-marker-" + hash)
-                                .on(EventType.CLICK, (e) => this.selectMarker(marker));
+                                .setID(mid)
+                                .on(EventType.MOUSE_OVER, (e) => {
+                                    this.map.fire(MapEventType.MARKER_HOVER, false, marker.getRefs());
+                                    return false;
+                                })
+                                .on(EventType.CLICK, (e) => {
+                                    if (marker.active) {
+                                        this.selected(marker.getID());
+                                    }
+                                    return false;
+                                });
                         }
 
                         marker.addRefs(data.id);
 
-                        markers[hash] = marker;
+                        this.me[mid] = marker;
                     }
                 }
 
-                for (let marker of o.values(markers)) {
-                    e.append(marker);
+                if (!hasBound) {
+                    for (let marker of o.values(this.me)) {
+                        e.append(marker);
+                    }
                 }
-
-                this.me = markers;
             }
         }
 
         onDraw(): void {
             if (this.e) {
-                for (let bound of this.be || []) {
+                for (let bound of this.be) {
                     bound.setPosition(this.boundToRect(bound.bounds));
                 }
 
-                for (let marker of o.values(this.me || {})) {
-                    marker.setPosition(this.coordinateToPixel(marker.point));
+                for (let marker of o.values(this.me)) {
+                    marker
+                        .setPosition(this.coordinateToPixel(marker.point))
+                        .toggleClass('is-select', marker.getID() == this._selected);
                 }
             }
         };
 
-        addBound(...bounds: IBoundGridData[]): void {
-            this.be = this.be || [];
-
+        addBound(...bounds: IBoundData[]): void {
             for (let bound of bounds) {
                 const element = new GridBoundElement(bound)
-                    .on(EventType.CLICK, (e) => this.zoomToBound(element));
+                    .on(EventType.CLICK, (e) => {
+                        if (element.active) {
+                            this.map.setBounds(element.bounds);
+                            return false;
+                        }
+                    });
                 this.be.push(element);
             }
 
@@ -204,15 +237,13 @@ export function GridLayerController<T extends Constructor<ILayerController>>(bas
         }
 
         addMarker(...markers: IMarkerData[]): void {
-            let markerObjects = this.mo || {};
-
-            const markerList = o.values(markerObjects);
+            const markerList = o.values(this.mo);
 
             // 新しいマーカーを追加
             for (let marker of markers) {
                 const data = new MarkerData(marker);
 
-                if (!markerObjects[data.id]) {
+                if (!this.mo[data.id]) {
                     markerList.push(data);
                 }
             }
@@ -230,47 +261,151 @@ export function GridLayerController<T extends Constructor<ILayerController>>(bas
                 return 1;
             });
 
-            // マーカーオブジェクトリストに追加
-            markerObjects = {};
-
             for (let marker of markerList) {
-                markerObjects[marker.id] = marker;
+                this.mo[marker.id] = marker;
             }
 
-            this.mo = markerObjects;
+            this.clearMarker();
 
-            // 既存のマーカーエレメントを削除する
+            // 再描写
+            this.refresh();
+
+            // マーカー追加イベントを発行
+            this.map.fire(MapEventType.MARKER_ADD, true);
+        }
+
+        getMarker(id: string): MarkerData | null {
+            const markers = this.mo || {};
+
+            if (markers[id]) {
+                return markers[id];
+            }
+
+            return null;
+        }
+
+        getGroupInMarker(id: string): MarkerData[] {
+            const list = [];
+
+            if (this.me[id]) {
+                const refs = this.me[id].getRefs();
+
+                for (let ref of refs) {
+                    const marker = this.getMarker(ref);
+                    if (marker) {
+                        list.push(marker);
+                    }
+                }
+            }
+
+            return list;
+        }
+
+        getDisplayMarkers(limit: number = 0): MarkerData[] {
+            let list: MarkerData[] = [];
+
+            const bound = this.map.getBounds(),
+                center = this.map.getCenter();
+
+            if (!bound) {
+                return list;
+            }
+
+            // 全てのマーカー情報を取得する
+            for (let id in this.me) {
+                list.push(...this.getGroupInMarker(id));
+            }
+
+            // 矩形内に存在しないマーカーは除外する
+            list = list.filter((a) => {
+                return bound.inside(a.coordinate);
+            });
+
+            // 中心点に近い順にマーカーをソートする
+            list = list.sort((a, b) => {
+                const ad = center.distance(a.coordinate), bd = center.distance(b.coordinate);
+
+                if (ad < bd) {
+                    return -1;
+                }
+
+                if (ad > bd) {
+                    return 1;
+                }
+
+                return 0;
+            });
+
+            return limit > 0 ? list.slice(0, limit) : list;
+        }
+
+        removeMarker(...ids: string[]): number {
+            let count = 0;
+
+            for (let id of ids) {
+                if (this.mo[id]) {
+                    delete this.mo[id];
+                    count++;
+                }
+            }
+
+            if (count > 0) {
+                this.clearMarker();
+                this.refresh();
+            }
+
+            return count;
+        }
+
+        /**
+         * 既存のマーカーエレメントを削除する
+         */
+        clearMarker(): void {
+            this.selected();
+
             for (let element of o.values(this.me)) {
                 element.remove();
             }
 
             this.me = {};
 
-            // 再描写
-            this.refresh();
+            // マーカー追加イベントを発行
+            this.map.fire(MapEventType.MARKER_HIDE, true);
         }
 
         clear(): void {
             this.be = [];
-            this.mo = {};
-            this.me = {};
+
+            for (let id of o.keys(this.mo)) {
+                if (!this.mo[id].user) {
+                    delete this.mo[id];
+                }
+            }
+
+            this.clearMarker();
+
             this.refresh();
         }
 
-        zoomToBound(element: GridBoundElement): false {
-            if (element.active) {
-                this.map.setBounds(element.bounds);
+        selected(id: string | null = null): void {
+            const current = this._selected;
+
+            if (current == id) {
+                id = null;
             }
 
-            return false;
-        }
-
-        selectMarker(element: GridMarkerElement): false {
-            if (element.active) {
-                console.info("selectMarker", element.getRefs());
+            if (current && this.me[current]) {
+                this.map.fire(MapEventType.MARKER_RELEASE, false, this.me[current].getRefs());
+                this.me[current].removeClass("is-select");
             }
 
-            return false;
+            if (id && this.me[id]) {
+                this.map.fire(MapEventType.MARKER_SELECT, false, this.me[id].getRefs());
+            }
+
+            this._selected = id;
+
+            this.onDraw();
         }
     }
 

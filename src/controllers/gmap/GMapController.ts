@@ -1,7 +1,6 @@
 import {LatLng, LatLngBounds} from "../../entities/LatLng";
 import {ILayers, MapController} from "../MapController";
-import {IMarkerData} from "../../entities/Response";
-import {IMarkerList} from "../IMarkers";
+import {MarkerData} from "../../entities/Response";
 import {IController} from "../IController";
 import {GGridMarkerLayer, GLoadingLayer, GMessageLayer} from "./GLayer";
 import {isNumber} from "../../utils/Types";
@@ -62,8 +61,6 @@ export class GMapController extends MapController<google.maps.Map, google.maps.M
             load: new GLoadingLayer(this, "loading"),
             message: new GMessageLayer(this, "message")
         };
-
-        console.info(this.layers);
     }
 
     getBounds(): LatLngBounds | null {
@@ -96,40 +93,6 @@ export class GMapController extends MapController<google.maps.Map, google.maps.M
         this.map.setCenter(center.gmap());
     }
 
-    addMarker(marker: IMarkerData): IMarkerData {
-        const m = this.createMarker(marker);
-
-        if (m.origin === null) {
-            m.origin = new google.maps.Marker({
-                position: new google.maps.LatLng(m.marker.lat, m.marker.lng),
-                label: m.marker.label,
-            });
-
-            m.origin.addListener("click", () => {
-                this.onClickMarkerHandler(m);
-            });
-        }
-
-        if (!m.display && m.marker.display()) {
-            m.display = true;
-            m.origin.setMap(this.map);
-        }
-
-        return m.marker;
-    }
-
-    removeMarker(id: string): boolean {
-        const m = this.findMarker(id);
-
-        if (m !== null && m.origin !== null) {
-            m.display = false;
-            m.origin.setMap(null);
-            return true;
-        }
-
-        return false;
-    }
-
     setUI(show: boolean): void {
         this.map.setOptions({
             disableDefaultUI: !show
@@ -140,9 +103,10 @@ export class GMapController extends MapController<google.maps.Map, google.maps.M
 
     /**
      * モーダルを開く
-     * @param marker
+     * @param markers
      */
-    protected openModal(marker: IMarkerList<google.maps.Marker>): void {
+    protected openModal(markers: MarkerData[]): void {
+        /*
         const
             content = marker.marker.content();
 
@@ -153,5 +117,6 @@ export class GMapController extends MapController<google.maps.Map, google.maps.M
 
             info.open(this.map, marker.origin);
         }
+         */
     }
 }

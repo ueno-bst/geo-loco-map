@@ -5,7 +5,7 @@ import {ILatLng, ILatLngBounds, LatLng} from "./entities/LatLng";
 export class GeoLocoMap extends IController {
 
     request(): void {
-        this.controller.request();
+        this.controller.apiRequest();
     }
 
     getElement(): Element {
@@ -32,8 +32,13 @@ export class GeoLocoMap extends IController {
         return this.controller.setCenter(new LatLng(lat, lng));
     }
 
-    addMarker(marker: IMarkerData): IMarkerData {
-        return this.controller.addMarker(marker);
+    addMarker(...markers: IMarkerData[]): void {
+        // ユーザー用マーカーとして認識する
+        for (let marker of markers) {
+            marker.user = true;
+        }
+
+        return this.controller.addMarker(...markers);
     }
 
     hasMarker(id: string): boolean {
@@ -44,12 +49,12 @@ export class GeoLocoMap extends IController {
         return this.controller.getMarker(id);
     }
 
-    removeMarker(id: string): boolean {
-        return this.controller.removeMarker(id)
+    removeMarker(...ids: string[]): number {
+        return this.controller.removeMarker(...ids)
     }
 
     getViewInMarkers(limit: number = 10) {
-        return this.controller.getViewInMarkers(limit);
+        return this.controller.getDisplayMarkers(limit);
     }
 
     getUI(): boolean {

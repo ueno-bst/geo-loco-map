@@ -3,7 +3,7 @@ import {Constructor, getClass} from "../../utils/Mixin";
 import {LatLng, LatLngBounds, Point, Rectangle} from "../../entities/LatLng";
 import ElementHelper from "../../utils/ElementHelper";
 import {YMapController} from "./YMapController";
-import {MapEventType} from "../../entities/MapEvent";
+import {MapEventType} from "../MapEventType";
 
 const
     get_class = getClass;
@@ -79,7 +79,7 @@ abstract class YLayerControllerBase<L extends YLayer> extends ILayerController {
         this.map = map;
 
         // ズーム率変更時の、地物再配置を行う
-        map.emit.on(MapEventType.zoom, () => {
+        map.emit.on(MapEventType.ZOOM, () => {
             this.onDraw();
         });
     }

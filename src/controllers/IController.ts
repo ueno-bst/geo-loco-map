@@ -1,20 +1,21 @@
-import {fixMapConfig, IConfig, MapType} from "../entities/MapConfig";
+import {Config, IConfig, MapType} from "./Config";
 import {GMapController} from "./gmap/GMapController";
 import {YMapController} from "./ymap/YMapController";
 import {ILatLng, ILatLngBounds} from "../entities/LatLng";
 import {IMarkerData} from "../entities/Response";
-import {MapEventListener, MapEventType} from "../entities/MapEvent";
+import {MapEventListener, MapEventType} from "./MapEventType";
 import {MapController} from "./MapController";
+import {IEventTypes} from "../utils/EventEmitter";
 
 export abstract class IController {
 
-    public config: IConfig;
+    public config: Config;
 
     protected readonly controller: MapController<Object>;
 
     constructor(params: IConfig) {
         // 実行パラメータを正規化
-        this.config = fixMapConfig(params);
+        this.config = new Config(params);
 
         switch (this.config.map_type) {
             case MapType.GoogleMap:
@@ -42,13 +43,13 @@ export abstract class IController {
 
     public abstract setCenter(lat: number, lng: number): void;
 
-    public abstract addMarker(marker: IMarkerData): IMarkerData;
+    public abstract addMarker(marker: IMarkerData): void;
 
     public abstract hasMarker(id: string): boolean;
 
     public abstract getMarker(id: string): IMarkerData | null;
 
-    public abstract removeMarker(id: string): boolean;
+    public abstract removeMarker(...ids: string[]): number;
 
     public abstract getViewInMarkers(limit: number): IMarkerData[];
 
@@ -60,11 +61,13 @@ export abstract class IController {
 
     public abstract setInfo(flag: boolean): void;
 
-    public on(type: MapEventType, callback: MapEventListener): void {
-        this.controller.emit.on(type, callback);
+    public on(types: IEventTypes<MapEventType | string>, callback: MapEventListener): this {
+        this.controller.emit.on(types, callback);
+        return this;
     }
 
-    public off(type: MapEventType, callback: MapEventListener): void {
-        this.controller.emit.off(type, callback);
+    public off(types: IEventTypes<MapEventType | string>, callback: MapEventListener): this {
+        this.controller.emit.off(types, callback);
+        return this;
     }
 }

@@ -324,7 +324,6 @@ export class LatLngBounds implements ILatLngBounds, ICoordinate {
             this.sw = new ll(ne.sw);
             this.ne = new ll(ne.ne);
         } else {
-            console.info(ne, sw);
             throw new Error("The argument format is incorrect");
         }
 
