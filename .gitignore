@@ -3,7 +3,6 @@ node_modules/
 /*.log
 @types/GeoLocoMap
 dist/
-src/**/*.d.ts
 src/**/*.js
 src/**/*.js.map
 test/**/*.d.ts
