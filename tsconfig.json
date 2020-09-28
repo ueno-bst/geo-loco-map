@@ -112,6 +112,7 @@
 		// "emitDecoratorMetadata": true,
 	},
 	"include": [
+		"./@types",
 		"./src",
 		"./test"
 	]
