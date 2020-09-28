@@ -229,7 +229,7 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
             }
 
         } else if (isArray(json.data)) {
-            this.addMarker(...json.data);
+            this.addMarker(...json.data as IMarkerData[]);
         }
 
         this.fire(MapEventType.API_RESPONSE, false, json);
