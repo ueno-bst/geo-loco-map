@@ -212,10 +212,9 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
 
         if (json.error) {
             layers.message.show().html(json.message);
-            return;
+        } else {
+            layers.message.hide();
         }
-
-        layers.message.hide();
 
         if (json.type == 'bounds') {
 
