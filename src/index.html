@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script type="text/javascript" src="http://maps.google.com/maps/api/js?key=AIzaSyDys3l0fXuc1b39XjRGoHdhP24N3Ovg1iI"></script>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?key=AIzaSyDRGJSXj5IdGac5QnKc3_gb_1zjgB4IwmQ"></script>
     <script type="text/javascript" charset="utf-8" src="https://map.yahooapis.jp/js/V1/jsapi?appid=dj00aiZpPU51NkFQOFB5N0hZVSZzPWNvbnN1bWVyc2VjcmV0Jng9MDg-"></script>
     <script data-main="GeoLocoMap" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.20/require.js"></script>
     <title>sample</title>
@@ -64,7 +64,7 @@
 	require(['GeoLocoMap'], function (a) {
 		var markers = [];
 		var map = new a.GeoLocoMap({
-			map_type: 'yahoo',
+			map_type: 'google',
 			center: [35.6525164, 139.7366392],
 			// center: [35, 135],
 			zoom: 15,
@@ -127,9 +127,10 @@
 
 		map
             .on("request", function(o, url) {
-            	console.info(url.build());
+                console.info("onRequest", url.build());
             })
             .on("response", function(o, response) {
+                console.info("onResponse", response);
             	$("#marker-total").text(response.totalCount || 0);
             })
 			.on("marker.disable", function (o, ids) {
