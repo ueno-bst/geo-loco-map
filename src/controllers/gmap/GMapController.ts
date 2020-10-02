@@ -21,6 +21,8 @@ export class GMapController extends MapController<google.maps.Map, google.maps.M
         const mapConfig: google.maps.MapOptions = {
             center: {lat: this.config.center.lat, lng: this.config.center.lng},
             scrollwheel: true,
+            fullscreenControl: false,
+            streetViewControl: false,
             zoom: this.config.zoom,
             disableDefaultUI: !this.config.show_ui,
             scaleControl: this.config.show_ui,
@@ -53,6 +55,14 @@ export class GMapController extends MapController<google.maps.Map, google.maps.M
 
         this.map.addListener("zoom_changed", () => {
             this.onZoomListener();
+        });
+
+        // マップクリック時のイベント処理
+        this.map.addListener("click", (e) => {
+            // 地物を対象にしたイベントの場合、情報ウィンドウ表示を抑止するためにイベントを停止する
+            if (e.hasOwnProperty("placeId")) {
+                e.stop();
+            }
         });
 
         // test
