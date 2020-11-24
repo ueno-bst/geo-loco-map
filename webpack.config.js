@@ -15,7 +15,7 @@ module.exports = env => {
 		},
 		output: {
 			filename: `geo-loco-map.js`,
-			path: __dirname + "/dist/" + version,
+			path: __dirname + "/dist",
 			libraryExport: 'GeoLocoMap',
 			library: 'GeoLocoMap',
 			libraryTarget: 'umd2'
@@ -56,7 +56,7 @@ module.exports = env => {
 				name: 'GeoLocoMap',
 				main: 'src/GeoLocoMap.d.ts',
 				baseDir: 'src',
-				out: `${__dirname}/dist/${packageJson.version}/@types/geo-loco-map.d.ts`
+				out: `${__dirname}/dist/geo-loco-map.d.ts`
 			})
 		]
 	}
