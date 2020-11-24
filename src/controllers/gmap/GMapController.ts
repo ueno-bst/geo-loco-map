@@ -2,7 +2,7 @@ import {LatLng, LatLngBounds} from "../../entities/LatLng";
 import {ILayers, MapController} from "../MapController";
 import {MarkerData} from "../../entities/Response";
 import {IController} from "../IController";
-import {GGridMarkerLayer, GLoadingLayer, GMessageLayer} from "./GLayer";
+import {GDebugLayer, GGridMarkerLayer, GLoadingLayer, GMessageLayer} from "./GLayer";
 import {isNumber} from "../../utils/Types";
 
 const
@@ -69,8 +69,15 @@ export class GMapController extends MapController<google.maps.Map, google.maps.M
         this.layers = {
             grid: new GGridMarkerLayer(this, "grid"),
             load: new GLoadingLayer(this, "loading"),
-            message: new GMessageLayer(this, "message")
+            message: new GMessageLayer(this, "message"),
         };
+
+        if (this.config.debug) {
+            this.layers.debug = {
+                response: new GDebugLayer(this, "response").setClasses("gl-response"),
+                request: new GDebugLayer(this, "request").setClasses("gl-request"),
+            }
+        }
     }
 
     getBounds(): LatLngBounds | null {

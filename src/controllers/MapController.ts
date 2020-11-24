@@ -8,7 +8,7 @@ import {LatLng, LatLngBounds} from "../entities/LatLng";
 import {MapElement} from "./Element";
 import ElementHelper from "../utils/ElementHelper";
 import EventEmitter from "../utils/EventEmitter";
-import {IGridLayerController, ILayerController, IMessageLayerController} from "./ILayerController";
+import {IDebugLayerController, IGridLayerController, ILayerController, IMessageLayerController} from "./ILayerController";
 
 function numberFixed(value: number, digit: number): string {
     return value.toFixed(digit).replace(/(\.?0+)$/, "");
@@ -17,7 +17,11 @@ function numberFixed(value: number, digit: number): string {
 export interface ILayers {
     grid: IGridLayerController,
     load: ILayerController,
-    message: IMessageLayerController
+    message: IMessageLayerController,
+    debug?: {
+        request: IDebugLayerController,
+        response: IDebugLayerController,
+    }
 }
 
 export abstract class MapController<M extends Object = {}, T extends Object = {}> {
@@ -148,6 +152,10 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
 
                 bounds.round(zoom);
 
+                if (this.layers.debug?.request) {
+                    this.layers.debug.request.setBound(bounds);
+                }
+
                 url.query
                     .set("nelt", numberFixed(bounds.ne.lat, api.precision))
                     .set("neln", numberFixed(bounds.ne.lng, api.precision))
@@ -214,6 +222,10 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
             layers.message.show().html(json.message);
         } else {
             layers.message.hide();
+        }
+
+        if (json.bounds && layers.debug?.response) {
+            layers.debug.response.setBound(new LatLngBounds(json.bounds));
         }
 
         if (json.type == 'bounds') {

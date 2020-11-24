@@ -1,4 +1,4 @@
-import {isNull, isUndefined} from "./Types";
+import {isNull, isUndefined, isString} from "./Types";
 
 const
     is_null = isNull;
@@ -143,7 +143,7 @@ export class URLBuilder {
 class QueryBuilder {
     private query: QueryObjectList = [];
 
-    constructor(query: string) {
+    constructor(query: string = "") {
         parseQuery(this, query);
     }
 
@@ -228,6 +228,39 @@ class QueryBuilder {
         });
 
         return length != this.length;
+    }
+
+    /**
+     *
+     * @param queries
+     * @param replace
+     */
+    merge(queries: string | QueryBuilder, replace: boolean = false): this {
+        if (isString(queries)) {
+            queries = new QueryBuilder(queries);
+        }
+
+        const keys = queries.keys;
+
+        for (let index = 0; index < keys.length; index++) {
+            const
+                key = keys[index],
+                values = queries.get(key);
+
+            if (values === null) {
+                if (replace) {
+                    this.drop(key);
+                }
+            } else {
+                if (replace) {
+                    this.set(key, ...values);
+                } else {
+                    this.add(key, ...values);
+                }
+            }
+        }
+
+        return this;
     }
 
     clear(): void {

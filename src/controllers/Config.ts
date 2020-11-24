@@ -87,6 +87,11 @@ export interface IConfig {
     lazy_load?: number;
 
     /**
+     * デバッグモードを使用するかの設定
+     */
+    debug?: boolean;
+
+    /**
      * マップの初期化・サイズ変更時のイベントリスナー
      * @param ctrl マップコントローラーオブジェクト
      */
@@ -199,6 +204,8 @@ export class Config implements IConfig {
     zoom_min: number;
     zoom_max: number;
 
+    debug: boolean;
+
     onInit?: (ctrl: IController) => void;
     onChange?: (ctrl: IController) => void;
     onInfo?: (ctrl: IController, flag: boolean) => void;
@@ -232,6 +239,8 @@ export class Config implements IConfig {
         this.zoom = helper.asNum(data.zoom, 9);
         this.zoom_min = helper.asNum(data.zoom_min, 0);
         this.zoom_max = helper.asNum(data.zoom_max, 99);
+
+        this.debug = helper.asBool(data.debug, false);
 
         this.onInit = data.onInit;
         this.onChange = data.onChange;
