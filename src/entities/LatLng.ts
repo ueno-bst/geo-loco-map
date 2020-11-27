@@ -330,21 +330,25 @@ export class LatLngBounds implements ILatLngBounds, ICoordinate {
     }
 
     /**
-     * 点が矩形の範囲内にあるか検証する
+     * 点|矩形が矩形の範囲内にあるか検証する
      * @param p
      */
-    inside(p: LatLng): boolean {
+    inside(p: LatLng | LatLngBounds): boolean {
         const t = this;
 
-        return (t.ne.lat >= p.lat && t.ne.lng >= p.lng) &&
-            (t.sw.lat <= p.lat && t.sw.lng <= p.lng);
+        if (p instanceof LatLng) {
+            return (t.ne.lat >= p.lat && t.ne.lng >= p.lng) &&
+                (t.sw.lat <= p.lat && t.sw.lng <= p.lng);
+        }
+
+        return this.inside(p.ne) && this.inside(p.sw);
     }
 
     /**
-     * 点が矩形の範囲外にあるか検証する
+     * 点|矩形が矩形の範囲外にあるか検証する
      * @param p
      */
-    outside(p: LatLng): boolean {
+    outside(p: LatLng | LatLngBounds): boolean {
         return !this.inside(p);
     }
 

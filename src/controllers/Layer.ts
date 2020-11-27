@@ -5,7 +5,7 @@ import {DebugElement, GridBoundElement, GridMarkerElement, LoadingElement, Messa
 import {IBoundData, IMarkerData, MarkerData} from "../entities/Response";
 import EventType from "../utils/EventType";
 import {MapEventType} from "./MapEventType";
-import {LatLng, LatLngBounds, Point, Rectangle} from "../entities/LatLng";
+import {LatLngBounds, Rectangle} from "../entities/LatLng";
 
 function FullSizeLayer<T extends Constructor<ILayerController>>(base: T) {
     abstract class FullSizeLayer extends base implements ILayerController {
@@ -417,6 +417,7 @@ export function DebugLayer<T extends Constructor<ILayerController>>(base: T) {
     abstract class DebugLayerController extends base implements IDebugLayerController {
         e?: ElementHelper;
         _classes: string[] = [];
+        _bounds?: LatLngBounds;
         _rectangle?: Rectangle;
 
         onAdd(): void {
@@ -437,8 +438,8 @@ export function DebugLayer<T extends Constructor<ILayerController>>(base: T) {
             if (e) {
                 e.addClass(...this._classes);
 
-                if (this._rectangle) {
-                    e.setPosition(this._rectangle);
+                if (this._bounds) {
+                    e.setPosition(this.boundToRect(this._bounds));
                 }
             }
         }
@@ -449,7 +450,7 @@ export function DebugLayer<T extends Constructor<ILayerController>>(base: T) {
         }
 
         setBound(bounds: LatLngBounds): this {
-            this._rectangle = this.boundToRect(bounds);
+            this._bounds = bounds;
             this.refresh();
             return this;
         }
