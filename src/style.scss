@@ -1,5 +1,7 @@
 @charset "UTF-8";
 
+@import "~bootstrap/scss/bootstrap";
+
 $primary-color: gray;
 $secondary-color: silver;
 
@@ -13,6 +15,10 @@ $background-color: white;
   * {
     box-sizing: content-box;
   }
+}
+
+.map {
+  overflow: visible !important;
 }
 
 body {
@@ -233,4 +239,17 @@ dl {
     }
   }
 
+}
+
+
+.gl-debugs {
+  > .gl-request {
+    border: 5px solid rgba(red, 50%);
+    background: rgba(red, 5%);
+  }
+
+  > .gl-response {
+    border: 2px solid rgba(blue, 50%);
+    background: rgba(blue, 5%);
+  }
 }
