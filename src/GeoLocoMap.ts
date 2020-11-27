@@ -77,3 +77,12 @@ export class GeoLocoMap extends IController {
         }
     }
 }
+
+
+declare global {
+    interface Window {
+        GeoLocoMap: GeoLocoMap
+    }
+}
+
+window.GeoLocoMap = window.GeoLocoMap || GeoLocoMap;
