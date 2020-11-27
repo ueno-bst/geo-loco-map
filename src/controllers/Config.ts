@@ -1,7 +1,7 @@
 import {ILatLng, ILatLngBounds, LatLng, LatLngBounds} from "../entities/LatLng";
 import {IMarkerData} from "../entities/Response";
 import {IController} from "./IController";
-import {URLBuilder} from "../utils/URLBuilder";
+import {URLBuilder} from "@tueeeeno/url-builder";
 import {JsonHelper} from "../utils/JsonHelper";
 
 export enum MapType {

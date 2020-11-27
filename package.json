@@ -4,12 +4,14 @@
 	"description": "",
 	"author": "biost.co.jp",
 	"license": "ISC",
-	"main": "src/GeoLocoMap.ts",
+	"main": "dist/geo-loco-map.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "webpack-dev-server --open",
-		"build": "webpack",
-		"prod": "webpack --env.production"
+		"dev": "npm run development",
+		"development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+		"prod": "npm run production",
+		"production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+		"watch": "npm run development -- --watch",
+		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [
 		"map",
@@ -21,25 +23,23 @@
 		"url": "git@gitlab.com:bst-co/geo-loco-project/geo-loco-map.git"
 	},
 	"devDependencies": {
-		"sass": "^1.24.2",
-		"mocha": "^6.2.2",
-		"chai": "^4.2.0",
+		"@types/chai": "^4.2.14",
+		"@types/mocha": "^5.2.7",
 		"@types/node": "^13.1.0",
-		"espower-typescript": "^9.0.2",
-		"power-assert": "^1.6.1",
-		"ts-loader": "^6.1.2",
-		"dts-bundle-webpack": "^1.0.2",
-		"html-loader": "^0.5.5",
-		"html-webpack-plugin": "^3.2.0",
-		"typescript": "^4.0.3",
-		"validate-typescript": "^4.0.2",
-		"webpack": "^4.39.1",
-		"webpack-cli": "^3.3.6",
-		"webpack-merge": "^4.2.2"
+		"bootstrap": "^4.5.3",
+		"chai": "^4.2.0",
+		"cross-env": "^7.0.2",
+		"laravel-mix": "^5.0.9",
+		"mocha": "^6.2.3",
+		"resolve-url-loader": "^3.1.0",
+		"sass": "^1.29.0",
+		"sass-loader": "^10.1.0",
+		"ts-loader": "^6.2.2",
+		"typescript": "^4.1.2",
+		"vue-template-compiler": "^2.6.12"
 	},
 	"dependencies": {
-		"@types/mocha": "^5.2.7",
-		"@types/jquery": "^1.10.35",
-		"@types/googlemaps": "^3.37.1"
+		"@tueeeeno/url-builder": "^1.0.1",
+		"@types/googlemaps": "^3.40.3"
 	}
 }

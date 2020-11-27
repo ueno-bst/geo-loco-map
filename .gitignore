@@ -1,6 +1,8 @@
 node_modules/
 .idea
 /*.log
+/dev
+mix-manifest.json
 @types/GeoLocoMap
 dist/*
 !dist/*.js

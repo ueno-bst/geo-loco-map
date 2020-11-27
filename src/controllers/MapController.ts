@@ -3,7 +3,7 @@ import {IMarkerData, IResponse, MarkerData} from "../entities/Response";
 import {IController} from "./IController";
 import {isArray} from "../utils/Types";
 import {MapEventType} from "./MapEventType";
-import {URLBuilder} from "../utils/URLBuilder";
+import {URLBuilder} from "@tueeeeno/url-builder";
 import {LatLng, LatLngBounds} from "../entities/LatLng";
 import {MapElement} from "./Element";
 import ElementHelper from "../utils/ElementHelper";
