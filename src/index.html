@@ -64,7 +64,7 @@
 	</div>
 </section>
 <script>
-	$(function() {
+	$(function () {
 		var markers = [];
 		var map = new GeoLocoMap({
 			map_type: 'google',
@@ -78,10 +78,10 @@
 			selector: '.map',
 			api: {
 				// url: '/geo-loco-map/src/response.json',
-				// url: 'http://oshigoto-lab.aldev.designserver.space/rest-api/gis/v1/bounds/item',
-				// user: 'oshigoto-dev',
-				// password: 'sMlre20Y3CUO1xMxlejq',
-				url: 'http://localhost/wp-json/gis/v1/bounds/item',
+				url: 'http://oshigoto-lab.aldev.designserver.space/rest-api/gis/v1/bounds/item',
+				user: 'oshigoto-dev',
+				password: 'sMlre20Y3CUO1xMxlejq',
+				// url: 'http://localhost/wp-json/gis/v1/bounds/item',
 				// user: 'asuka-std',
 				// password: '37fJ1LmplrPTljP5Vfxe',
 				precision: 10,
@@ -139,6 +139,15 @@
 			.on("response", function (o, response) {
 				console.info("onResponse", response);
 				$("#marker-total").text(response.totalCount || 0);
+			})
+			.on('grid.add', function (o, ids) {
+				console.debug('grid.add', o, ids)
+			})
+			.on('marker.add', function (o, ids) {
+				console.debug('marker.add', o, ids)
+			})
+			.on('marker.hide', function(o, ids) {
+				console.debug("marker.hide", o, ids)
 			})
 			.on("marker.disable", function (o, ids) {
 				markers = [];

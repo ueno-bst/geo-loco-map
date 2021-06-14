@@ -235,6 +235,9 @@ export function GridLayerController<T extends Constructor<ILayerController>>(bas
             }
 
             this.refresh();
+
+            // グリッドマーカー追加イベントを発行
+            this.map.fire(MapEventType.GRID_ADD, true, bounds);
         }
 
         addMarker(...markers: IMarkerData[]): void {
@@ -271,8 +274,8 @@ export function GridLayerController<T extends Constructor<ILayerController>>(bas
             // 再描写
             this.refresh();
 
-            // マーカー追加イベントを発行
-            this.map.fire(MapEventType.MARKER_ADD, true);
+            // ピンマーカー追加イベントを発行
+            this.map.fire(MapEventType.MARKER_ADD, true, markers);
         }
 
         getMarker(id: string): MarkerData | null {

@@ -25,7 +25,7 @@ export interface IResponse {
     zoom: number,
     bounds: ILatLngBounds,
     count: number,
-    data: any[],
+    data: any,
 }
 
 export interface IBoundData {
@@ -34,6 +34,7 @@ export interface IBoundData {
     bounds: ILatLngBounds,
     label?: string,
     count: number,
+    data: any,
 }
 
 export interface IMarkerData {
@@ -47,6 +48,7 @@ export interface IMarkerData {
     marker_display: boolean;
     coordinate: ILatLng;
     user: boolean;
+    data: any;
 }
 
 export class MarkerData implements IMarkerData {
@@ -60,6 +62,7 @@ export class MarkerData implements IMarkerData {
     marker_display = true;
     url = "";
     user = false;
+    data = {};
 
     static index: number = 1;
 
@@ -75,6 +78,7 @@ export class MarkerData implements IMarkerData {
         this.marker_display = c.boolean('marker_display', this.marker_display);
         this.url = c.string('url', this.url);
         this.user = c.boolean("user", this.user);
+        this.data = c.get('data', this.data)
 
         let coordinate = data['coordinate'];
         if (Array.isArray(coordinate)) {
