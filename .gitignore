@@ -10,3 +10,4 @@ test/**/*.d.ts
 test/**/*.js
 test/**/*.js.map
 sample/
+.npmrc

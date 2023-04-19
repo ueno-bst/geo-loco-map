@@ -7,13 +7,13 @@ import {MapEventListener, MapEventType} from "~/controllers/MapEventType";
 import {MapController} from "~/controllers/MapController";
 import {IEventTypes} from "~/utils/EventEmitter";
 
-export abstract class IController {
+export default abstract class IController {
 
     public config: Config;
 
     protected readonly controller: MapController<Object>;
 
-    constructor(params: IConfig) {
+    protected constructor(params: IConfig) {
         // 実行パラメータを正規化
         this.config = new Config(params);
 

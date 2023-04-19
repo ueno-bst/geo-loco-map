@@ -36,11 +36,10 @@ module.exports = env => {
 		},
 		mode: (env && env.production) ? "production" : "development",
 		devServer: {
-			contentBase: __dirname + '/public',
+			contentBase: __dirname + '/src',
 			publicPath: '/',
 			noInfo: true,
 			historyApiFallback: true
-
 		},
 		plugins: [
 			new webpack.BannerPlugin({

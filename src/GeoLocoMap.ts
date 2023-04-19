@@ -1,8 +1,14 @@
 import {IMarkerData} from "~/entities/Response";
-import {IController} from "~/controllers/IController";
 import {ILatLng, ILatLngBounds, LatLng} from "~/entities/LatLng";
+import {IConfig} from "~/controllers/Config";
+import IController from "~/controllers/IController";
+import {MapEventListener, MapEventType} from "~/controllers/MapEventType";
+import {IEventTypes} from "~/utils/EventEmitter";
 
 export class GeoLocoMap extends IController {
+    constructor(config: IConfig) {
+        super(config);
+    }
 
     request(): void {
         this.controller.apiRequest();
@@ -75,5 +81,13 @@ export class GeoLocoMap extends IController {
         if (this.config.show_info != flag) {
             this.config.show_info = flag;
         }
+    }
+
+    on(types: IEventTypes<MapEventType | string>, callback: MapEventListener): this {
+        return super.on(types, callback);
+    }
+
+    off(types: IEventTypes<MapEventType | string>, callback: MapEventListener): this {
+        return super.off(types, callback);
     }
 }
