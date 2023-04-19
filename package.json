@@ -22,8 +22,6 @@
 	"devDependencies": {
 		"sass": "^1.24.2",
 		"@types/jquery": "^1.10.35",
-		"@types/mocha": "^5.2.7",
-		"@types/node": "^13.1.0",
 		"ts-loader": "^9.0.0",
 		"dts-bundle-webpack": "^1.0.2",
 		"webpack": "^4.39.1",
