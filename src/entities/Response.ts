@@ -1,5 +1,5 @@
-import {LatLng, ILatLng, ILatLngBounds} from "./LatLng";
-import {JsonHelper} from "../utils/JsonHelper";
+import {JsonHelper} from "~/utils/JsonHelper";
+import {ILatLng, ILatLngBounds, LatLng} from "~/entities/LatLng";
 
 enum FormatType {
     HTML = "html",
@@ -15,7 +15,7 @@ enum ResponseFormat {
     GRID = 'grid',
 }
 
-export interface IResponse {
+export interface IResponse<T = IMarkerData | IBoundData> {
     datetime: string,
     timestamp: number,
     error: boolean,
@@ -25,7 +25,7 @@ export interface IResponse {
     zoom: number,
     bounds: ILatLngBounds,
     count: number,
-    data: any[],
+    data: T[],
 }
 
 export interface IBoundData {

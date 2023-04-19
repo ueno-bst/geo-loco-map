@@ -1,15 +1,14 @@
 {
 	"name": "geo-loco-map",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"description": "",
 	"author": "biost.co.jp",
 	"license": "ISC",
-	"main": "src/GeoLocoMap.ts",
+	"main": "index.ts",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
 		"dev": "webpack-dev-server --open",
-		"build": "webpack",
-		"prod": "webpack --env.production"
+		"build": "NODE_OPTIONS='--openssl-legacy-provider' webpack",
+		"prod": "NODE_OPTIONS='--openssl-legacy-provider' webpack --env.production"
 	},
 	"keywords": [
 		"map",
@@ -22,24 +21,21 @@
 	},
 	"devDependencies": {
 		"sass": "^1.24.2",
-		"mocha": "^6.2.2",
-		"chai": "^4.2.0",
 		"@types/jquery": "^1.10.35",
 		"@types/mocha": "^5.2.7",
 		"@types/node": "^13.1.0",
-		"espower-typescript": "^9.0.2",
-		"power-assert": "^1.6.1",
-		"ts-loader": "^6.1.2",
-		"dts-bundle-webpack": "^1.0.2"
+		"ts-loader": "^9.0.0",
+		"dts-bundle-webpack": "^1.0.2",
+		"webpack": "^4.39.1",
+		"webpack-cli": "^3.3.6",
+		"webpack-merge": "^4.2.2",
+		"html-loader": "^0.5.5",
+		"html-webpack-plugin": "^3.2.0",
+		"validate-typescript": "^4.0.2"
 	},
 	"dependencies": {
 		"@types/googlemaps": "^3.37.1",
-		"html-loader": "^0.5.5",
-		"html-webpack-plugin": "^3.2.0",
-		"typescript": "^3.5.3",
-		"validate-typescript": "^4.0.2",
-		"webpack": "^4.39.1",
-		"webpack-cli": "^3.3.6",
-		"webpack-merge": "^4.2.2"
+		"typescript": "^5.0.0",
+		"ts-loader": "^9.0.0"
 	}
 }

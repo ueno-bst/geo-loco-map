@@ -1,7 +1,7 @@
-import {LatLng, LatLngBounds, Point, Rectangle} from "../entities/LatLng";
+import {LatLng, LatLngBounds, Point, Rectangle} from "~/entities/LatLng";
 import ElementHelper from "../utils/ElementHelper";
 import {MapController} from "./MapController";
-import {IBoundData, IMarkerData, MarkerData} from "../entities/Response";
+import {IBoundData, IMarkerData, MarkerData} from "~/entities/Response";
 
 export interface ILayer {
     /**

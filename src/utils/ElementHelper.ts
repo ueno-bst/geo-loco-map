@@ -1,5 +1,5 @@
-import {isNumber, isNull, isString} from "./Types";
-import {Rectangle, Point} from "../entities/LatLng";
+import {isNull, isNumber, isString} from "./Types";
+import {Point, Rectangle} from "~/entities/LatLng";
 import EventEmitter from "./EventEmitter";
 
 function isHtmlElement(value: any): value is HTMLElement {

@@ -1,8 +1,8 @@
-import {LatLng, LatLngBounds} from "../../entities/LatLng";
+import {LatLng, LatLngBounds} from "~/entities/LatLng";
 import {ILayers, MapController} from "../MapController";
-import {MarkerData} from "../../entities/Response";
+import {MarkerData} from "~/entities/Response";
 import {IController} from "../IController";
-import {isNumber, isUndefined} from "../../utils/Types";
+import {isNumber, isUndefined} from "~/utils/Types";
 import {YGridMarkerLayer, YLoadingLayer, YMessageLayer} from "./YLayer";
 import EventType from "../../utils/EventType";
 

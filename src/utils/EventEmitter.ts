@@ -1,7 +1,7 @@
 import {isArray, isFunction} from "./Types";
 
 interface ICallback<T> {
-    (...args: any): boolean | false | void;
+    (...args: any): boolean | false | void | undefined;
 }
 
 interface IListener<T> {

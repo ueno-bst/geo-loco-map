@@ -1,8 +1,8 @@
-import {Constructor} from "../utils/Mixin";
+import {Constructor} from "~/utils/Mixin";
 import {IGridLayerController, ILayerController, IMessageLayerController} from "./ILayerController";
 import ElementHelper from "../utils/ElementHelper";
 import {GridBoundElement, GridMarkerElement, LoadingElement, MessageElement} from "./Element";
-import {IBoundData, IMarkerData, MarkerData} from "../entities/Response";
+import {IBoundData, IMarkerData, MarkerData} from "~/entities/Response";
 import EventType from "../utils/EventType";
 import {MapEventType} from "./MapEventType";
 

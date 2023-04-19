@@ -1,6 +1,6 @@
-import {IMarkerData} from "./entities/Response";
-import {IController} from "./controllers/IController";
-import {ILatLng, ILatLngBounds, LatLng} from "./entities/LatLng";
+import {IMarkerData} from "~/entities/Response";
+import {IController} from "~/controllers/IController";
+import {ILatLng, ILatLngBounds, LatLng} from "~/entities/LatLng";
 
 export class GeoLocoMap extends IController {
 

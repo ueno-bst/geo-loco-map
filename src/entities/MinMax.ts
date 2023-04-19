@@ -1,4 +1,4 @@
-import {isNumber, isArray, isNull, isObject} from "../utils/Types";
+import {isArray, isNull, isNumber, isObject} from "~/utils/Types";
 
 export interface IMinMax {
     max: number;

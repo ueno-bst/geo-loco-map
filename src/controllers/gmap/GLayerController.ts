@@ -1,6 +1,6 @@
-import {getClass} from "../../utils/Mixin";
+import {getClass} from "~/utils/Mixin";
 import {ILayer, ILayerController} from "../ILayerController";
-import {LatLng, LatLngBounds, Point, Rectangle} from "../../entities/LatLng";
+import {LatLng, LatLngBounds, Point, Rectangle} from "~/entities/LatLng";
 import ElementHelper from "../../utils/ElementHelper";
 import {GMapController} from "./GMapController";
 

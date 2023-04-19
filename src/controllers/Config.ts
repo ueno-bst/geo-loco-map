@@ -1,8 +1,8 @@
-import {ILatLng, ILatLngBounds, LatLng, LatLngBounds} from "../entities/LatLng";
-import {IMarkerData} from "../entities/Response";
+import {ILatLng, ILatLngBounds, LatLng, LatLngBounds} from "~/entities/LatLng";
+import {IMarkerData} from "~/entities/Response";
 import {IController} from "./IController";
-import {URLBuilder} from "../utils/URLBuilder";
-import {JsonHelper} from "../utils/JsonHelper";
+import {URLBuilder} from "~/utils/URLBuilder";
+import {JsonHelper} from "~/utils/JsonHelper";
 
 export enum MapType {
     GoogleMap = "google",
@@ -51,7 +51,7 @@ export interface IConfig {
     /**
      *　表示対象のHTMLエレメントを指定
      */
-    selector: string;
+    selector: string | HTMLElement;
 
     /**
      * 地図の表示用コントローラーを表示する
@@ -190,7 +190,7 @@ export class Config implements IConfig {
     center: LatLng;
     center_bound?: LatLngBounds;
     map_type: MapType;
-    selector: string;
+    selector: string | HTMLElement;
 
     show_info: boolean;
     show_ui: boolean;
@@ -223,7 +223,7 @@ export class Config implements IConfig {
         }
 
         this.map_type = helper.asEnum<MapType>(MapType, data.map_type as MapType, MapType.GoogleMap);
-        this.selector = helper.asStr(data.selector, "#map");
+        this.selector = data.selector instanceof HTMLElement ? data.selector : helper.asStr(data.selector, "#map");
         this.api = new ConfigApi(data.api || {});
 
         this.show_ui = helper.asBool(data.show_ui, true);

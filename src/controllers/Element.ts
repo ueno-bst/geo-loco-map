@@ -1,6 +1,6 @@
 import ElementHelper from "../utils/ElementHelper";
-import {IBoundData} from "../entities/Response";
-import {Rectangle, LatLng, LatLngBounds, Point} from "../entities/LatLng";
+import {IBoundData} from "~/entities/Response";
+import {LatLng, LatLngBounds, Point, Rectangle} from "~/entities/LatLng";
 import EventType from "../utils/EventType";
 
 const ev = EventType;

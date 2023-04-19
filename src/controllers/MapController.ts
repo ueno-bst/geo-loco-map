@@ -1,14 +1,14 @@
-import {ApiType, Config, MapType} from './Config'
-import {IMarkerData, IResponse, MarkerData} from "../entities/Response";
-import {IController} from "./IController";
-import {isArray} from "../utils/Types";
-import {MapEventType} from "./MapEventType";
-import {URLBuilder} from "../utils/URLBuilder";
-import {LatLng, LatLngBounds} from "../entities/LatLng";
-import {MapElement} from "./Element";
-import ElementHelper from "../utils/ElementHelper";
-import EventEmitter from "../utils/EventEmitter";
-import {IGridLayerController, ILayerController, IMessageLayerController} from "./ILayerController";
+import {IBoundData, IMarkerData, IResponse, MarkerData} from "~/entities/Response";
+import {isArray, isString} from "~/utils/Types";
+import {URLBuilder} from "~/utils/URLBuilder";
+import {LatLng, LatLngBounds} from "~/entities/LatLng";
+import {MapEventType} from "~/controllers/MapEventType";
+import EventEmitter from "~/utils/EventEmitter";
+import ElementHelper from "~/utils/ElementHelper";
+import {MapElement} from "~/controllers/Element";
+import {IGridLayerController, ILayerController, IMessageLayerController} from "~/controllers/ILayerController";
+import {IController} from "~/controllers/IController";
+import {ApiType, Config, MapType} from "~/controllers/Config";
 
 function numberFixed(value: number, digit: number): string {
     return value.toFixed(digit).replace(/(\.?0+)$/, "");
@@ -55,13 +55,15 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
     protected constructor(root: IController) {
         this.root = root;
 
-        const element = ElementHelper.query(this.config.selector);
+        const element = isString(this.config.selector) ? ElementHelper.query(this.config.selector) : new ElementHelper(this.config.selector);
 
         if (element) {
             this.target = new MapElement(element.src);
         } else {
             throw new Error("Cannot find element to display map");
         }
+
+        element.uniqueID()
 
         // イベントエミッタを定義
         this.emit = new EventEmitter(element.src);
@@ -221,15 +223,15 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
 
             switch (json.format) {
                 case 'grid':
-                    layers.grid.addBound(...json.data);
+                    layers.grid.addBound(...json.data as IBoundData[]);
                     break;
                 case 'content':
-                    layers.grid.addMarker(...json.data);
+                    layers.grid.addMarker(...json.data as IMarkerData[]);
                     break;
             }
 
         } else if (isArray(json.data)) {
-            this.addMarker(...json.data);
+            this.addMarker(...json.data as IMarkerData[]);
         }
 
         this.fire(MapEventType.API_RESPONSE, false, json);
