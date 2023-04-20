@@ -2,3 +2,9 @@
 node_modules
 test/
 .npmrc
+dist/
+public/
+yarn-error.log
+.editorconfig
+vite.config.ts
+webpack.config.js

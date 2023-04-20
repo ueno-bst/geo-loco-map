@@ -1,4 +1,4 @@
-import {IController} from "~/controllers/IController";
+import IController from "~/controllers/IController";
 
 export enum MapEventType {
     /**

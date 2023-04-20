@@ -1,36 +1,58 @@
 {
-  /* Basic Options */
-  "compilerOptions": {
-    "target": "es5",
-    "module": "amd",
-    "moduleResolution": "Node",
-    "lib": [
-      "es5",
-      "esnext",
-      "DOM"
-    ],
-    "declaration": true,
-    "sourceMap": true,
-    "removeComments": true,
-    "incremental": true,
-    "strict": true,
-    "jsx": "preserve",
-    "baseUrl": ".",
-    "paths": {
-      "~/*": [
-        "src/*"
-      ]
+    "compilerOptions": {
+        "jsx": "preserve",
+        "target": "ES2018",
+        "module": "Node16",
+        "lib": [
+            "dom",
+            "DOM.Iterable",
+            "ES2018"
+        ],
+        "moduleResolution": "Node",
+        "moduleDetection": "force",
+        "skipLibCheck": true,
+        "strict": true,
+        "allowJs": true,
+        "noEmit": false,
+//        "resolveJsonModule": true,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "declaration": true,
+        "baseUrl": ".",
+        "outDir": "./dist",
+        "sourceMap": true,
+        "paths": {
+            "~/*": [
+                "src/*"
+            ],
+            "@/*": [
+                "test/*"
+            ]
+        },
+        "types": [
+            "googlemaps",
+            "yahoo"
+        ],
+        "typeRoots": [
+            "node_modules/@types",
+            "@types",
+            "src"
+        ]
     },
-    "typeRoots": [
-      "@types/yahoo/yahoo-map.d.ts",
-      "node_modules/@types"
+    "include": [
+        "@types/**/*.d.ts",
+        "src/**/*.ts",
     ],
-    "esModuleInterop": true
-  },
-  "include": [
-    "@types/**/*.d.ts",
-    "index.ts",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-  ]
+    "exclude": [
+        "test/**/*.ts",
+        "test/**/*.d.ts",
+        "test/**/*.tsx",
+        "test/**/*.vue",
+        "node_modules"
+    ],
+    "references": [
+        {
+            "path": "./tsconfig.node.json"
+        }
+    ]
 }

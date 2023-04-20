@@ -1,44 +1,41 @@
 {
-	"name": "@ueno-bst/geo-loco-map",
-	"version": "2.0.4",
-	"private": false,
-	"description": "",
-	"author": "biost.co.jp",
-	"license": "ISC",
-	"main": "index.ts",
-	"scripts": {
-		"dev": "NODE_OPTIONS='--openssl-legacy-provider' webpack-dev-server --open",
-		"build": "NODE_OPTIONS='--openssl-legacy-provider' webpack",
-		"prod": "NODE_OPTIONS='--openssl-legacy-provider' webpack --env.production"
-	},
-	"keywords": [
-		"map",
-		"google-map",
-		"yolp"
-	],
-	"repository": {
-		"type": "git",
-		"url": "git@github.com:ueno-bst/geo-loco-map.git"
-	},
-	"devDependencies": {
-		"@types/jquery": "^1.10.35",
-		"dts-bundle-webpack": "^1.0.2",
-		"html-loader": "^0.5.5",
-		"html-webpack-plugin": "^3.2.0",
-		"sass": "^1.24.2",
-		"ts-loader": "^9.0.0",
-		"validate-typescript": "^4.0.2",
-		"webpack": "^4.39.1",
-		"webpack-cli": "^3.3.6",
-		"webpack-merge": "^4.2.2",
-		"webpack-dev-server": "^3.11.3"
-	},
-	"dependencies": {
-		"@types/googlemaps": "^3.37.1",
-		"ts-loader": "^9.0.0",
-		"typescript": "^5.0.0"
-	},
-	"publishConfig": {
-		"registry": "https://npm.pkg.github.com"
-	}
+    "name": "@ueno-bst/geo-loco-map",
+    "version": "2.0.5",
+    "private": false,
+    "description": "",
+    "author": "biost.co.jp",
+    "license": "ISC",
+    "type": "module",
+    "main": "index.ts",
+    "scripts": {
+        "dev": "vite",
+        "build": "vue-tsc && vite build",
+        "preview": "vite preview"
+    },
+    "keywords": [
+        "map",
+        "google-map",
+        "yolp"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:ueno-bst/geo-loco-map.git"
+    },
+    "devDependencies": {
+        "sass": "^1.62.0",
+        "@types/node": "^18.15.11",
+        "@vitejs/plugin-vue": "^4.1.0",
+        "@types/jquery": "^1.10.35",
+        "@babel/types": "^7.21.4",
+        "vue": "^3.2.47",
+        "vite": "^4.2.0",
+        "vue-tsc": "^1.2.0"
+    },
+    "dependencies": {
+        "@types/googlemaps": "^3.37.1",
+        "typescript": "^4.9.3"
+    },
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com"
+    }
 }

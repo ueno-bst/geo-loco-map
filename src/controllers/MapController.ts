@@ -7,7 +7,7 @@ import EventEmitter from "~/utils/EventEmitter";
 import ElementHelper from "~/utils/ElementHelper";
 import {MapElement} from "~/controllers/Element";
 import {IGridLayerController, ILayerController, IMessageLayerController} from "~/controllers/ILayerController";
-import {IController} from "~/controllers/IController";
+import IController from "~/controllers/IController";
 import {ApiType, Config, MapType} from "~/controllers/Config";
 
 function numberFixed(value: number, digit: number): string {
