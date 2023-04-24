@@ -1,7 +1,7 @@
 import IController from "../controllers/IController";
 import {ILatLng} from "../entities/LatLng";
 import {URLBuilder} from "@ueno-bst/url-builder";
-import {IMarkerData, IResponse} from "../entities/Response";
+import {IBoundData, IMarkerData, IResponse, MarkerData} from "../entities/Response";
 
 export enum MapEventType {
     /**
@@ -26,25 +26,45 @@ export enum MapEventType {
     UI = "ui",
     info = "info",
     /**
-     * マーカーが追加された際に発行されるイベント
+     * ピンマーカーが追加された際に発行されるイベント
      */
     MARKER_ADD = "marker.add",
     /**
-     * マーカーが削除された際に発行されるイベント
+     * ピンマーカーが削除された際に発行されるイベント
      */
     MARKER_HIDE = "marker.hide",
     /**
-     * マーカーが選択された際に発行されるイベント
+     * ピンマーカーが選択された際に発行されるイベント
      */
     MARKER_SELECT = "marker.active",
     /**
-     * マーカーが選択解除された際に発行されるイベント
+     * ピンマーカーが選択解除された際に発行されるイベント
      */
     MARKER_RELEASE = "marker.disable",
     /**
-     * マーカーにカーソルが当たった際に発行されるイベント
+     * ピンマーカーにカーソルが当たった際に発行されるイベント
      */
     MARKER_HOVER = "marker.hover",
+    /**
+     * グリッドマーカーが追加された際に発行されるイベント
+     */
+    GRID_ADD = "grid.add",
+    /**
+     * グリッドマーカーが削除された際に発行されるイベント
+     */
+    GRID_HIDE = "grid.hide",
+    /**
+     * グリッドマーカーが選択された際に発行されるイベント
+     */
+    GRID_SELECT = "grid.active",
+    /**
+     * グリッドマーカーが選択解除された際に発行されるイベント
+     */
+    GRID_RELEASE = "grid.disable",
+    /**
+     * グリッドマーカーが選択解除された際に発行されるイベント
+     */
+    GRID_HOVER = "grid.hover",
     /**
      * APIのリクエストが実行される際に発行されるイベント
      */
@@ -68,9 +88,10 @@ export type MapEventMap = {
     info: (ctrl: IController, flag: boolean) => void,
     request: (ctrl: IController, url: URLBuilder) => void,
     response: (ctrl: IController, json: IResponse) => void,
-    "marker.add": (ctrl: IController) => void,
-    "marker.hide": (ctrl: IController, marker: IMarkerData) => void,
-    "marker.active": (ctrl: IController, refs: string[]) => void,
-    "marker.disable": (ctrl: IController, refs: string[]) => void,
+    'grid.add': (ctrl: IController, bounds: IBoundData[]) => void,
+    'marker.add': (ctrl: IController, marker: Record<string, MarkerData>) => void,
+    'marker.hide': (ctrl: IController, marker: IMarkerData) => void,
+    'marker.active': (ctrl: IController, refs: string[]) => void,
+    'marker.disable': (ctrl: IController, refs: string[]) => void,
     "marker.hover": (ctrl: IController, refs: string[]) => void,
 }

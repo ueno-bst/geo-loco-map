@@ -4,7 +4,7 @@ import {YMapController} from "./ymap/YMapController";
 import {GMapController} from "./gmap/GMapController";
 import {ILatLng, ILatLngBounds} from "../entities/LatLng";
 import {IMarkerData} from "../entities/Response";
-import {MapEventMap} from "./MapEventType";
+import {MapEventMap, MapEventType} from "./MapEventType";
 
 
 export default abstract class IController {

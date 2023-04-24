@@ -250,3 +250,14 @@ export class LoadingElement extends OverWrapBaseElement {
             .append(layer);
     }
 }
+
+export class DebugElement extends OverWrapBaseElement {
+    constructor() {
+        super();
+
+        const div = ElementHelper.div()
+            .addClass("gl-debug-layer");
+
+        this.append(div);
+    }
+}

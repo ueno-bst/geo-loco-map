@@ -1,10 +1,11 @@
 import {Constructor} from "../utils/Mixin";
-import {IGridLayerController, ILayerController, IMessageLayerController} from "./ILayerController";
+import {IDebugLayerController, IGridLayerController, ILayerController, IMessageLayerController} from "./ILayerController";
 import ElementHelper from "../utils/ElementHelper";
-import {GridBoundElement, GridMarkerElement, LoadingElement, MessageElement} from "./Element";
+import {DebugElement, GridBoundElement, GridMarkerElement, LoadingElement, MessageElement} from "./Element";
 import {IBoundData, IMarkerData, MarkerData} from "../entities/Response";
 import EventType from "../utils/EventType";
 import {MapEventType} from "./MapEventType";
+import {LatLngBounds, Rectangle} from "../entities/LatLng";
 
 function FullSizeLayer<T extends Constructor<ILayerController>>(base: T) {
     abstract class FullSizeLayer extends base implements ILayerController {
@@ -173,8 +174,7 @@ export function GridLayerController<T extends Constructor<ILayerController>>(bas
                             continue;
                         }
 
-                        const hash = data.coordinate.hash(8);
-                        const mid = "gl-marker-" + hash;
+                        const mid = data.marker_id
 
                         let marker = this.me[mid];
 
@@ -234,6 +234,9 @@ export function GridLayerController<T extends Constructor<ILayerController>>(bas
             }
 
             this.refresh();
+
+            // グリッドマーカー追加イベントを発行
+            this.map.fire(MapEventType.GRID_ADD, true, bounds);
         }
 
         addMarker(...markers: IMarkerData[]): void {
@@ -270,8 +273,8 @@ export function GridLayerController<T extends Constructor<ILayerController>>(bas
             // 再描写
             this.refresh();
 
-            // マーカー追加イベントを発行
-            this.map.fire(MapEventType.MARKER_ADD, true);
+            // ピンマーカー追加イベントを発行
+            this.map.fire(MapEventType.MARKER_ADD, true, this.mo);
         }
 
         getMarker(id: string): MarkerData | null {
@@ -410,4 +413,50 @@ export function GridLayerController<T extends Constructor<ILayerController>>(bas
     }
 
     return GridLayerController;
+}
+
+export function DebugLayer<T extends Constructor<ILayerController>>(base: T) {
+    abstract class DebugLayerController extends base implements IDebugLayerController {
+        e?: ElementHelper;
+        _classes: string[] = [];
+        _bounds?: LatLngBounds;
+        _rectangle?: Rectangle;
+
+        onAdd(): void {
+            if (!this.e) {
+                this.e = new DebugElement();
+            }
+
+            const target = this.target(false);
+
+            if (target) {
+                target.append(this.e).addClass("gl-debugs");
+            }
+        }
+
+        onDraw(): void {
+            const e = this.e;
+
+            if (e) {
+                e.addClass(...this._classes);
+
+                if (this._bounds) {
+                    e.setPosition(this.boundToRect(this._bounds));
+                }
+            }
+        }
+
+        setClasses(...classes: string[]): this {
+            this._classes = classes;
+            return this;
+        }
+
+        setBound(bounds: LatLngBounds): this {
+            this._bounds = bounds;
+            this.refresh();
+            return this;
+        }
+    }
+
+    return DebugLayerController;
 }

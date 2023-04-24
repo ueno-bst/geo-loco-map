@@ -128,3 +128,9 @@ export abstract class IGridLayerController extends ILayerController {
      */
     abstract clear(): void;
 }
+
+export abstract class IDebugLayerController extends ILayerController {
+    abstract setClasses(...classes: string[]): this;
+
+    abstract setBound(rectangle: LatLngBounds): this;
+}

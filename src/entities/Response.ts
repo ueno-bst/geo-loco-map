@@ -15,7 +15,7 @@ enum ResponseFormat {
     GRID = 'grid',
 }
 
-export interface IResponse<T = IMarkerData | IBoundData> {
+export interface IResponse {
     datetime: string,
     timestamp: number,
     error: boolean,
@@ -25,7 +25,7 @@ export interface IResponse<T = IMarkerData | IBoundData> {
     zoom: number,
     bounds: ILatLngBounds,
     count: number,
-    data: T[],
+    data: any,
 }
 
 export interface IBoundData {
@@ -34,9 +34,11 @@ export interface IBoundData {
     bounds: ILatLngBounds,
     label?: string,
     count: number,
+    data: any,
 }
 
 export interface IMarkerData {
+    marker_id: string;
     id: string;
     url: string;
     label: string;
@@ -47,9 +49,11 @@ export interface IMarkerData {
     marker_display: boolean;
     coordinate: ILatLng;
     user: boolean;
+    data: any;
 }
 
 export class MarkerData implements IMarkerData {
+    marker_id = "";
     coordinate = new LatLng(0, 0);
     description = "";
     description_format = "html";
@@ -60,6 +64,7 @@ export class MarkerData implements IMarkerData {
     marker_display = true;
     url = "";
     user = false;
+    data = {};
 
     static index: number = 1;
 
@@ -75,11 +80,15 @@ export class MarkerData implements IMarkerData {
         this.marker_display = c.boolean('marker_display', this.marker_display);
         this.url = c.string('url', this.url);
         this.user = c.boolean("user", this.user);
+        this.data = c.get('data', this.data)
 
         let coordinate = data['coordinate'];
+
         if (Array.isArray(coordinate)) {
             this.coordinate = new LatLng(coordinate);
         }
+
+        this.marker_id = "gl-marker-" + this.coordinate.hash(8);
 
         if (this.id === "") {
             this.id = "#tmp-" + (MarkerData.index++);

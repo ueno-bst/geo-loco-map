@@ -2,7 +2,7 @@ import {LatLng, LatLngBounds} from "../../entities/LatLng";
 import {ILayers, MapController} from "../MapController";
 import {MarkerData} from "../../entities/Response";
 import IController from "../IController";
-import {GGridMarkerLayer, GLoadingLayer, GMessageLayer} from "./GLayer";
+import {GDebugLayer, GGridMarkerLayer, GLoadingLayer, GMessageLayer} from "./GLayer";
 import {isNumber} from "../../utils/Types";
 
 const
@@ -21,6 +21,8 @@ export class GMapController extends MapController<google.maps.Map, google.maps.M
         const mapConfig: google.maps.MapOptions = {
             center: {lat: this.config.center.lat, lng: this.config.center.lng},
             scrollwheel: true,
+            fullscreenControl: false,
+            streetViewControl: false,
             zoom: this.config.zoom,
             disableDefaultUI: !this.config.show_ui,
             scaleControl: this.config.show_ui,
@@ -55,12 +57,27 @@ export class GMapController extends MapController<google.maps.Map, google.maps.M
             this.onZoomListener();
         });
 
+        // マップクリック時のイベント処理
+        this.map.addListener("click", (e) => {
+            // 地物を対象にしたイベントの場合、情報ウィンドウ表示を抑止するためにイベントを停止する
+            if (e.hasOwnProperty("placeId")) {
+                e.stop();
+            }
+        });
+
         // test
         this.layers = {
             grid: new GGridMarkerLayer(this, "grid"),
             load: new GLoadingLayer(this, "loading"),
-            message: new GMessageLayer(this, "message")
+            message: new GMessageLayer(this, "message"),
         };
+
+        if (this.config.debug) {
+            this.layers.debug = {
+                response: new GDebugLayer(this, "response").setClasses("gl-response"),
+                request: new GDebugLayer(this, "request").setClasses("gl-request"),
+            }
+        }
     }
 
     getBounds(): LatLngBounds | null {

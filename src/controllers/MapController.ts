@@ -6,7 +6,12 @@ import {MapEventType} from "./MapEventType";
 import EventEmitter from "../utils/EventEmitter";
 import ElementHelper from "../utils/ElementHelper";
 import {MapElement} from "./Element";
-import {IGridLayerController, ILayerController, IMessageLayerController} from "./ILayerController";
+import {
+    IDebugLayerController,
+    IGridLayerController,
+    ILayerController,
+    IMessageLayerController
+} from "./ILayerController";
 import IController from "../controllers/IController";
 import {ApiType, Config, MapType} from "./Config";
 
@@ -17,7 +22,11 @@ function numberFixed(value: number, digit: number): string {
 export interface ILayers {
     grid: IGridLayerController,
     load: ILayerController,
-    message: IMessageLayerController
+    message: IMessageLayerController,
+    debug?: {
+        request: IDebugLayerController,
+        response: IDebugLayerController,
+    }
 }
 
 export abstract class MapController<M extends Object = {}, T extends Object = {}> {
@@ -51,6 +60,10 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
     protected target: MapElement;
 
     private xhr: XMLHttpRequest | null = null;
+
+    protected currentBounds: LatLngBounds | null = null;
+
+    protected currentZoom: number | null = null;
 
     protected constructor(root: IController) {
         this.root = root;
@@ -148,7 +161,17 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
                     return;
                 }
 
+                if (this.currentBounds && this.currentZoom && this.currentBounds.inside(bounds) && this.currentZoom === zoom) {
+                    return;
+                }
+
+                this.currentZoom = zoom;
+
                 bounds.round(zoom);
+
+                if (this.layers.debug?.request) {
+                    this.layers.debug.request.setBound(bounds);
+                }
 
                 url.query
                     .set("nelt", numberFixed(bounds.ne.lat, api.precision))
@@ -214,22 +237,27 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
 
         if (json.error) {
             layers.message.show().html(json.message);
-            return;
+        } else {
+            layers.message.hide();
         }
 
-        layers.message.hide();
+        if (json.bounds) {
+            this.currentBounds = new LatLngBounds(json.bounds);
+
+            if (layers.debug?.response) {
+                layers.debug.response.setBound(new LatLngBounds(json.bounds));
+            }
+        }
 
         if (json.type == 'bounds') {
-
             switch (json.format) {
                 case 'grid':
-                    layers.grid.addBound(...json.data as IBoundData[]);
+                    layers.grid.addBound(...json.data);
                     break;
                 case 'content':
-                    layers.grid.addMarker(...json.data as IMarkerData[]);
+                    layers.grid.addMarker(...json.data);
                     break;
             }
-
         } else if (isArray(json.data)) {
             this.addMarker(...json.data as IMarkerData[]);
         }
@@ -326,7 +354,7 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
     /**
      * マップにマーカーを追加する
      */
-    public addMarker = (...markers: IMarkerData[]): void  => this.layers.grid.addMarker(...markers);
+    public addMarker = (...markers: IMarkerData[]): void => this.layers.grid.addMarker(...markers);
 
     /**
      * マーカー情報を取得する
@@ -343,7 +371,7 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
     /**
      * マーカーを削除する
      */
-    public removeMarker = (... ids: string[]): number => this.layers.grid.removeMarker(...ids);
+    public removeMarker = (...ids: string[]): number => this.layers.grid.removeMarker(...ids);
 
     /**
      * コントロールの表示状態を設定する
