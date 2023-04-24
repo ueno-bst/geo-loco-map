@@ -3,6 +3,7 @@
     "compilerOptions": {
         "target": "es6",
         "module": "es2015",
+        "noEmit": false,
         "outDir": "./esm",
         "declaration": true,
         "declarationMap": true

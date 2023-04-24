@@ -1,8 +1,8 @@
 import {ILatLng, ILatLngBounds, LatLng, LatLngBounds} from "../entities/LatLng";
 import {IMarkerData} from "../entities/Response";
 import IController from "./IController";
-import {URLBuilder} from "../utils/URLBuilder";
 import {JsonHelper} from "../utils/JsonHelper";
+import {URLBuilder} from "@ueno-bst/url-builder";
 
 export enum MapType {
     GoogleMap = "google",

@@ -1,6 +1,6 @@
 import IController from "../controllers/IController";
 import {ILatLng} from "../entities/LatLng";
-import {URLBuilder} from "../utils/URLBuilder";
+import {URLBuilder} from "@ueno-bst/url-builder";
 import {IMarkerData, IResponse} from "../entities/Response";
 
 export enum MapEventType {

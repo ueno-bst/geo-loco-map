@@ -19,6 +19,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.15.11.tgz#b3b790f09cb1696cffcec605de025b088fa4225f"
   integrity sha512-E5Kwq2n4SbMzQOn6wnmBjuK9ouqlURrcZDVfbo9ftDDTFt3nk7ZKK4GMOzoYgnpQJKcxwQw+lGaBvvlMo0qN/Q==
 
+"@ueno-bst/url-builder@1.0.2":
+  version "1.0.2"
+  resolved "https://npm.pkg.github.com/download/@ueno-bst/url-builder/1.0.2/fd478f317fccbf290e846af8e83a8ac34d72066e#fd478f317fccbf290e846af8e83a8ac34d72066e"
+  integrity sha512-PpoejvktDGZUWhgIX6hJoLmaABtCvOMKo3f9fkkS5sjppXm18ahao1ntJUOuCdWTmT2XKj1aEm3HJiu6f+nyUQ==
+
 fast-deep-equal@^3.1.3:
   version "3.1.3"
   resolved "https://registry.yarnpkg.com/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz#3a7d56b559d6cbc3eb512325244e619a65c6c525"
