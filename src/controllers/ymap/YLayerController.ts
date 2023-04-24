@@ -1,6 +1,6 @@
 import {ILayer, ILayerController} from "../ILayerController";
-import {Constructor, getClass} from "~/utils/Mixin";
-import {LatLng, LatLngBounds, Point, Rectangle} from "~/entities/LatLng";
+import {Constructor, getClass} from "../../utils/Mixin";
+import {LatLng, LatLngBounds, Point, Rectangle} from "../../entities/LatLng";
 import ElementHelper from "../../utils/ElementHelper";
 import {YMapController} from "./YMapController";
 import {MapEventType} from "../MapEventType";

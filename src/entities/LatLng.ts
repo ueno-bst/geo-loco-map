@@ -1,6 +1,6 @@
-import {isArray, isInstanceOf, isNull, isNumber, isObject} from "~/utils/Types";
-import {init} from "~/entities/Initialize";
-import {GeoHash} from "~/entities/GeoHash";
+import {isArray, isInstanceOf, isNull, isNumber, isObject} from "../utils/Types";
+import {init} from "./Initialize";
+import {GeoHash} from "./GeoHash";
 
 init();
 

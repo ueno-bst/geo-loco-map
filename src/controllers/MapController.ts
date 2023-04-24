@@ -1,14 +1,14 @@
-import {IBoundData, IMarkerData, IResponse, MarkerData} from "~/entities/Response";
-import {isArray, isString} from "~/utils/Types";
-import {URLBuilder} from "~/utils/URLBuilder";
-import {LatLng, LatLngBounds} from "~/entities/LatLng";
-import {MapEventType} from "~/controllers/MapEventType";
-import EventEmitter from "~/utils/EventEmitter";
-import ElementHelper from "~/utils/ElementHelper";
-import {MapElement} from "~/controllers/Element";
-import {IGridLayerController, ILayerController, IMessageLayerController} from "~/controllers/ILayerController";
-import IController from "~/controllers/IController";
-import {ApiType, Config, MapType} from "~/controllers/Config";
+import {IBoundData, IMarkerData, IResponse, MarkerData} from "../entities/Response";
+import {isArray, isString} from "../utils/Types";
+import {URLBuilder} from "../utils/URLBuilder";
+import {LatLng, LatLngBounds} from "../entities/LatLng";
+import {MapEventType} from "./MapEventType";
+import EventEmitter from "../utils/EventEmitter";
+import ElementHelper from "../utils/ElementHelper";
+import {MapElement} from "../controllers/Element";
+import {IGridLayerController, ILayerController, IMessageLayerController} from "../controllers/ILayerController";
+import IController from "../controllers/IController";
+import {ApiType, Config, MapType} from "../controllers/Config";
 
 function numberFixed(value: number, digit: number): string {
     return value.toFixed(digit).replace(/(\.?0+)$/, "");

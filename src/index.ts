@@ -1,8 +1,8 @@
-import {IMarkerData} from "~/entities/Response";
-import {ILatLng, ILatLngBounds, LatLng} from "~/entities/LatLng";
-import {IConfig} from "~/controllers/Config";
-import IController from "~/controllers/IController";
-import {MapEventMap} from "~/controllers/MapEventType";
+import {IMarkerData} from "./entities/Response";
+import {ILatLng, ILatLngBounds, LatLng} from "./entities/LatLng";
+import {IConfig} from "./controllers/Config";
+import IController from "./controllers/IController";
+import {MapEventMap} from "./controllers/MapEventType";
 
 export class GeoLocoMap extends IController {
     constructor(config: IConfig) {

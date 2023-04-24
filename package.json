@@ -1,23 +1,31 @@
 {
     "name": "@ueno-bst/geo-loco-map",
-    "version": "2.0.9",
+    "version": "2.0.10",
     "private": false,
     "description": "",
     "author": "biost.co.jp",
     "license": "ISC",
     "type": "module",
-    "main": "./lib/index.js",
-    "types": "./lib/index.d.js",
+    "main": "./cjs/index.js",
+    "types": "./esm/index.d.js",
     "module": "./esm/index.js",
     "scripts": {
         "dev": "vite",
         "build": "vue-tsc && vite build",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "release": "yarn release:cjs && yarn release:mjs",
+        "release:cjs": "tsc --build tsconfig.cjs.json",
+        "release:mjs": "tsc --build tsconfig.esm.json"
     },
     "keywords": [
         "map",
         "google-map",
         "yolp"
+    ],
+    "files": [
+        "cjs",
+        "esm",
+        "src"
     ],
     "repository": {
         "type": "git",
@@ -25,14 +33,7 @@
     },
     "devDependencies": {
         "@googlemaps/js-api-loader": "^1.15.1",
-        "sass": "^1.62.0",
-        "@types/node": "^18.15.11",
-        "@vitejs/plugin-vue": "^4.1.0",
-        "@types/jquery": "^1.10.35",
-        "@babel/types": "^7.21.4",
-        "vue": "^3.2.47",
-        "vite": "^4.2.0",
-        "vue-tsc": "^1.2.0"
+        "@types/node": "^18.15.11"
     },
     "dependencies": {
         "@types/googlemaps": "^3.37.1",

@@ -1,5 +1,5 @@
-import {JsonHelper} from "~/utils/JsonHelper";
-import {ILatLng, ILatLngBounds, LatLng} from "~/entities/LatLng";
+import {JsonHelper} from "../utils/JsonHelper";
+import {ILatLng, ILatLngBounds, LatLng} from "./LatLng";
 
 enum FormatType {
     HTML = "html",

@@ -17,19 +17,10 @@
 //        "resolveJsonModule": true,
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
-        "declaration": true,
-        "declarationMap": true,
+        "declaration": false,
+        "declarationMap": false,
         "baseUrl": ".",
-        "outDir": "./lib",
         "sourceMap": true,
-        "paths": {
-            "~/*": [
-                "src/*"
-            ],
-            "@/*": [
-                "test/*"
-            ]
-        },
         "types": [
             "googlemaps",
             "yahoo"

@@ -1,8 +1,8 @@
-import {ILatLng, ILatLngBounds, LatLng, LatLngBounds} from "~/entities/LatLng";
-import {IMarkerData} from "~/entities/Response";
+import {ILatLng, ILatLngBounds, LatLng, LatLngBounds} from "../entities/LatLng";
+import {IMarkerData} from "../entities/Response";
 import IController from "./IController";
-import {URLBuilder} from "~/utils/URLBuilder";
-import {JsonHelper} from "~/utils/JsonHelper";
+import {URLBuilder} from "../utils/URLBuilder";
+import {JsonHelper} from "../utils/JsonHelper";
 
 export enum MapType {
     GoogleMap = "google",

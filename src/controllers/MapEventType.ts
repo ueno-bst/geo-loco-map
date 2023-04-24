@@ -1,7 +1,7 @@
-import IController from "~/controllers/IController";
-import {ILatLng} from "~/entities/LatLng";
-import {URLBuilder} from "~/utils/URLBuilder";
-import {IMarkerData, IResponse} from "~/entities/Response";
+import IController from "../controllers/IController";
+import {ILatLng} from "../entities/LatLng";
+import {URLBuilder} from "../utils/URLBuilder";
+import {IMarkerData, IResponse} from "../entities/Response";
 
 export enum MapEventType {
     /**
@@ -60,17 +60,17 @@ export interface MapEventListener {
 }
 
 export type MapEventMap = {
-    [MapEventType.INIT]: (ctrl: IController) => void,
-    [MapEventType.CHANGE]: (ctrl: IController) => void,
-    [MapEventType.MOVE]: (ctrl: IController, coordinate: ILatLng) => void,
-    [MapEventType.ZOOM]: (ctrl: IController, zoom: number) => void,
-    [MapEventType.UI]: (ctrl: IController, flag: boolean) => void,
-    [MapEventType.info]: (ctrl: IController, flag: boolean) => void,
-    [MapEventType.API_REQUEST]: (ctrl: IController, url: URLBuilder) => void,
-    [MapEventType.API_RESPONSE]: (ctrl: IController, json: IResponse) => void,
-    [MapEventType.MARKER_ADD]: (ctrl: IController) => void,
-    [MapEventType.MARKER_HIDE]: (ctrl: IController, marker: IMarkerData) => void,
-    [MapEventType.MARKER_SELECT]: (ctrl: IController, refs: string[]) => void,
-    [MapEventType.MARKER_RELEASE]: (ctrl: IController, refs: string[]) => void,
-    [MapEventType.MARKER_HOVER]: (ctrl: IController, refs: string[]) => void,
+    init: (ctrl: IController) => void,
+    change: (ctrl: IController) => void,
+    move: (ctrl: IController, coordinate: ILatLng) => void,
+    zoom: (ctrl: IController, zoom: number) => void,
+    ui: (ctrl: IController, flag: boolean) => void,
+    info: (ctrl: IController, flag: boolean) => void,
+    request: (ctrl: IController, url: URLBuilder) => void,
+    response: (ctrl: IController, json: IResponse) => void,
+    "marker.add": (ctrl: IController) => void,
+    "marker.hide": (ctrl: IController, marker: IMarkerData) => void,
+    "marker.active": (ctrl: IController, refs: string[]) => void,
+    "marker.disable": (ctrl: IController, refs: string[]) => void,
+    "marker.hover": (ctrl: IController, refs: string[]) => void,
 }

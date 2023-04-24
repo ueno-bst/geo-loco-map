@@ -1,9 +1,9 @@
-import {LatLng, LatLngBounds} from "~/entities/LatLng";
+import {LatLng, LatLngBounds} from "../../entities/LatLng";
 import {ILayers, MapController} from "../MapController";
-import {MarkerData} from "~/entities/Response";
+import {MarkerData} from "../../entities/Response";
 import IController from "../IController";
 import {GGridMarkerLayer, GLoadingLayer, GMessageLayer} from "./GLayer";
-import {isNumber} from "~/utils/Types";
+import {isNumber} from "../../utils/Types";
 
 const
     is_number = isNumber;

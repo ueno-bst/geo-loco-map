@@ -1,11 +1,11 @@
-import {Config, IConfig, MapType} from "~/controllers/Config";
-import {GMapController} from "~/controllers/gmap/GMapController";
-import {YMapController} from "~/controllers/ymap/YMapController";
-import {ILatLng, ILatLngBounds} from "~/entities/LatLng";
-import {IMarkerData} from "~/entities/Response";
-import {MapEventListener, MapEventMap, MapEventType} from "~/controllers/MapEventType";
-import {MapController} from "~/controllers/MapController";
-import {IEventTypes} from "~/utils/EventEmitter";
+import {Config, IConfig, MapType} from "./Config";
+import {MapController} from "./MapController";
+import {YMapController} from "./ymap/YMapController";
+import {GMapController} from "./gmap/GMapController";
+import {ILatLng, ILatLngBounds} from "../entities/LatLng";
+import {IMarkerData} from "../entities/Response";
+import {MapEventMap} from "./MapEventType";
+
 
 export default abstract class IController {
 

@@ -1,5 +1,5 @@
-import {GridLayerController, LoadingLayer, MessageLayer} from "~/controllers/Layer";
-import {YFeatureLayerController, YLayerController} from "~/controllers/ymap/YLayerController";
+import {GridLayerController, LoadingLayer, MessageLayer} from "../Layer";
+import {YFeatureLayerController, YLayerController} from "./YLayerController";
 
 
 export class YGridMarkerLayer extends GridLayerController(YFeatureLayerController) {

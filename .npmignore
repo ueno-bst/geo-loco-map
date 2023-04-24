@@ -1,7 +1,5 @@
 .idea
 .npmrc
-test/
 node_modules
 yarn-error.log
 .editorconfig
-vite.config.ts
