@@ -2,6 +2,7 @@ import {IMarkerData} from "~/entities/Response";
 import {ILatLng, ILatLngBounds, LatLng} from "~/entities/LatLng";
 import {IConfig} from "~/controllers/Config";
 import IController from "~/controllers/IController";
+import {MapEventMap} from "~/controllers/MapEventType";
 
 export class GeoLocoMap extends IController {
     constructor(config: IConfig) {
@@ -80,4 +81,14 @@ export class GeoLocoMap extends IController {
             this.config.show_info = flag;
         }
     }
+
+    on<K extends keyof MapEventMap>(event: K, callback: MapEventMap[K]): this {
+        return super.on(event, callback);
+    }
+
+    off<K extends keyof MapEventMap>(event: K, callback: MapEventMap[K]): this {
+        return super.off(event, callback);
+    }
 }
+
+export default GeoLocoMap;

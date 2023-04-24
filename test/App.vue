@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {GeoLocoMap} from "~/GeoLocoMap";
 import {onMounted, reactive, ref} from "vue";
 import {ILatLng, ILatLngBounds} from "~/entities/LatLng";
+import {Loader} from "@googlemaps/js-api-loader";
 
 const
     $map = ref<HTMLElement>(),
@@ -19,105 +19,111 @@ const
 
 onMounted(() => {
     if ($map.value) {
-        let timer: NodeJS.Timeout | undefined;
+        new Loader({
+            apiKey: "AIzaSyDys3l0fXuc1b39XjRGoHdhP24N3Ovg1iI",
+        }).load().then(() => {
+            let timer: NodeJS.Timeout | undefined;
 
-        const map = new GeoLocoMap({
-            map_type: 'google',
-            center: [35.6525164, 139.7366392],
-            // center: [35, 135],
-            zoom: 15,
-            // zoom_min: 1,
-            zoom_max: 20,
-            show_ui: true,
-            show_info: true,
-            selector: $map.value,
-            api: {
-                url: 'http://oshigoto-lab.aldev.designserver.space/rest-api/gis/v1/bounds/item',
-                // url: '/geo-loco-map/src/response.json',
-                user: 'oshigoto-dev',
-                password: 'sMlre20Y3CUO1xMxlejq',
-                precision: 10,
-                type: 'bounds',
-                delay: 500,
-                auto: true
-            },
-            onInit: function (e) {
-                // console.info("onInit", map.controller, e.controller);
-            },
-            onMove: function (obj, coordinate) {
-                console.info("onMove", obj.controller, coordinate.lat, coordinate.lng);
-            },
-            onZoom: function (obj, zoom) {
-                console.info("onZoom", obj.controller, zoom, obj.getBounds().ne, obj.getBounds().sw);
-            },
-            onUI: function (obj, f) {
-                // console.info("onUI", map.controller, obj.controller, f);
-            },
-            onChange: function (obj) {
-                console.info("onChange", obj.controller);
+            import('~/index').then((GeoLocoMap) => {
+                const map = new GeoLocoMap.default({
+                    map_type: 'google',
+                    center: [35.6525164, 139.7366392],
+                    // center: [35, 135],
+                    zoom: 15,
+                    // zoom_min: 1,
+                    zoom_max: 20,
+                    show_ui: true,
+                    show_info: true,
+                    selector: $map.value,
+                    api: {
+                        url: 'http://oshigoto-lab.aldev.designserver.space/rest-api/gis/v1/bounds/item',
+                        // url: '/geo-loco-map/src/response.json',
+                        user: 'oshigoto-dev',
+                        password: 'sMlre20Y3CUO1xMxlejq',
+                        precision: 10,
+                        type: 'bounds',
+                        delay: 500,
+                        auto: true
+                    },
+                    onInit: function (e) {
+                        // console.info("onInit", map.controller, e.controller);
+                    },
+                    onMove: function (obj, coordinate) {
+                        console.info("onMove", obj.controller, coordinate.lat, coordinate.lng);
+                    },
+                    onZoom: function (obj, zoom) {
+                        console.info("onZoom", obj.controller, zoom, obj.getBounds().ne, obj.getBounds().sw);
+                    },
+                    onUI: function (obj, f) {
+                        // console.info("onUI", map.controller, obj.controller, f);
+                    },
+                    onChange: function (obj) {
+                        console.info("onChange", obj.controller);
 
-                center.value = obj.getCenter();
-                bound.value = obj.getBounds();
-                zoom.value = obj.getZoom();
-                ui.value = obj.getUI();
-                info.value = obj.getInfo();
-                autoRequest.value = map.config.api.auto;
+                        center.value = obj.getCenter();
+                        bound.value = obj.getBounds();
+                        zoom.value = obj.getZoom();
+                        ui.value = obj.getUI();
+                        info.value = obj.getInfo();
+                        autoRequest.value = map.config.api.auto;
 
 
-                renderMarkers();
-            }
-        });
-
-        map
-            .on("request", function (o, url) {
-                console.info(url.build());
-            })
-            .on("response", function (o, response) {
-                $("#marker-total").text(response.totalCount || 0);
-            })
-            .on("marker.disable", function (o, ids) {
-                markers.value = [];
-                renderMarkers();
-            })
-            .on("marker.active", function (o, ids) {
-                markers.value = ids;
-                renderMarkers();
-            });
-
-        function renderMarkers() {
-            clearTimeout(timer);
-
-            timer = setTimeout(function () {
-                const
-                    m = markers.value;
-
-                let
-                    i,
-                    data = [];
-
-                if (markers && m.length > 0) {
-                    for (i = 0; i < m.length; i++) {
-                        data.push(map.getMarker(m[i]));
+                        renderMarkers();
                     }
-                } else {
-                    data = map.getViewInMarkers(30);
+                });
+
+                map
+                    .on("request", function (o, url) {
+                        console.info(url.build());
+                    })
+                    .on("response", function (o, response) {
+                        $("#marker-total").text(response.data.length);
+                    })
+                    .on("marker.disable", function (o, ids) {
+                        markers.value = [];
+                        renderMarkers();
+                    })
+                    .on("marker.active", function (o, ids) {
+                        markers.value = ids;
+                        renderMarkers();
+                    });
+
+                function renderMarkers() {
+                    clearTimeout(timer);
+
+                    timer = setTimeout(function () {
+                        const
+                            m = markers.value;
+
+                        let
+                            i,
+                            data = [];
+
+                        if (markers && m.length > 0) {
+                            for (i = 0; i < m.length; i++) {
+                                data.push(map.getMarker(m[i]));
+                            }
+                        } else {
+                            data = map.getViewInMarkers(30);
+                        }
+
+                        /*
+                        const $node = $("<ol>").appendTo($("#markers").empty());
+
+                        for ( i = 0; i < data.length; i ++) {
+                            const datum = data[i];
+
+                            $node.append($("<li>").html(datum.id + ":" + datum.label));
+                        }
+
+                        $("#marker-count").text(data.length);
+                        */
+
+                        count.current = data.length;
+                    }, 200);
                 }
-
-                /*
-                const $node = $("<ol>").appendTo($("#markers").empty());
-
-                for ( i = 0; i < data.length; i ++) {
-                    const datum = data[i];
-
-                    $node.append($("<li>").html(datum.id + ":" + datum.label));
-                }
-
-                $("#marker-count").text(data.length);
-                */
-
-                count.current = data.length;
-            }, 200);
-        }
+            });
+        })
     }
 });
 </script>

@@ -3,7 +3,7 @@ import {GMapController} from "~/controllers/gmap/GMapController";
 import {YMapController} from "~/controllers/ymap/YMapController";
 import {ILatLng, ILatLngBounds} from "~/entities/LatLng";
 import {IMarkerData} from "~/entities/Response";
-import {MapEventListener, MapEventType} from "~/controllers/MapEventType";
+import {MapEventListener, MapEventMap, MapEventType} from "~/controllers/MapEventType";
 import {MapController} from "~/controllers/MapController";
 import {IEventTypes} from "~/utils/EventEmitter";
 
@@ -61,13 +61,13 @@ export default abstract class IController {
 
     public abstract setInfo(flag: boolean): void;
 
-    public on(types: IEventTypes<MapEventType | string>, callback: MapEventListener): this {
-        this.controller.emit.on(types, callback);
+    public on<K extends keyof MapEventMap>(event: K, callback: MapEventMap[K]): this {
+        this.controller.emit.on(event, callback);
         return this;
     }
 
-    public off(types: IEventTypes<MapEventType | string>, callback: MapEventListener): this {
-        this.controller.emit.off(types, callback);
+    public off<K extends keyof MapEventMap>(event: K, callback: MapEventMap[K]): this {
+        this.controller.emit.off(event, callback);
         return this;
     }
 }

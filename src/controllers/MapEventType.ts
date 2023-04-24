@@ -1,4 +1,7 @@
 import IController from "~/controllers/IController";
+import {ILatLng} from "~/entities/LatLng";
+import {URLBuilder} from "~/utils/URLBuilder";
+import {IMarkerData, IResponse} from "~/entities/Response";
 
 export enum MapEventType {
     /**
@@ -54,4 +57,20 @@ export enum MapEventType {
 
 export interface MapEventListener {
     (c: IController, ...args: any[]): void;
+}
+
+export type MapEventMap = {
+    [MapEventType.INIT]: (ctrl: IController) => void,
+    [MapEventType.CHANGE]: (ctrl: IController) => void,
+    [MapEventType.MOVE]: (ctrl: IController, coordinate: ILatLng) => void,
+    [MapEventType.ZOOM]: (ctrl: IController, zoom: number) => void,
+    [MapEventType.UI]: (ctrl: IController, flag: boolean) => void,
+    [MapEventType.info]: (ctrl: IController, flag: boolean) => void,
+    [MapEventType.API_REQUEST]: (ctrl: IController, url: URLBuilder) => void,
+    [MapEventType.API_RESPONSE]: (ctrl: IController, json: IResponse) => void,
+    [MapEventType.MARKER_ADD]: (ctrl: IController) => void,
+    [MapEventType.MARKER_HIDE]: (ctrl: IController, marker: IMarkerData) => void,
+    [MapEventType.MARKER_SELECT]: (ctrl: IController, refs: string[]) => void,
+    [MapEventType.MARKER_RELEASE]: (ctrl: IController, refs: string[]) => void,
+    [MapEventType.MARKER_HOVER]: (ctrl: IController, refs: string[]) => void,
 }

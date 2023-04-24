@@ -1,10 +1,7 @@
 .idea
-node_modules
-test/
 .npmrc
-dist/
-public/
+test/
+node_modules
 yarn-error.log
 .editorconfig
 vite.config.ts
-webpack.config.js

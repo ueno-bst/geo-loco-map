@@ -1,12 +1,14 @@
 {
     "name": "@ueno-bst/geo-loco-map",
-    "version": "2.0.6",
+    "version": "2.0.8",
     "private": false,
     "description": "",
     "author": "biost.co.jp",
     "license": "ISC",
     "type": "module",
-    "main": "index.ts",
+    "main": "./lib/index.js",
+    "types": "./lib/index.d.js",
+    "module": "./esm/index.js",
     "scripts": {
         "dev": "vite",
         "build": "vue-tsc && vite build",
@@ -22,6 +24,7 @@
         "url": "git@github.com:ueno-bst/geo-loco-map.git"
     },
     "devDependencies": {
+        "@googlemaps/js-api-loader": "^1.15.1",
         "sass": "^1.62.0",
         "@types/node": "^18.15.11",
         "@vitejs/plugin-vue": "^4.1.0",
