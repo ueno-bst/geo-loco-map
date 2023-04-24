@@ -230,7 +230,7 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
      * APIの受信処理
      * @param json
      */
-    protected apiResponse(json: IResponse) {
+    protected apiResponse(json: IResponse<any>) {
         const layers = this.layers;
 
         layers.grid.clear();

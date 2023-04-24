@@ -15,17 +15,22 @@ enum ResponseFormat {
     GRID = 'grid',
 }
 
-export interface IResponse {
+type ResponseFormats = {
+    grid: IBoundData[],
+    content: IMarkerData[],
+}
+
+export interface IResponse<T extends keyof ResponseFormats, D = ResponseFormats[T]> {
     datetime: string,
     timestamp: number,
     error: boolean,
     message: string,
-    type: string,
+    type: T,
     format: string,
     zoom: number,
     bounds: ILatLngBounds,
     count: number,
-    data: any,
+    data: D,
 }
 
 export interface IBoundData {
