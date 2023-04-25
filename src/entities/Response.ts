@@ -21,16 +21,24 @@ type ResponseFormats = {
 }
 
 export interface IResponse<T extends keyof ResponseFormats = keyof ResponseFormats, D = ResponseFormats[T]> {
-    datetime: string,
-    timestamp: number,
-    error: boolean,
-    message: string,
-    type: string,
-    format: T,
-    zoom: number,
     bounds: ILatLngBounds,
+    /**
+     * ピン/グリッド数
+     */
     count: number,
     data: D,
+    datetime: string,
+    error: boolean,
+    format: T,
+    message: string,
+    scale: number,
+    timestamp: number,
+    /**
+     * ピン/グリッドに含まれる要素数
+     */
+    totalCount: number,
+    type: string,
+    zoom: number,
 }
 
 export interface IBoundData {
