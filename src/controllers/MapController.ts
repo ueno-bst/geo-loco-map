@@ -230,7 +230,7 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
      * APIの受信処理
      * @param json
      */
-    protected apiResponse(json: IResponse<any>) {
+    protected apiResponse(json: IResponse) {
         const layers = this.layers;
 
         layers.grid.clear();
@@ -252,10 +252,10 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
         if (json.type == 'bounds') {
             switch (json.format) {
                 case 'grid':
-                    layers.grid.addBound(...json.data);
+                    layers.grid.addBound(...json.data as IBoundData[]);
                     break;
                 case 'content':
-                    layers.grid.addMarker(...json.data);
+                    layers.grid.addMarker(...json.data as IMarkerData[]);
                     break;
             }
         } else if (isArray(json.data)) {

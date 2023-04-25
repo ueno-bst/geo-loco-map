@@ -20,13 +20,13 @@ type ResponseFormats = {
     content: IMarkerData[],
 }
 
-export interface IResponse<T extends keyof ResponseFormats, D = ResponseFormats[T]> {
+export interface IResponse<T extends keyof ResponseFormats = keyof ResponseFormats, D = ResponseFormats[T]> {
     datetime: string,
     timestamp: number,
     error: boolean,
     message: string,
-    type: T,
-    format: string,
+    type: string,
+    format: T,
     zoom: number,
     bounds: ILatLngBounds,
     count: number,
