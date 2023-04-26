@@ -2,7 +2,9 @@ name: publish
 on:
   workflow_dispatch:
   push:
-    tags: 
+    branches:
+      - master
+    tags:
       - 'v*'
 jobs:
   convert:
