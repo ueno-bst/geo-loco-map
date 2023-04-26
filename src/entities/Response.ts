@@ -48,6 +48,7 @@ export interface IBoundData {
     label?: string,
     count: number,
     data: any,
+    type: string,
 }
 
 export interface IMarkerData {
