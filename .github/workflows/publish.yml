@@ -23,6 +23,7 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
           scope: '@ueno-bst'
           cache: npm
+      - run: cat .npmrc
       - run: npm ci
       - run: npm run release
       - run: npm publish
