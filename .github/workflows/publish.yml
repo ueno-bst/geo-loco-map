@@ -5,7 +5,7 @@ on:
     tags:
       - 'v*'
 jobs:
-  convert:
+  release:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -16,15 +16,26 @@ jobs:
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v3
-      - name: Npm Publish
+      - name: Setup Node.JS
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
           registry-url: 'https://npm.pkg.github.com'
           scope: '@ueno-bst'
           cache: npm
-      - run: npm ci
-      - run: npm run build
-      - run: npm publish
+      - name: Install Dependencies
+        run: npm ci
+      - name: Generate Codes 
+        run: npm run build
+      - name: Commit and Push Generated code to release Branch
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "t-ueno@bstinc.co.jp"
+          git checkout -b release
+          git add --all
+          git commit -m "Generated code by Github Actions" || exit 0
+          git push -u origin release
+      - name: Publish GitHub Package
+        run: npm publish
