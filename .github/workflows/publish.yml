@@ -4,15 +4,14 @@ on:
   push:
     tags:
       - 'v*'
-permissions:
-    pull-requests: write
-    issues: write
-    repository-projects: write
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      pull-requests: write
+      issues: write
+      repository-projects: write
+      contents: write
       packages: write
     strategy:
       matrix:
