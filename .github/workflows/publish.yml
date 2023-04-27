@@ -40,6 +40,6 @@ jobs:
           git checkout -b release
           git add cjs esm --force
           git commit -m "Generated code by Github Actions" || exit 0
-          git push -u origin release
+          git push -u origin release --force
       - name: Publish GitHub Package
         run: npm publish
