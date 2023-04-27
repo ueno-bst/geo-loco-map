@@ -1,6 +1,8 @@
 name: publish
 on:
+  # GitHub Actions から手動実行を許可
   workflow_dispatch:
+  # Tag がプッシュされた場合に自動実行
   push:
     tags:
       - 'v*'
@@ -13,9 +15,6 @@ jobs:
       repository-projects: write
       contents: write
       packages: write
-    strategy:
-      matrix:
-        node-version: [18.x]
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
