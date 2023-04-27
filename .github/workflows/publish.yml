@@ -34,7 +34,7 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "t-ueno@bstinc.co.jp"
           git checkout -b release
-          git add cjs esm
+          git add cjs esm --force
           git commit -m "Generated code by Github Actions" || exit 0
           git push -u origin release
       - name: Publish GitHub Package
