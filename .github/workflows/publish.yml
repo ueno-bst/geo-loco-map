@@ -27,14 +27,14 @@ jobs:
           cache: npm
       - name: Install Dependencies
         run: npm ci
-      - name: Generate Codes 
+      - name: Generate Codes
         run: npm run build
       - name: Commit and Push Generated code to release Branch
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "t-ueno@bstinc.co.jp"
           git checkout -b release
-          git add --all
+          git add cjs esm
           git commit -m "Generated code by Github Actions" || exit 0
           git push -u origin release
       - name: Publish GitHub Package
