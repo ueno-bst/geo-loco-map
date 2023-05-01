@@ -219,6 +219,7 @@ export abstract class MapController<M extends Object = {}, T extends Object = {}
 
         // API接続開始
         xhr.open("GET", url.build(), true, api.user, api.password);
+        xhr.withCredentials = true;
         xhr.send();
 
         this.layers.load.show();
