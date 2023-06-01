@@ -137,11 +137,7 @@ export default class ElementHelper {
      */
     setStyle(key: string, value: string | null): this {
         const style = this.node.style;
-
-        if (style.hasOwnProperty(key)) {
-            style.setProperty(key, value);
-        }
-
+        style.setProperty(key, value);
         return this;
     }
 
