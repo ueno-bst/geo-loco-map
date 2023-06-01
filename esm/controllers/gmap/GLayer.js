@@ -1,0 +1,11 @@
+import { DebugLayer, GridLayerController, LoadingLayer, MessageLayer } from "../Layer";
+import { GLayerController } from "./GLayerController";
+export class GGridMarkerLayer extends GridLayerController(GLayerController) {
+}
+export class GLoadingLayer extends LoadingLayer(GLayerController) {
+}
+export class GMessageLayer extends MessageLayer(GLayerController) {
+}
+export class GDebugLayer extends DebugLayer(GLayerController) {
+}
+//# sourceMappingURL=GLayer.js.map
